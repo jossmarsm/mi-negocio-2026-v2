@@ -731,10 +731,70 @@ body {
 .refresh-btn{ border-radius: 50%; width: 34px; height: 34px; padding: 0;
   display: inline-flex; align-items: center; justify-content: center; }
 
-/* ---------- Pestañas ---------- */
-.nav-tabs{ padding: 8px 16px; gap: 5px; }
-.nav-tab{ padding: 9px 15px; border-radius: 99px; font-size: 12.5px; font-weight: 600; }
-.nav-tab.active{ font-weight: 700; }
+/* ---------- Armazón: menú lateral + área principal ---------- */
+.app-shell{ display: flex; min-height: 100vh; align-items: stretch; }
+.sidebar{
+  width: 226px; flex-shrink: 0; border-right: 1px solid var(--border);
+  display: flex; flex-direction: column; padding: 16px 12px;
+  position: sticky; top: 0; height: 100vh; overflow-y: auto; background: var(--bg);
+  padding-top: calc(16px + env(safe-area-inset-top,0px));
+}
+.sb-brand{ display: flex; align-items: center; gap: 10px; padding: 2px 8px 16px; }
+.sb-brand .topbar-title{ font-size: 15px; }
+.sb-group{
+  font-size: 9.5px; font-weight: 800; letter-spacing: .09em; text-transform: uppercase;
+  color: var(--text3); padding: 14px 10px 5px;
+}
+.sb-group:first-child{ padding-top: 2px; }
+.app-main{ flex: 1; min-width: 0; display: flex; flex-direction: column; }
+
+/* Las pestañas, ahora verticales */
+.nav-tabs{
+  display: flex; flex-direction: column; gap: 1px; overflow: visible;
+  position: static; padding: 0; border-bottom: none; background: none;
+}
+.nav-tabs::after{ display: none !important; }
+.nav-tab{
+  display: flex; align-items: center; gap: 11px; width: 100%;
+  padding: 10px 11px; border-radius: var(--r-sm); font-size: 13px; font-weight: 500;
+  color: var(--text2); white-space: nowrap; transition: all .16s var(--ease2);
+}
+.nav-tab svg{ width: 17px; height: 17px; flex-shrink: 0; }
+.nav-tab:hover{ background: var(--surface); color: var(--text); }
+.nav-tab.active{ background: #f5f5f7; color: var(--bg); font-weight: 600; }
+#badge-autorizar{
+  margin-left: auto !important; background: var(--red); color: #fff;
+  font-size: 10px; font-weight: 800; border-radius: 99px; padding: 1px 6px;
+}
+.nav-tab.active #badge-autorizar{ background: var(--bg); color: var(--text); }
+
+/* Usuario al pie del menú */
+.sb-user{
+  margin-top: auto; border-radius: var(--r-sm) !important; padding: 9px 10px !important;
+  background: var(--surface); width: 100%; justify-content: flex-start; gap: 9px;
+}
+.sb-out{ width: 15px; height: 15px; margin-left: auto; color: var(--text3); flex-shrink: 0; }
+
+/* La barra superior ahora es la cabecera del área principal */
+.topbar{ position: sticky; top: 0; z-index: 90; }
+.sb-toggle{
+  display: none; background: var(--surface); border: 1px solid var(--border);
+  border-radius: 10px; width: 36px; height: 36px; color: var(--text2);
+  align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; margin-right: 4px;
+}
+.sb-toggle svg{ width: 17px; height: 17px; }
+
+/* En pantallas chicas el menú se esconde y sale sobre el contenido */
+@media (max-width: 860px){
+  .sidebar{
+    position: fixed; left: 0; top: 0; bottom: 0; z-index: 300;
+    transform: translateX(-100%); transition: transform .28s var(--ease2);
+    box-shadow: 0 0 60px rgba(0,0,0,.7);
+  }
+  .sidebar.abierto{ transform: none; }
+  .sb-toggle{ display: flex; }
+  .fab{ bottom: calc(20px + env(safe-area-inset-bottom,0px)); }
+}
 
 /* ---------- Métricas ---------- */
 .metrics{ gap: 11px; padding: 18px 20px 10px; }
@@ -751,6 +811,60 @@ body {
 .racha-banner{ border-radius: var(--r-md); padding: 13px 16px; }
 .racha-emoji{ font-size: 17px; animation: flick2 2.6s ease-in-out infinite; }
 @keyframes flick2{0%,100%{transform:scale(1) rotate(-2deg)}50%{transform:scale(1.12) rotate(3deg)}}
+
+/* ---------- Barra de estado (reemplaza métricas + racha + filtros) ---------- */
+.sbar{
+  background: var(--surface-solid); border: 1px solid var(--border);
+  border-radius: var(--r-md); padding: 16px 18px 14px; margin-bottom: 14px;
+  animation: cardIn2 .45s var(--ease2) both;
+}
+.sbar-top{ display: flex; align-items: center; gap: 12px; margin-bottom: 13px; flex-wrap: wrap; }
+.sbar-n{ font-size: 26px; font-weight: 800; letter-spacing: -.03em; }
+.sbar-l{ font-size: 12.5px; color: var(--text3); margin-left: -4px; }
+.sbar-r{ margin-left: auto; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.flame{
+  display: flex; align-items: center; gap: 7px; padding: 7px 13px; border-radius: 99px;
+  font-size: 12px; font-weight: 600; color: #fbbf24;
+  background: linear-gradient(100deg, rgba(251,146,60,.16), rgba(251,191,36,.06));
+  border: 1px solid rgba(251,146,60,.28);
+}
+.flame b{ color: #fed7aa; font-weight: 800; }
+.flame .fi{ font-size: 14px; animation: flick2 2.6s ease-in-out infinite; }
+.alertchip{
+  display: flex; align-items: center; gap: 7px; padding: 7px 13px; border-radius: 99px;
+  font-size: 12px; font-weight: 600; cursor: pointer;
+  background: var(--red-bg); border: 1px solid rgba(251,113,133,.3); color: var(--red);
+  transition: all .18s var(--ease2);
+}
+.alertchip:hover{ background: rgba(251,113,133,.2); }
+.alertchip.ok{ background: var(--green-bg); border-color: rgba(52,211,153,.28); color: var(--green); }
+.alertchip .cnt{
+  background: var(--red); color: #fff; min-width: 18px; height: 18px; border-radius: 99px;
+  font-size: 10px; font-weight: 800; display: flex; align-items: center; justify-content: center; padding: 0 5px;
+}
+.sbar-track{ display: flex; gap: 3px; height: 10px; margin-bottom: 13px; }
+.sbar-seg{ border-radius: 99px; cursor: pointer; min-width: 6px; transition: all .3s var(--ease2); }
+.sbar-seg:hover{ filter: brightness(1.2); transform: scaleY(1.35); }
+.sbar-seg.dim{ opacity: .28; }
+.sbar-legend{ display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.lg{
+  display: flex; align-items: center; gap: 7px; padding: 7px 13px; border-radius: 99px;
+  font-size: 12px; font-weight: 600; color: var(--text3);
+  background: transparent; border: 1px solid transparent; cursor: pointer;
+  transition: all .16s var(--ease2);
+}
+.lg:hover{ background: var(--surface); color: var(--text2); }
+.lg i{ width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+.lg b{ font-weight: 800; font-variant-numeric: tabular-nums; }
+.lg.on{ background: #f5f5f7; color: var(--bg); }
+.sbar-sep{ width: 1px; height: 20px; background: var(--border); margin: 0 4px; }
+.lgx{
+  padding: 6px 11px; border-radius: 99px; font-size: 11.5px; font-weight: 600;
+  color: var(--text3); background: var(--surface); border: 1px solid transparent;
+  cursor: pointer; transition: all .16s var(--ease2);
+}
+.lgx:hover{ color: var(--text2); background: var(--surface-hover); }
+.lgx.on{ background: var(--violet-bg); border-color: rgba(0,149,246,.35); color: var(--violet); }
 
 /* ---------- Buscador y filtros ---------- */
 .search-wrap input{ border-radius: 99px; padding: 12px 16px 12px 40px; font-size: 13.5px; }
@@ -780,6 +894,25 @@ body {
   transform: translateY(-2px);
   box-shadow: 0 12px 30px -16px rgba(0,149,246,.55);
 }
+/* La tarjeta pasa a dos filas: los datos arriba, el ciclo abajo */
+.cliente-card{ display: block !important; padding: 14px 16px 0 !important; }
+.cc-top{ display: flex; align-items: center; gap: 14px; }
+.cc-foot{
+  display: flex; align-items: center; gap: 11px;
+  margin-top: 12px; padding: 9px 0 11px; border-top: 1px solid var(--border);
+}
+.cyc{ flex: 1; height: 5px; border-radius: 99px; background: var(--surface); overflow: hidden; }
+.cyc.late{ background: rgba(251,113,133,.18); }
+.cyc i{ display: block; height: 100%; border-radius: 99px; transition: width 1s var(--ease2); }
+.cc-days{ font-size: 11px; color: var(--text3); white-space: nowrap; font-variant-numeric: tabular-nums; }
+.cc-days b{ color: var(--text2); font-weight: 600; }
+.cc-debe{
+  font-size: 9.5px; font-weight: 800; letter-spacing: .04em; padding: 3px 8px; border-radius: 99px;
+  background: rgba(167,139,250,.15); color: #a78bfa; flex-shrink: 0;
+}
+/* la altura reservada crece porque ahora hay una fila más */
+.cliente-card{ contain-intrinsic-size: auto 116px; }
+@media (max-width: 600px){ .cliente-card{ contain-intrinsic-size: auto 185px; } }
 .nombre{ font-size: 14.5px; font-weight: 700; letter-spacing: -.01em; }
 .sub{ font-size: 12px; margin-top: 3px; }
 .avatar{ border-radius: 14px; font-size: 13px; }
@@ -878,6 +1011,125 @@ body {
 .tour-card{ border-radius: 18px; }
 .tour-next{ border-radius: 99px; padding: 10px 20px; }
 
+/* ---------- Origen del cliente ---------- */
+.orig-grid{ display: flex; gap: 7px; flex-wrap: wrap; }
+.orig-opt{
+  display: flex; align-items: center; gap: 6px; padding: 9px 13px; border-radius: 12px;
+  background: var(--surface); border: 1px solid var(--border);
+  font-size: 12px; font-weight: 600; color: var(--text3); cursor: pointer;
+  transition: all .16s var(--ease2);
+}
+.orig-opt:hover{ border-color: var(--border-strong); color: var(--text2); }
+.orig-opt:active{ transform: scale(.95); }
+.orig-row{ display: flex; align-items: center; gap: 11px; margin-bottom: 9px; }
+.orig-n{ font-size: 12.5px; font-weight: 600; width: 118px; flex-shrink: 0; }
+.orig-tr{ flex: 1; height: 9px; background: var(--surface); border-radius: 99px; overflow: hidden; }
+.orig-fl{ height: 100%; border-radius: 99px; transition: width .8s var(--ease2); }
+.orig-c{ font-size: 12px; font-weight: 700; width: 26px; text-align: right; font-variant-numeric: tabular-nums; }
+.orig-p{ font-size: 11.5px; color: var(--text3); width: 62px; text-align: right; font-variant-numeric: tabular-nums; }
+
+/* ---------- Buscador global (Ctrl/⌘ + K) ---------- */
+.cmdk{ position: fixed; inset: 0; background: rgba(0,0,0,.62); backdrop-filter: blur(3px);
+  display: none; justify-content: center; padding-top: 90px; z-index: 700; }
+.cmdk.on{ display: flex; }
+.cmdk-box{ width: 520px; max-width: 92%; max-height: 60%; background: var(--surface-solid);
+  border: 1px solid var(--border-strong); border-radius: var(--r-md);
+  display: flex; flex-direction: column; overflow: hidden;
+  box-shadow: 0 30px 70px -18px rgba(0,0,0,.9); animation: cardIn2 .3s var(--ease2) both; }
+.cmdk-in{ display: flex; align-items: center; gap: 11px; padding: 15px 17px; border-bottom: 1px solid var(--border); }
+.cmdk-in svg{ width: 17px; height: 17px; color: var(--text3); flex-shrink: 0; }
+.cmdk-in input{ flex: 1; background: none; border: none; outline: none; color: var(--text); font-size: 15px; }
+.cmdk-in kbd{ font-size: 10px; color: var(--text3); background: var(--surface);
+  border: 1px solid var(--border-strong); border-radius: 4px; padding: 3px 6px; }
+.cmdk-b{ overflow-y: auto; padding: 8px; }
+.cmdk-grp{ font-size: 9.5px; font-weight: 700; color: var(--text3); letter-spacing: .08em;
+  text-transform: uppercase; padding: 9px 10px 5px; }
+.cmdk-i{ display: flex; align-items: center; gap: 11px; padding: 10px 11px;
+  border-radius: var(--r-sm); cursor: pointer; }
+.cmdk-i:hover{ background: var(--surface-hover); }
+.ck-ic{ width: 28px; height: 28px; border-radius: 9px; display: flex; align-items: center;
+  justify-content: center; font-size: 12px; font-weight: 800; flex-shrink: 0; }
+.ck-n{ font-size: 13px; font-weight: 600; }
+.ck-d{ font-size: 11px; color: var(--text3); margin-top: 1px; }
+.ck-go{ margin-left: auto; font-size: 10.5px; color: var(--text3); }
+
+/* ---------- Panel de avisos de salud ---------- */
+.avisos-ov{ position: fixed; inset: 0; background: rgba(0,0,0,.55); z-index: 650;
+  display: none; justify-content: flex-end; }
+.avisos-ov.on{ display: flex; }
+.avisos-panel{ width: 380px; max-width: 100%; background: var(--surface-solid);
+  border-left: 1px solid var(--border-strong); display: flex; flex-direction: column;
+  animation: sliden .3s var(--ease2) both; }
+@keyframes sliden{ from{ transform: translateX(100%); } to{ transform: none; } }
+.avisos-panel .ap-h{ padding: 19px 20px 15px; border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; gap: 11px; flex-shrink: 0; }
+.avisos-panel .ap-t{ font-size: 16px; font-weight: 800; }
+.avisos-panel .ap-s{ font-size: 11.5px; color: var(--text3); margin-top: 2px; }
+.avisos-panel .ap-h .modal-close{ margin-left: auto; }
+.avisos-panel .ap-b{ flex: 1; overflow-y: auto; padding: 14px 18px 18px; }
+.aviso{ border-radius: var(--r-sm); border: 1px solid; padding: 14px 15px; margin-bottom: 9px;
+  animation: cardIn2 .4s var(--ease2) both; }
+.aviso.crit{ background: var(--red-bg); border-color: rgba(251,113,133,.26); }
+.aviso.warn{ background: var(--amber-bg); border-color: rgba(251,191,36,.24); }
+.aviso-h{ display: flex; align-items: center; gap: 9px; margin-bottom: 7px; }
+.aviso-h .ico{ font-size: 16px; }
+.aviso-h .tag{ font-size: 9.5px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase;
+  padding: 3px 8px; border-radius: 99px; }
+.aviso.crit .tag{ background: rgba(251,113,133,.22); color: var(--red); }
+.aviso.warn .tag{ background: rgba(251,191,36,.2); color: var(--amber); }
+.aviso-x{ margin-left: auto; background: none; border: none; color: var(--text3); cursor: pointer;
+  font-size: 13px; width: 22px; height: 22px; border-radius: 50%; }
+.aviso-x:hover{ background: rgba(255,255,255,.09); color: var(--text); }
+.aviso-t{ font-size: 12.5px; line-height: 1.55; color: var(--text2); }
+.aviso-t b{ color: var(--text); font-weight: 700; }
+.aviso-f{ margin-top: 11px; font-size: 11.5px; font-weight: 700; padding: 7px 13px;
+  border-radius: 99px; background: rgba(255,255,255,.08); color: var(--text);
+  border: none; cursor: pointer; }
+.aviso-f:hover{ background: rgba(255,255,255,.15); }
+
+/* ---------- Pestañas internas de la ficha de cliente (verDetalle) ---------- */
+/* La ficha tenía todo apilado y había que hacer scroll para llegar a lo que de
+   verdad se busca (los datos de acceso). Se parte en 4 solapas y se muestra
+   una sola a la vez. */
+.vd-tabs{ display: flex; gap: 4px; background: var(--surface); border: 1px solid var(--border);
+  border-radius: 12px; padding: 4px; margin-bottom: 16px; }
+.vd-tab{ flex: 1; background: none; border: none; color: var(--text3); cursor: pointer;
+  font-family: inherit; font-size: 12px; font-weight: 700; padding: 8px 4px;
+  border-radius: 9px; white-space: nowrap; transition: background .15s, color .15s; }
+.vd-tab:hover{ color: var(--text2); }
+.vd-tab.activo{ background: var(--surface-hover); color: var(--text); }
+.vd-panel{ display: none; }
+.vd-panel.activo{ display: block; }
+
+/* Filas copiables de la solapa Acceso */
+.vd-acc-box{ background: var(--surface); border: 1px solid var(--border); border-radius: 12px;
+  padding: 10px 12px; margin-bottom: 12px; }
+.vd-acc-head{ font-size: 12px; font-weight: 700; color: var(--text2); margin-bottom: 8px;
+  display: flex; align-items: center; gap: 7px; }
+.vd-copia{ display: flex; align-items: center; gap: 10px; cursor: pointer;
+  background: var(--surface-solid); border: 1px solid var(--border); border-radius: 10px;
+  padding: 9px 11px; margin-bottom: 7px; transition: background .18s, border-color .18s; }
+.vd-copia:hover{ border-color: var(--border-strong); }
+.vd-copia-txt{ flex: 1; min-width: 0; }
+.vd-copia-label{ font-size: 10px; font-weight: 800; letter-spacing: .05em; text-transform: uppercase;
+  color: var(--text3); margin-bottom: 2px; }
+.vd-copia-val{ font-size: 13.5px; font-weight: 600; color: var(--text); word-break: break-all; }
+/* La contraseña queda borrosa hasta pasar el mouse: se ve la ficha con alguien
+   al lado sin enseñar la clave sin querer. */
+.vd-copia-val.vd-secreto{ filter: blur(4px); transition: filter .15s; }
+.vd-copia:hover .vd-copia-val.vd-secreto{ filter: none; }
+.vd-copia-ico{ font-size: 14px; color: var(--text3); flex-shrink: 0; }
+.vd-copia.vd-ok{ background: var(--green-bg); border-color: rgba(52,211,153,.45); }
+.vd-copia.vd-ok .vd-copia-val{ filter: none; }
+.vd-copia.vd-ok .vd-copia-ico{ color: var(--green); }
+.vd-copia-flash{ font-size: 11.5px; font-weight: 800; color: var(--green); flex-shrink: 0; }
+
+/* La barra flotante de selección se centra sobre el área de contenido,
+   no sobre toda la ventana (si no queda corrida por el menú lateral). */
+@media (min-width: 861px){
+  #barra-seleccion{ left: calc(50% + 113px); }
+}
+
 /* ---------- Respeta "reducir movimiento" ---------- */
 @media (prefers-reduced-motion: reduce){
   .lista .cliente-card, .cuenta-card, .vendor-card, .mini-stat, .metric, .racha-emoji,
@@ -907,35 +1159,74 @@ body {
   </div>
 </div>
 
-<div class="topbar">
-  <div class="topbar-brand">
+<!-- ============================================================
+     ARMAZÓN: menú lateral + área principal.
+     Las pestañas conservan su clase .nav-tab, su id y su onclick,
+     así que mostrarSeccion() y aplicarPermisosUI() siguen igual.
+     ============================================================ -->
+<div class="app-shell">
+
+<aside class="sidebar" id="sidebar">
+  <div class="sb-brand">
     <div class="topbar-icon">M</div>
     <div>
-      <div class="topbar-title">Cuentas Streaming</div>
+      <div class="topbar-title">Cuentas</div>
       <div class="topbar-sub"><span class="dot"></span><span id="ultima-act">Cargando...</span></div>
     </div>
   </div>
-  <div class="topbar-right">
-    <div class="user-chip" onclick="cerrarSesion()" title="Cerrar sesión">
-      <div class="av" id="user-av">?</div>
-      <span id="user-nombre">—</span>
+
+  <div class="nav-tabs" id="nav-tabs">
+    <div class="sb-group">Día a día</div>
+    <div class="nav-tab active" id="tab-clientes" onclick="mostrarSeccion('clientes', this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><circle cx="12" cy="8" r="3.5"/><path d="M5.2 20c0-3.7 3-6.2 6.8-6.2s6.8 2.5 6.8 6.2"/></svg>Clientes</div>
+    <div class="nav-tab" id="tab-hoy" onclick="mostrarSeccion('hoy', this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M8 3v4M16 3v4M3.5 10h17M9 15l2 2 4-4"/></svg>Tareas de hoy</div>
+    <div class="nav-tab" id="tab-autorizar" onclick="mostrarSeccion('autorizar', this)" style="display:none;">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M9 12.5l2 2 4.5-4.5"/><circle cx="12" cy="12" r="8.5"/></svg>Autorizar<span id="badge-autorizar" style="display:none;">0</span></div>
+
+    <div class="sb-group">Inventario</div>
+    <div class="nav-tab" id="tab-cuentas" onclick="mostrarSeccion('cuentas', this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><rect x="3.5" y="4.5" width="7" height="6" rx="1.6"/><rect x="13.5" y="4.5" width="7" height="6" rx="1.6"/><rect x="3.5" y="13.5" width="7" height="6" rx="1.6"/><rect x="13.5" y="13.5" width="7" height="6" rx="1.6"/></svg>Cuentas</div>
+    <div class="nav-tab" id="tab-catalogo" onclick="mostrarSeccion('catalogo', this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M4 6.5h16M4 12h16M4 17.5h16"/></svg>Catálogo</div>
+
+    <div class="sb-group">Dinero</div>
+    <div class="nav-tab" id="tab-ganancias" onclick="mostrarSeccion('ganancias', this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M4 19V10M10 19V5M16 19v-6M21.5 19h-19"/></svg>Ganancias</div>
+    <div class="nav-tab" id="tab-comprobantes" onclick="mostrarSeccion('comprobantes', this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M5.5 3.5h13v17l-2.2-1.6-2.2 1.6-2.1-1.6-2.2 1.6-2.3-1.6V3.5Z"/><path d="M9 8h6M9 12h6"/></svg>Comprobantes</div>
+    <div class="nav-tab" id="tab-historial" onclick="mostrarSeccion('historial', this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M12 7v5.5l3.5 2"/><path d="M20.5 12a8.5 8.5 0 1 1-8.5-8.5"/><path d="M20.5 4v4h-4"/></svg>Historial</div>
+
+    <div class="sb-group">Sistema</div>
+    <div class="nav-tab" id="tab-config" onclick="mostrarSeccion('config', this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M12 2.5v2M12 19.5v2M21.5 12h-2M4.5 12h-2M18.7 5.3l-1.4 1.4M6.7 17.3l-1.4 1.4M18.7 18.7l-1.4-1.4M6.7 6.7 5.3 5.3"/></svg>Configuración</div>
+  </div>
+
+  <div class="user-chip sb-user" onclick="cerrarSesion()" title="Cerrar sesión">
+    <div class="av" id="user-av">?</div>
+    <span id="user-nombre">—</span>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" class="sb-out"><path d="M15 17v1.5a2 2 0 0 1-2 2H6.5a2 2 0 0 1-2-2v-13a2 2 0 0 1 2-2H13a2 2 0 0 1 2 2V7"/><path d="M19.5 12H9.5m10 0-3-3m3 3-3 3"/></svg>
+  </div>
+</aside>
+
+<div class="app-main">
+
+<div class="topbar">
+  <button class="sb-toggle" onclick="document.getElementById('sidebar').classList.toggle('abierto')" title="Menú">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6.5h16M4 12h16M4 17.5h16"/></svg>
+  </button>
+  <div class="topbar-brand">
+    <div>
+      <div class="topbar-title" id="titulo-seccion">Clientes</div>
+      <div class="topbar-sub" id="sub-seccion">—</div>
     </div>
+  </div>
+  <div class="topbar-right">
     <button class="refresh-btn" id="btn-notif" onclick="abrirNotificaciones()" title="Notificaciones" style="position:relative;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg><span class="notif-badge" id="notif-badge" style="display:none;">0</span></button>
     <button class="refresh-btn" id="btn-ayuda" onclick="iniciarTour(true)" title="Cómo funciona la app"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="vertical-align:-2px;"><circle cx="12" cy="12" r="10"/><path d="M9.1 9a3 3 0 0 1 5.8 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></button>
     <button class="refresh-btn" id="refresh-btn" onclick="recargarVista()">↻</button>
   </div>
-</div>
-
-<div class="nav-tabs" id="nav-tabs">
-  <div class="nav-tab active" id="tab-clientes" onclick="mostrarSeccion('clientes', this)">Clientes</div>
-  <div class="nav-tab" id="tab-hoy" onclick="mostrarSeccion('hoy', this)">Hoy</div>
-  <div class="nav-tab" id="tab-cuentas" onclick="mostrarSeccion('cuentas', this)">Cuentas</div>
-  <div class="nav-tab" id="tab-catalogo" onclick="mostrarSeccion('catalogo', this)">Catálogo</div>
-  <div class="nav-tab" id="tab-ganancias" onclick="mostrarSeccion('ganancias', this)">Ganancias</div>
-  <div class="nav-tab" id="tab-comprobantes" onclick="mostrarSeccion('comprobantes', this)">Comprobantes</div>
-  <div class="nav-tab" id="tab-autorizar" onclick="mostrarSeccion('autorizar', this)" style="display:none;">Autorizar<span id="badge-autorizar" style="display:none;background:var(--red);color:#fff;font-size:10px;font-weight:800;border-radius:99px;padding:1px 6px;margin-left:5px;vertical-align:middle;">0</span></div>
-  <div class="nav-tab" id="tab-historial" onclick="mostrarSeccion('historial', this)">Historial</div>
-  <div class="nav-tab" id="tab-config" onclick="mostrarSeccion('config', this)">Configuración</div>
 </div>
 
 <!-- Franja fija de meta mensual: vive FUERA de las secciones que se
@@ -959,12 +1250,18 @@ body {
 
 <!-- SECCIÓN CLIENTES -->
 <div id="sec-clientes">
-  <div id="racha-container" style="max-width:960px;margin:0 auto;padding:14px 20px 0;"></div>
-  <div class="metrics">
+  <!-- Los conteos siguen existiendo pero ocultos: actualizarMetricas() los
+       escribe igual y otras partes del código los leen. Lo visible ahora es
+       la barra de estado, que además ES el filtro. -->
+  <div class="metrics" style="display:none;">
     <div class="metric"><div class="metric-label">Total</div><div class="metric-value" id="m-total">—</div></div>
     <div class="metric"><div class="metric-label">Activos</div><div class="metric-value green" id="m-activos">—</div></div>
     <div class="metric"><div class="metric-label">Por vencer</div><div class="metric-value amber" id="m-proximos">—</div></div>
     <div class="metric"><div class="metric-label">Vencidos</div><div class="metric-value red" id="m-vencidos">—</div></div>
+  </div>
+  <div id="racha-container" style="display:none;"></div>
+  <div class="content" style="padding-top:16px;padding-bottom:0;">
+    <div class="sbar" id="sbar"></div>
   </div>
   <div class="content">
     <div id="alerta-container"></div>
@@ -981,7 +1278,10 @@ body {
         <option value="ganancia">💰 Mayor ganancia</option>
       </select>
     </div>
-    <div class="filters" id="filtros-clientes">
+    <!-- Los filtros viven ahora dentro de la barra de estado (#sbar). Estos
+         quedan ocultos porque setFiltro() y restaurarFiltroGuardado() marcan
+         el botón activo a través de ellos. -->
+    <div class="filters" id="filtros-clientes" style="display:none;">
       <button class="f-btn active" onclick="setFiltro('todos',this)">Todos</button>
       <button class="f-btn" onclick="setFiltro('activo',this)">Activos</button>
       <button class="f-btn" onclick="setFiltro('proximo',this)">Por vencer</button>
@@ -1123,6 +1423,9 @@ body {
   </div>
 </div>
 
+</div><!-- /.app-main -->
+</div><!-- /.app-shell -->
+
 <button class="fab" id="fab-nuevo" onclick="abrirModalNuevo()" title="Agregar cliente">+</button>
 
 <!-- MODAL NUEVO CLIENTE -->
@@ -1237,6 +1540,13 @@ body {
         <div class="ganancia-label" style="color:var(--amber);">Comisión vendedor</div>
         <div style="font-family:'Space Grotesk';font-size:17px;color:var(--amber);font-weight:700;" id="g-com">$0</div>
       </div>
+    </div>
+    <!-- De dónde llegó: alimenta la estadística de canales en Ganancias.
+         Se manda como data.origen; si no se elige nada, el servidor guarda 'otro'. -->
+    <div class="form-group">
+      <label class="form-label">¿De dónde llegó?</label>
+      <div class="orig-grid" id="n-origen-grid"></div>
+      <input type="hidden" id="n-origen" value="">
     </div>
     <div class="form-group">
       <label class="form-label">Nota (opcional)</label>
@@ -2102,12 +2412,35 @@ function abrirWhatsAppBienvenida(datos) {
   window.open(urlWhatsApp_(datos.contacto, mensajeBienvenida(datos)), '_blank');
 }
 
+// Título y bajada de cada sección, para la cabecera del área principal.
+const TITULOS_SECCION = {
+  clientes:     ['Clientes',       'tu cartera completa'],
+  hoy:          ['Tareas de hoy',  'a quién contactar hoy'],
+  autorizar:    ['Autorizar',      'cambios de vendedores esperando tu OK'],
+  cuentas:      ['Cuentas',        'tu inventario de streaming'],
+  catalogo:     ['Catálogo',       'paquetes, precios y comisiones'],
+  ganancias:    ['Ganancias',      'a dónde se fue cada peso'],
+  comprobantes: ['Comprobantes',   'archivos guardados en tu Drive'],
+  historial:    ['Historial',      'quién hizo qué y cuándo'],
+  config:       ['Configuración',  'ajustes del negocio'],
+};
+
 function mostrarSeccion(sec, btn) {
   seccionActual = sec;
   document.querySelectorAll('[id^="sec-"]').forEach(s=>s.classList.add('section-hidden'));
   document.getElementById('sec-'+sec).classList.remove('section-hidden');
   document.querySelectorAll('.nav-tab').forEach(b=>b.classList.remove('active'));
   if (btn) btn.classList.add('active');
+  // Cabecera: nombre de la sección + una bajada corta.
+  const t = TITULOS_SECCION[sec];
+  const elT = document.getElementById('titulo-seccion');
+  const elS = document.getElementById('sub-seccion');
+  if (t && elT) elT.textContent = t[0];
+  if (t && elS) elS.textContent = t[1];
+  // En móvil el menú sale por encima: al elegir, se cierra solo.
+  const sb = document.getElementById('sidebar');
+  if (sb) sb.classList.remove('abierto');
+  window.scrollTo({top:0, behavior:'smooth'});
   // Cada sección usa lo que ya tenga en memoria si está cargado (instantáneo).
   // La primera vez sí descarga; después, navegar entre pestañas es inmediato.
   if (sec==='hoy') renderTareasHoy();
@@ -2615,6 +2948,9 @@ function cargarDatos() {
           // dispositivo que descuadraban el conteo y la vista de ganancias.
           estado_raw: (f['estado'] || 'ACTIVO').toUpperCase(),
           notas:f['notas']||'',
+          // Canal por el que llegó. Los clientes viejos no tienen el dato:
+          // se leen como 'otro' para que la estadística no se rompa.
+          origen: (f['origen']||'otro').toLowerCase(),
           meses: Math.max(1, parseInt(f['meses'])||1),
           congeladoHasta: f['congelado_hasta']||'',
           // Última vez que se le avisó para renovar ("dd/mm/aaaa hh:mm").
@@ -2657,7 +2993,88 @@ function actualizarMetricas() {
   document.title = numVencidos > 0 ? '(' + numVencidos + ') Cuentas Streaming' : 'Cuentas Streaming';
 
   renderRacha(activos, numVencidos);
+  renderSbar();
   actualizarNotificaciones();
+}
+
+// ===== Barra de estado de Clientes =====
+// Un solo elemento en lugar de las 4 cajas + la racha + la fila de filtros.
+// La barra de colores ES el filtro: cada tramo y cada etiqueta filtran la lista.
+function renderSbar() {
+  const cont = document.getElementById('sbar');
+  if (!cont) return;
+  const activos    = todosClientes.filter(c => c.estado_raw !== 'ARCHIVADO');
+  const archivados = todosClientes.filter(c => c.estado_raw === 'ARCHIVADO').length;
+  const alDia   = activos.filter(c => c.estado === 'activo').length;
+  const proximo = activos.filter(c => c.estado === 'proximo').length;
+  const vencido = activos.filter(c => c.estado === 'vencido').length;
+  const deben   = activos.filter(c => (c.pago||'').toUpperCase() === 'PENDIENTE').length;
+  const porAvisar = activos.filter(faltaAvisar_).length;
+  const mias    = activos.filter(c => (c.vendedor||'').toLowerCase() === 'yo').length;
+  const total   = activos.length || 1;
+
+  // Momentum de la semana, lo que antes contaba el banner de racha.
+  const hoy = new Date(); hoy.setHours(0,0,0,0);
+  const hace7 = new Date(hoy); hace7.setDate(hace7.getDate()-7);
+  const nuevosSemana = activos.filter(c => {
+    const f = parseFecha(c.inicio);
+    return f && f >= hace7 && f <= hoy;
+  }).length;
+
+  const seg = (k, n, color) => n
+    ? `<div class="sbar-seg${filtroActual!=='todos'&&filtroActual!==k?' dim':''}" data-f="${k}" title="${n}" style="width:${n/total*100}%;background:${color}"></div>`
+    : '';
+  const lg = (k, n, color, txt) =>
+    `<button class="lg${filtroActual===k?' on':''}" data-f="${k}">${color?`<i style="background:${color}"></i>`:''}${txt} <b>${n}</b></button>`;
+  const lgx = (k, txt) =>
+    `<button class="lgx${filtroActual===k?' on':''}" data-f="${k}">${txt}</button>`;
+
+  cont.innerHTML = `
+    <div class="sbar-top">
+      <div class="sbar-n">${activos.length}</div>
+      <div class="sbar-l">cliente${activos.length!==1?'s':''} activo${activos.length!==1?'s':''}</div>
+      <div class="sbar-r">
+        ${nuevosSemana ? `<div class="flame"><span class="fi">🔥</span><b>${nuevosSemana}</b> nuevo${nuevosSemana!==1?'s':''} esta semana</div>` : ''}
+        ${(() => {
+          const nAvisos = (typeof chequeosSalud === 'function')
+            ? chequeosSalud().filter(h => !avisosOcultos.includes(h.txt)).length : 0;
+          return nAvisos
+            ? `<button class="alertchip" onclick="abrirAvisos()">⚠️ Revisá esto <span class="cnt">${nAvisos}</span></button>`
+            : `<button class="alertchip ok" onclick="abrirAvisos()">✓ Todo en orden</button>`;
+        })()}
+      </div>
+    </div>
+    <div class="sbar-track">
+      ${seg('activo', alDia, 'var(--green)')}
+      ${seg('proximo', proximo, 'var(--amber)')}
+      ${seg('vencido', vencido, 'var(--red)')}
+    </div>
+    <div class="sbar-legend">
+      ${lg('todos', activos.length, '', 'Todos')}
+      ${lg('activo', alDia, 'var(--green)', 'Al día')}
+      ${lg('proximo', proximo, 'var(--amber)', 'Por vencer')}
+      ${lg('vencido', vencido, 'var(--red)', 'Vencidos')}
+      <div class="sbar-sep"></div>
+      ${lgx('poravisar', '📣 Por avisar '+porAvisar)}
+      ${lgx('debe', '💵 Deben '+deben)}
+      ${MI_ROL==='admin' ? lgx('yo', 'Mis ventas '+mias) : ''}
+      ${lgx('archivado', '🗂 Archivados '+archivados)}
+    </div>`;
+
+  cont.querySelectorAll('[data-f]').forEach(b => {
+    b.addEventListener('click', () => filtrarDesdeBarra(b.getAttribute('data-f')));
+  });
+}
+
+// Puente entre la barra y el filtro de siempre: busca el botón oculto que
+// corresponde para que setFiltro() y restaurarFiltroGuardado() sigan intactos.
+function filtrarDesdeBarra(f) {
+  let btn = null;
+  document.querySelectorAll('#filtros-clientes .f-btn').forEach(b => {
+    if ((b.getAttribute('onclick')||'').includes("setFiltro('"+f+"'")) btn = b;
+  });
+  setFiltro(f, btn);
+  renderSbar();
 }
 
 // ===== Centro de notificaciones =====
@@ -3091,7 +3508,22 @@ function filtrar() {
     const idArg = esc(JSON.stringify(c.id));
     const accion = modoSeleccion ? `toggleSeleccion(${idArg})` : `verDetalle(${idArg})`;
     const avisadoHoy = contactadoHoy_(c);
+    // Barra del ciclo: qué tanto lleva consumido del periodo que pagó.
+    // Con ventas de varios meses el periodo es más largo, así que se mide
+    // sobre meses*30 y no sobre 30 fijos.
+    const totalDias = Math.max(1, (parseInt(c.meses)||1) * 30);
+    const transcurrido = c.dias === null ? 0
+      : Math.max(0, Math.min(100, Math.round((totalDias - c.dias) / totalDias * 100)));
+    const colorCiclo = c.estado==='vencido' ? 'var(--red)'
+      : c.estado==='proximo' ? 'var(--amber)'
+      : c.estado==='activo' ? 'var(--green)' : 'var(--border-strong)';
+    const textoDias = c.dias === null ? 'sin fecha'
+      : c.dias < 0 ? `<b>${Math.abs(c.dias)} días</b> vencido`
+      : c.dias === 0 ? '<b>vence hoy</b>'
+      : `quedan <b>${c.dias} días</b>`;
+
     return `<div class="cliente-card${modoSeleccion&&sel?' card-sel':''}" style="${esArchivado?'opacity:0.55;':''}" onclick="${accion}">
+      <div class="cc-top">
       ${modoSeleccion ? `<div class="sel-check${sel?' on':''}">${sel?'✓':''}</div>` : ''}
       ${barraPlataformas_(c.paquete)}
       ${esArchivado ? `<div class="avatar" style="background:var(--surface);color:var(--text3);">${iniciales(c.cliente)}</div>` : anilloHTML(c.estado, c.dias)}
@@ -3105,6 +3537,12 @@ function filtrar() {
         ${esArchivado && c.fechaArchivado ? `<div style="font-size:10px;color:var(--text3);margin-top:4px;white-space:nowrap;">🗂 ${esc(String(c.fechaArchivado).split(' ')[0])}</div>` : ''}
       </div>
       ${!esArchivado && !modoSeleccion && c.contacto ? `<div class="wa-hit" onclick="abrirWhatsApp(${idArg},event)" title="${avisadoHoy?'Ya le avisaste hoy — toca para escribirle otra vez':(esClienteReciente(c)?'Enviar bienvenida':'Escribir por WhatsApp')}"><div class="wa-btn wa-lista${avisadoHoy?' contactado':''}">${esClienteReciente(c)?'🎉':'💬'}</div></div>` : ''}
+      </div>
+      ${esArchivado ? '' : `<div class="cc-foot">
+        <div class="cyc${c.estado==='vencido'?' late':''}"><i style="width:${c.estado==='vencido'?100:transcurrido}%;background:${colorCiclo}"></i></div>
+        <div class="cc-days">${textoDias}</div>
+        ${c.pago && c.pago.toUpperCase()==='PENDIENTE' ? '<span class="cc-debe">DEBE</span>' : ''}
+      </div>`}
     </div>`;
   }).join('');
 }
@@ -3333,9 +3771,65 @@ function verDetalle(id) {
     </div>`;
   }
 
+  // ===== Solapa "Acceso": los datos con los que el cliente entra =====
+  // c.cuenta guarda el NOMBRE de la cuenta, pero puede venir con texto extra
+  // (sufijos, número de slot) y con varias cuentas separadas por coma, así que
+  // el cruce con todasCuentas se hace por coincidencia tolerante, no exacta.
+  const cuentasDelCliente = (() => {
+    const crudo = (c.cuenta||'').trim();
+    if (!crudo) return [];
+    const norm = s => String(s||'').toLowerCase().replace(/\s+/g,' ').trim();
+    const encontradas = [];
+    crudo.split(',').forEach(trozo => {
+      const t = norm(trozo);
+      if (!t) return;
+      // Primero coincidencia exacta; si no, la cuenta cuyo nombre esté contenido
+      // en el trozo (o al revés). Se queda con el nombre más largo para no
+      // confundir "Netflix 1" con "Netflix 10".
+      let mejor = todasCuentas.find(x => norm(x.nombre) === t);
+      if (!mejor) {
+        const cands = todasCuentas.filter(x => x.nombre && (t.includes(norm(x.nombre)) || norm(x.nombre).includes(t)));
+        cands.sort((a,b) => String(b.nombre).length - String(a.nombre).length);
+        mejor = cands[0];
+      }
+      if (mejor && !encontradas.includes(mejor)) encontradas.push(mejor);
+    });
+    return encontradas;
+  })();
+  // Fila copiable genérica: el dato viaja por el onclick ya serializado, igual
+  // que en las tarjetas de cuentas, para no romperse con comillas raras.
+  const filaCopia = (label, valor, secreto) => {
+    if (!valor) return '';
+    return `<div class="vd-copia" onclick="vdCopiarFila_(this, ${esc(JSON.stringify(String(valor)))})">
+      <div class="vd-copia-txt">
+        <div class="vd-copia-label">${esc(label)}</div>
+        <div class="vd-copia-val${secreto?' vd-secreto':''}">${esc(valor)}</div>
+      </div>
+      <div class="vd-copia-ico">📋</div>
+    </div>`;
+  };
+  let accesoHTML = '';
+  if (cuentasDelCliente.length) {
+    accesoHTML = cuentasDelCliente.map(cu => `
+      <div class="vd-acc-box">
+        <div class="vd-acc-head">${esc(cu.plataforma||'Cuenta')} · <span style="color:var(--text);">${esc(cu.nombre)}</span>${cu.slotsTotal?`<span style="margin-left:auto;font-size:11px;color:var(--text3);font-weight:600;">${esc(String(cu.slotsTotal))} lugares</span>`:''}</div>
+        ${filaCopia('Correo', cu.correo, false) || '<div style="font-size:12px;color:var(--text3);padding:4px 0;">Sin correo guardado</div>'}
+        ${filaCopia('Contraseña · pasa el mouse para verla', cu.contrasena, true) || '<div style="font-size:12px;color:var(--text3);padding:4px 0;">Sin contraseña guardada</div>'}
+      </div>`).join('');
+  } else {
+    accesoHTML = `<div style="background:var(--amber-bg);border:1px solid rgba(251,191,36,0.35);border-radius:12px;padding:11px 14px;margin-bottom:12px;font-size:13px;color:var(--amber);">
+      ⚠️ <strong>Sin cuenta asignada</strong>
+      <div style="font-size:12px;color:var(--text2);margin-top:3px;">${c.cuenta ? 'La ficha dice “'+esc(c.cuenta)+'”, pero no coincide con ninguna cuenta cargada.' : 'Este cliente no está en ninguna cuenta, así que no hay datos de acceso que darle.'}</div>
+    </div>`;
+  }
+  accesoHTML += `<div class="vd-acc-box">
+      <div class="vd-acc-head">Contacto del cliente</div>
+      ${filaCopia('Teléfono', c.contacto, false) || '<div style="font-size:12px;color:var(--text3);padding:4px 0;">Sin teléfono cargado</div>'}
+    </div>`;
+
   document.getElementById('d-titulo').textContent=c.cliente;
   document.getElementById('d-contenido').innerHTML=`
-    <div style="display:flex;align-items:center;gap:14px;margin-bottom:20px;">
+    <div style="display:flex;align-items:center;gap:14px;margin-bottom:16px;">
       <div class="avatar" style="width:52px;height:52px;font-size:18px;background:${col.bg};color:${col.color};">${iniciales(c.cliente)}</div>
       <div style="flex:1;">
         <div style="font-size:16px;font-weight:700;font-family:'Space Grotesk';">${esc(c.cliente)}</div>
@@ -3344,23 +3838,23 @@ function verDetalle(id) {
       </div>
       ${c.contacto ? `<div class="wa-btn" style="width:38px;height:38px;font-size:16px;" onclick="abrirWhatsApp('${c.id}',event)" title="${esClienteReciente(c)?'Enviar bienvenida':'WhatsApp'}">${esClienteReciente(c)?'🎉':'💬'}</div>` : ''}
     </div>
+    <div class="vd-tabs">
+      <button type="button" class="vd-tab activo" onclick="vdTab_(this,'vd-p-resumen')">Resumen</button>
+      <button type="button" class="vd-tab" onclick="vdTab_(this,'vd-p-acceso')">🔑 Acceso</button>
+      <button type="button" class="vd-tab" onclick="vdTab_(this,'vd-p-dinero')">Dinero</button>
+      <button type="button" class="vd-tab" onclick="vdTab_(this,'vd-p-historial')">Historial</button>
+    </div>
+
+    <div class="vd-panel activo" id="vd-p-resumen">
     <div class="detalle-grid">
       <div><div class="detalle-label">Paquete</div><div class="detalle-value">${esc(c.paquete||'—')}${c.meses>1?` <span style="font-size:11px;color:var(--violet2);font-weight:700;">📆 ${c.meses}m</span>`:''}</div></div>
-      <div><div class="detalle-label">Precio</div><div class="detalle-value">${c.precio?'$'+esc(c.precio):'—'}</div></div>
+      <div><div class="detalle-label">Duración</div><div class="detalle-value">${mesesDet} mes${mesesDet!==1?'es':''}</div></div>
       <div><div class="detalle-label">Cuenta</div><div class="detalle-value" style="font-size:12px;">${esc(c.cuenta||'—')}</div></div>
       <div><div class="detalle-label">Vendedor</div><div class="detalle-value">${esc(c.vendedor||'—')}</div></div>
       <div><div class="detalle-label">Inicio</div><div class="detalle-value">${c.inicio||'—'}</div></div>
       <div><div class="detalle-label">Renovación</div><div class="detalle-value">${c.renovacion||'—'}</div></div>
       <div><div class="detalle-label">Pago</div><div class="detalle-value" style="${(c.pago||'').toUpperCase()==='PENDIENTE'?'color:var(--red);font-weight:700;':''}">${c.pago||'—'}</div></div>
-      ${MI_ROL==='admin'
-        ? `<div><div class="detalle-label">Tu ganancia</div><div class="detalle-value" style="color:var(--green);font-weight:700;">${ganancia>0?'$'+ganancia.toFixed(2):'—'}</div></div>
-           ${esVendedor ? `<div><div class="detalle-label">Comisión ${c.vendedor} (${pctVendedor}%)</div><div class="detalle-value" style="color:var(--amber);font-weight:700;">${comisionVend>0?'$'+comisionVend.toFixed(2):'—'}</div></div><div></div>` : ''}`
-        : `<div><div class="detalle-label">Tu comisión</div><div class="detalle-value" style="color:var(--green);font-weight:700;">${comisionVend>0?'$'+comisionVend.toFixed(2):'—'}</div></div>`
-      }
     </div>
-    ${repartoHTML}
-    ${historialHTML}
-    ${comprobantesHTML}
     ${c.estado_raw==='ARCHIVADO' ? `
       <div style="background:var(--surface);border:1px solid var(--border-strong);border-radius:12px;padding:12px 14px;margin-bottom:12px;font-size:13px;">
         <div style="font-weight:700;color:var(--text2);margin-bottom:6px;">🗂 Cliente archivado${c.fechaArchivado?` · ${esc(c.fechaArchivado)}`:''}</div>
@@ -3398,7 +3892,30 @@ function verDetalle(id) {
       return `<div style="background:var(--amber-bg);border:1px solid rgba(251,191,36,0.35);border-radius:12px;padding:11px 14px;margin-bottom:12px;font-size:13px;color:var(--amber);">⏳ <strong>${pend.length} cambio${pend.length!==1?'s':''} esperando autorización</strong><div style="font-size:12px;color:var(--text2);margin-top:3px;">${pend.map(s=>esc(s.resumen)).join('<br>')}</div></div>`;
     })()}
     ${clientePrecioProtegido_(c, false) ? `<div style="background:var(--blue-bg);border:1px solid rgba(96,165,250,0.35);border-radius:12px;padding:11px 14px;margin-bottom:12px;font-size:13px;color:var(--blue);">🔒 Precio protegido hasta ${esc(c.congeladoHasta)} — el aumento de precio aún no le aplica.</div>` : ''}
-    ${c.notas ? `<div style="background:var(--amber-bg);border:1px solid rgba(251,191,36,0.3);border-radius:12px;padding:11px 14px;margin-bottom:12px;font-size:13px;color:var(--amber);">📝 <strong>Nota:</strong> ${esc(c.notas)}</div>` : ''}`;
+    ${c.notas ? `<div style="background:var(--amber-bg);border:1px solid rgba(251,191,36,0.3);border-radius:12px;padding:11px 14px;margin-bottom:12px;font-size:13px;color:var(--amber);">📝 <strong>Nota:</strong> ${esc(c.notas)}</div>` : ''}
+    </div>
+
+    <div class="vd-panel" id="vd-p-acceso">
+      <div style="font-size:12px;color:var(--text3);margin-bottom:10px;line-height:1.5;">Con estos datos entra el cliente. Toca cualquier fila para copiarla.</div>
+      ${accesoHTML}
+    </div>
+
+    <div class="vd-panel" id="vd-p-dinero">
+      <div class="detalle-grid">
+        <div><div class="detalle-label">Precio</div><div class="detalle-value">${c.precio?'$'+esc(c.precio):'—'}</div></div>
+        ${MI_ROL==='admin'
+          ? `<div><div class="detalle-label">Tu ganancia</div><div class="detalle-value" style="color:var(--green);font-weight:700;">${ganancia>0?'$'+ganancia.toFixed(2):'—'}</div></div>
+             ${esVendedor ? `<div><div class="detalle-label">Comisión ${esc(c.vendedor)} (${pctVendedor}%)</div><div class="detalle-value" style="color:var(--amber);font-weight:700;">${comisionVend>0?'$'+comisionVend.toFixed(2):'—'}</div></div>` : ''}`
+          : `<div><div class="detalle-label">Tu comisión</div><div class="detalle-value" style="color:var(--green);font-weight:700;">${comisionVend>0?'$'+comisionVend.toFixed(2):'—'}</div></div>`
+        }
+      </div>
+      ${repartoHTML}
+    </div>
+
+    <div class="vd-panel" id="vd-p-historial">
+      ${historialHTML || '<div style="font-size:13px;color:var(--text3);margin-bottom:10px;">Todavía no hay ciclos registrados para este cliente.</div>'}
+      ${comprobantesHTML}
+    </div>`;
   const esArchivado = c.estado_raw==='ARCHIVADO';
   document.getElementById('d-contenido').innerHTML += esArchivado ? `
     <button onclick="reactivarCliente('${c.id}')" class="btn-secondary green" style="margin-top:4px;">✅ Reactivar cliente</button>` : `
@@ -3427,6 +3944,46 @@ function verDetalle(id) {
     cargarLedger().then(() => {
       if (ledgerCargado && detalleAbiertoId === id && document.getElementById('modal-detalle').classList.contains('open')) verDetalle(id);
     });
+  }
+}
+
+// ===== Pestañas internas de la ficha de cliente =====
+// Solo cambian qué panel se ve; no se vuelve a pintar nada, así que el estado
+// de los desplegables (historial, comprobantes) se conserva al ir y volver.
+function vdTab_(btn, panelId) {
+  const cont = document.getElementById('d-contenido');
+  if (!cont) return;
+  cont.querySelectorAll('.vd-tab').forEach(b => b.classList.remove('activo'));
+  cont.querySelectorAll('.vd-panel').forEach(p => p.classList.remove('activo'));
+  btn.classList.add('activo');
+  const panel = document.getElementById(panelId);
+  if (panel) panel.classList.add('activo');
+}
+
+// Copia el dato de una fila de la solapa Acceso y avisa en la fila misma: el
+// toast solo se ve arriba y aquí se copian varios datos seguidos, así que la
+// confirmación tiene que quedar donde está el dedo.
+function vdCopiarFila_(fila, texto) {
+  const ok = () => {
+    fila.classList.add('vd-ok');
+    if (!fila.querySelector('.vd-copia-flash')) {
+      const marca = document.createElement('div');
+      marca.className = 'vd-copia-flash';
+      marca.textContent = 'copiado ✓';
+      fila.appendChild(marca);
+    }
+    // Se limpia sola: si el usuario copia otra fila, cada una lleva su tiempo.
+    clearTimeout(fila._vdTimer);
+    fila._vdTimer = setTimeout(() => {
+      fila.classList.remove('vd-ok');
+      const m = fila.querySelector('.vd-copia-flash');
+      if (m) m.remove();
+    }, 1400);
+  };
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(texto).then(ok).catch(() => { copiarFallback_(texto) ? ok() : toast('No se pudo copiar', 'error'); });
+  } else {
+    copiarFallback_(texto) ? ok() : toast('No se pudo copiar', 'error');
   }
 }
 
@@ -3480,9 +4037,17 @@ function abrirModalNuevo() {
   // Si quedaron ventas a medias, se retoma la última tal cual en vez de
   // empezar con el formulario vacío; arriba salen todas para saltar entre ellas.
   const draft = leerBorradorNuevo_();
-  if (draft) { restaurarBorradorNuevo_(draft); return; }
+  if (draft) {
+    restaurarBorradorNuevo_(draft);
+    // El borrador puede traer canal guardado; se refleja en los botones.
+    const inpO = document.getElementById('n-origen');
+    if (inpO) inpO.value = draft.origen || '';
+    pintarSelectorOrigen_();
+    return;
+  }
   reiniciarFormNuevo_();
   pintarListaBorradores_();
+  pintarSelectorOrigen_();
 }
 
 function reiniciarFormNuevo_() {
@@ -3563,6 +4128,7 @@ function guardarBorradorNuevo_() {
       cliente: v('n-cliente'), contacto: v('n-contacto'), paquete: v('n-paquete'),
       meses: v('n-meses'), inicio: v('n-inicio'), vendedor: v('n-vendedor'),
       pago: v('n-pago'), notas: v('n-notas'), correo: v('n-correo'),
+      origen: v('n-origen'),
       cuentas: Array.from(document.querySelectorAll('.n-cuenta-plat')).map(s=>s.value).filter(Boolean),
       opId: nuevoClienteOpId, t: Date.now()
     };
@@ -4197,6 +4763,8 @@ async function guardarCliente() {
     meses:fm.meses,
     notas:document.getElementById('n-notas').value.trim(),
     correo:(document.getElementById('n-correo').value||'').trim(),
+    // Canal por el que llegó. Si no se eligió ninguno el servidor guarda 'otro'.
+    origen:(document.getElementById('n-origen')||{}).value||'',
     opId:nuevoClienteOpId,
     key:APP_KEY
   };
@@ -4977,6 +5545,8 @@ function renderGanancias() {
   </div>`;
 
   document.getElementById('ganancias-content').innerHTML = heroHTML;
+  // Estadística de canales: va al final, y solo si hay algo que contar.
+  if (typeof inyectarOrigenesEnGanancias_ === 'function') inyectarOrigenesEnGanancias_();
 }
 
 // Tarjeta individual de vendedor: mini-anillo de su propio avance + detalle colapsable.
@@ -6989,6 +7559,290 @@ window.addEventListener('resize', () => {
 // HTML. Si no existe el archivo, simplemente no pasa nada.
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => { navigator.serviceWorker.register('sw.js').catch(()=>{}); });
+}
+
+/* ============================================================
+   ===== AÑADIDOS ago-2026 ====================================
+   Bloque independiente: solo agrega funciones nuevas, no toca
+   ninguna existente. Borrándolo, la app sigue igual.
+   ============================================================ */
+
+/* ===== 1. Buscador global (Ctrl/⌘ + K) ===== */
+const CK_SECCIONES = [
+  ['clientes','👥','Clientes'], ['hoy','📋','Tareas de hoy'], ['autorizar','✋','Autorizar'],
+  ['cuentas','🔑','Cuentas'], ['catalogo','📦','Catálogo'], ['ganancias','💰','Ganancias'],
+  ['comprobantes','📎','Comprobantes'], ['historial','🕘','Historial'], ['config','⚙️','Configuración'],
+];
+
+function abrirCmdk() {
+  let ov = document.getElementById('cmdk');
+  if (!ov) {
+    ov = document.createElement('div');
+    ov.id = 'cmdk'; ov.className = 'cmdk';
+    ov.innerHTML =
+      '<div class="cmdk-box">' +
+        '<div class="cmdk-in">' +
+          '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.4-3.4"/></svg>' +
+          '<input id="ck-in" placeholder="Buscar cliente, cuenta o sección…" autocomplete="off"><kbd>esc</kbd>' +
+        '</div><div class="cmdk-b" id="ck-b"></div></div>';
+    document.body.appendChild(ov);
+    ov.addEventListener('click', e => { if (e.target === ov) cerrarCmdk(); });
+    document.getElementById('ck-in').addEventListener('input', e => ckBuscar(e.target.value));
+    document.getElementById('ck-in').addEventListener('keydown', e => {
+      if (e.key === 'Enter') { const f = document.querySelector('#ck-b .cmdk-i'); if (f) f.click(); }
+    });
+  }
+  ov.classList.add('on');
+  const inp = document.getElementById('ck-in');
+  inp.value = ''; ckBuscar('');
+  setTimeout(() => inp.focus(), 50);
+}
+function cerrarCmdk() { const o = document.getElementById('cmdk'); if (o) o.classList.remove('on'); }
+
+function ckBuscar(q) {
+  q = (q||'').trim().toLowerCase();
+  const b = document.getElementById('ck-b');
+  let html = '';
+  const grupo = (titulo, filas) => filas.length
+    ? '<div class="cmdk-grp">'+titulo+'</div>' + filas.join('') : '';
+  const fila = (color, ini, nombre, detalle, accion) =>
+    `<div class="cmdk-i" data-go="${esc(accion)}"><div class="ck-ic" style="background:${color}">${ini}</div>` +
+    `<div><div class="ck-n">${esc(nombre)}</div><div class="ck-d">${esc(detalle)}</div></div><span class="ck-go">↵</span></div>`;
+
+  const secs = CK_SECCIONES
+    .filter(s => !q || s[2].toLowerCase().includes(q))
+    .filter(s => MI_ROL === 'admin' || ['clientes','hoy','cuentas','catalogo','ganancias','comprobantes'].includes(s[0]))
+    .slice(0, q ? 4 : 9)
+    .map(s => fila('var(--surface-hover)', s[1], s[2], 'sección', 'sec:'+s[0]));
+  html += grupo('Ir a', secs);
+
+  if (q) {
+    const cli = todosClientes
+      .filter(c => ((c.cliente||'')+' '+(c.id||'')+' '+(c.contacto||'')+' '+(c.paquete||'')).toLowerCase().includes(q))
+      .slice(0, 6)
+      .map(c => { const col = colorAvatar(c.cliente);
+        return fila(col.bg, iniciales(c.cliente), c.cliente,
+          (c.paquete||'Sin paquete') + ' · ' + (c.estado_raw==='ARCHIVADO' ? 'archivado' : c.estado),
+          'cli:'+c.id); });
+    html += grupo('Clientes', cli);
+
+    if (cuentasCargadas) {
+      const cue = todasCuentas
+        .filter(a => ((a.nombre||'')+' '+(a.correo||'')+' '+(a.plataforma||'')).toLowerCase().includes(q))
+        .slice(0, 4)
+        .map(a => fila('var(--surface-hover)', (PLAT_ICONS[a.plataforma]||'📦'), a.nombre,
+          (a.correo||'') , 'sec:cuentas'));
+      html += grupo('Cuentas', cue);
+    }
+  }
+  b.innerHTML = html || '<div class="cmdk-grp">Sin resultados para “'+esc(q)+'”</div>';
+  b.querySelectorAll('[data-go]').forEach(el => {
+    el.addEventListener('click', () => {
+      const v = el.getAttribute('data-go');
+      cerrarCmdk();
+      if (v.startsWith('sec:')) irASeccion(v.slice(4));
+      else { irASeccion('clientes'); setTimeout(() => verDetalle(v.slice(4)), 120); }
+    });
+  });
+}
+
+document.addEventListener('keydown', e => {
+  if ((e.ctrlKey || e.metaKey) && (e.key === 'k' || e.key === 'K')) { e.preventDefault(); abrirCmdk(); return; }
+  if (e.key === 'Escape') cerrarCmdk();
+});
+
+/* ===== 2. Avisos de salud del negocio =====
+   Problemas que cuestan plata y no se ven solos. Se calculan de lo que
+   ya está cargado; no piden nada al servidor. */
+function chequeosSalud() {
+  const out = [];
+  if (MI_ROL !== 'admin') return out;
+  const vivos = todosClientes.filter(c => c.estado_raw !== 'ARCHIVADO');
+
+  // a) Clientes sin cuenta asignada: pagan pero no sabés dónde están.
+  const huerfanos = vivos.filter(c => !(c.cuenta||'').trim());
+  if (huerfanos.length) out.push({ t:'warn', ico:'🔌',
+    txt:`<b>${huerfanos.length} cliente${huerfanos.length!==1?'s':''}</b> sin cuenta asignada: ` +
+        huerfanos.slice(0,3).map(c=>esc(c.cliente)).join(', ') +
+        (huerfanos.length>3?` y ${huerfanos.length-3} más`:'') + '. No sabés en qué pantalla están.',
+    fix:'Ver', go:()=>irAClientesFiltro('todos') });
+
+  // b) Mismo teléfono en dos clientes: casi siempre es un duplicado.
+  const vistos = {}, dup = [];
+  vivos.forEach(c => {
+    const k = telDigitos_(c.contacto||'');
+    if (!k) return;
+    if (vistos[k] && dup.length < 3) dup.push([vistos[k], c.cliente]);
+    else vistos[k] = c.cliente;
+  });
+  dup.forEach(par => out.push({ t:'warn', ico:'👥',
+    txt:`Mismo teléfono en <b>${esc(par[0])}</b> y <b>${esc(par[1])}</b>. Puede ser un registro duplicado.`,
+    fix:'Revisar', go:()=>irAClientesFiltro('todos') }));
+
+  // c) Tu cuenta se llena: sin lugar no podés vender más de esa plataforma.
+  if (cuentasCargadas && todasCuentas.length) {
+    const llenas = todasCuentas.filter(a => {
+      const reales = a.slots.slice(0, a.slotsTotal);
+      const occ = reales.filter(s => s && s !== 'x' && s !== 'X').length;
+      const blq = reales.filter(s => s === 'x' || s === 'X').length;
+      return a.slotsTotal - occ - blq <= 0;
+    });
+    if (llenas.length) out.push({ t:'crit', ico:'📉',
+      txt:`<b>${llenas.length} cuenta${llenas.length!==1?'s':''} llena${llenas.length!==1?'s':''}</b> ` +
+          `(${llenas.slice(0,3).map(a=>esc(a.nombre)).join(', ')}). Cada venta que llega de esa plataforma la estás perdiendo.`,
+      fix:'Ver cuentas', go:()=>irASeccion('cuentas') });
+  }
+
+  // d) Vencidos que además deben: es plata ya entregada sin cobrar.
+  const debenVencidos = vivos.filter(c => c.estado==='vencido' && (c.pago||'').toUpperCase()==='PENDIENTE');
+  if (debenVencidos.length) {
+    const monto = debenVencidos.reduce((s,c)=>s+(parseFloat(c.precio)||0),0);
+    out.push({ t:'crit', ico:'⏰',
+      txt:`<b>${debenVencidos.length} cliente${debenVencidos.length!==1?'s':''}</b> vencido${debenVencidos.length!==1?'s':''} y sin pagar — ` +
+          `$${monto.toLocaleString('es-MX',{maximumFractionDigits:0})} que ya usaron y no cobraste.`,
+      fix:'Cobrar', go:()=>irAClientesFiltro('debe') });
+  }
+  return out;
+}
+
+let avisosOcultos = [];
+function abrirAvisos() {
+  const lista = chequeosSalud().filter(h => !avisosOcultos.includes(h.txt));
+  let ov = document.getElementById('avisos-ov');
+  if (!ov) {
+    ov = document.createElement('div');
+    ov.id = 'avisos-ov'; ov.className = 'avisos-ov';
+    ov.innerHTML = '<div class="avisos-panel"><div class="ap-h"><div><div class="ap-t">Revisá esto</div>' +
+      '<div class="ap-s" id="ap-sub">—</div></div><button class="modal-close" onclick="cerrarAvisos()">✕</button></div>' +
+      '<div class="ap-b" id="ap-b"></div></div>';
+    document.body.appendChild(ov);
+    ov.addEventListener('click', e => { if (e.target === ov) cerrarAvisos(); });
+  }
+  document.getElementById('ap-sub').textContent = lista.length
+    ? lista.length + ' cosa' + (lista.length!==1?'s':'') + ' que te pueden costar plata'
+    : 'Nada pendiente por ahora';
+  const b = document.getElementById('ap-b');
+  b.innerHTML = lista.length ? '' :
+    '<div class="empty"><div class="empty-icon">✅</div><div class="empty-title">Todo en orden</div>' +
+    '<div class="empty-sub">No hay clientes sueltos, ni cuentas llenas, ni vencidos sin cobrar.</div></div>';
+  lista.forEach(h => {
+    const d = document.createElement('div');
+    d.className = 'aviso ' + h.t;
+    d.innerHTML = '<div class="aviso-h"><span class="ico">'+h.ico+'</span>' +
+      '<span class="tag">'+(h.t==='crit'?'Urgente':'Revisar')+'</span>' +
+      '<button class="aviso-x" title="Ocultar">✕</button></div>' +
+      '<div class="aviso-t">'+h.txt+'</div>' +
+      '<button class="aviso-f">'+h.fix+' →</button>';
+    d.querySelector('.aviso-f').addEventListener('click', () => { cerrarAvisos(); h.go(); });
+    d.querySelector('.aviso-x').addEventListener('click', () => {
+      avisosOcultos.push(h.txt); abrirAvisos(); renderSbar();
+      toast('Aviso oculto — vuelve si el problema sigue');
+    });
+    b.appendChild(d);
+  });
+  ov.classList.add('on');
+}
+function cerrarAvisos() { const o = document.getElementById('avisos-ov'); if (o) o.classList.remove('on'); }
+
+/* ===== 3. Origen del cliente =====
+   De dónde llegó cada quien. Los identificadores deben coincidir exactamente
+   con ORIGENES_VALIDOS_ del backend (Code.gs). */
+const ORIGENES = {
+  whatsapp:   { n:'WhatsApp',   ic:'💬', c:'#25d366' },
+  instagram:  { n:'Instagram',  ic:'📸', c:'#e1306c' },
+  facebook:   { n:'Facebook',   ic:'👥', c:'#1877f2' },
+  tiktok:     { n:'TikTok',     ic:'🎵', c:'#ff2d55' },
+  anuncio:    { n:'Anuncio',    ic:'📢', c:'#fbbf24' },
+  referido:   { n:'Referido',   ic:'🤝', c:'#34d399' },
+  presencial: { n:'En persona', ic:'🏠', c:'#a78bfa' },
+  otro:       { n:'Otro',       ic:'❓', c:'#6e6e78' },
+};
+
+// Pinta los botones de canal dentro del modal de alta y deja el elegido
+// en el input oculto #n-origen, que es lo que lee guardarCliente().
+function pintarSelectorOrigen_() {
+  const grid = document.getElementById('n-origen-grid');
+  if (!grid) return;
+  const actual = (document.getElementById('n-origen')||{}).value || '';
+  grid.innerHTML = Object.keys(ORIGENES).map(k => {
+    const o = ORIGENES[k];
+    const on = k === actual;
+    return `<button type="button" class="orig-opt${on?' on':''}" data-o="${k}"` +
+      (on ? ` style="background:${o.c}22;border-color:${o.c}66;color:var(--text);"` : '') +
+      `>${o.ic} ${o.n}</button>`;
+  }).join('');
+  grid.querySelectorAll('.orig-opt').forEach(b => {
+    b.addEventListener('click', () => {
+      const k = b.getAttribute('data-o');
+      const inp = document.getElementById('n-origen');
+      // Volver a tocar el mismo lo deselecciona (queda 'otro' al guardar).
+      inp.value = (inp.value === k) ? '' : k;
+      pintarSelectorOrigen_();
+      if (typeof guardarBorradorNuevo_ === 'function') guardarBorradorNuevo_();
+    });
+  });
+}
+
+// Bloque "De dónde vienen tus clientes" para la pantalla de Ganancias.
+// Devuelve HTML; si no hay datos útiles devuelve cadena vacía.
+function bloqueOrigenesHTML_() {
+  if (MI_ROL !== 'admin') return '';
+  const vivos = todosClientes.filter(c => c.estado_raw !== 'ARCHIVADO');
+  if (!vivos.length) return '';
+  const por = {};
+  vivos.forEach(c => {
+    const k = ORIGENES[c.origen] ? c.origen : 'otro';
+    if (!por[k]) por[k] = { n:0, plata:0 };
+    por[k].n++;
+    // Precio por mes: una venta de 3 meses no vale el triple que una mensual
+    // a la hora de comparar canales.
+    por[k].plata += (parseFloat(c.precio)||0) / Math.max(1, parseInt(c.meses)||1);
+  });
+  const arr = Object.keys(por).map(k => ({ k, ...por[k] })).sort((a,b) => b.n - a.n);
+  // Si TODO cayó en 'otro' es que aún no se ha capturado el dato: mejor
+  // explicarlo que mostrar una barra sola que no dice nada.
+  if (arr.length === 1 && arr[0].k === 'otro') {
+    return `<div class="mini-stat" style="margin-top:14px;">
+      <div class="lbl">📊 De dónde vienen tus clientes</div>
+      <div style="font-size:12.5px;color:var(--text2);margin-top:8px;line-height:1.5;">
+        Todavía no hay datos. A partir de ahora, al dar de alta un cliente vas a poder
+        marcar por dónde llegó (WhatsApp, Instagram, un anuncio, un referido…) y acá
+        vas a ver qué canal te trae más ventas.</div></div>`;
+  }
+  const max = arr[0].n || 1;
+  const total = vivos.length;
+  const mejor = arr[0];
+  const filas = arr.map(o => {
+    const org = ORIGENES[o.k] || ORIGENES.otro;
+    return `<div class="orig-row">
+      <div class="orig-n">${org.ic} ${org.n}</div>
+      <div class="orig-tr"><div class="orig-fl" style="width:${(o.n/max*100).toFixed(1)}%;background:${org.c}"></div></div>
+      <div class="orig-c">${o.n}</div>
+      <div class="orig-p">$${o.plata.toLocaleString('es-MX',{maximumFractionDigits:0})}</div>
+    </div>`;
+  }).join('');
+  const org = ORIGENES[mejor.k] || ORIGENES.otro;
+  return `<div class="mini-stat" style="margin-top:14px;">
+    <div class="lbl">📊 De dónde vienen tus clientes</div>
+    <div style="margin-top:12px;">${filas}</div>
+    <div style="font-size:11.5px;color:var(--text3);margin-top:12px;padding-top:11px;border-top:1px solid var(--border);line-height:1.5;">
+      💡 <b style="color:${org.c}">${org.n}</b> es tu mejor canal: ${mejor.n} de tus ${total} clientes
+      (${Math.round(mejor.n/total*100)}%) y $${mejor.plata.toLocaleString('es-MX',{maximumFractionDigits:0})} al mes.</div>
+  </div>`;
+}
+
+// Inyecta el bloque de canales al final de Ganancias, después de que
+// renderGanancias haya pintado su contenido. Se llama solo, observando.
+function inyectarOrigenesEnGanancias_() {
+  const cont = document.getElementById('ganancias-content');
+  if (!cont || !cont.querySelector('.earn-wrap')) return;
+  if (cont.querySelector('#bloque-origenes')) return;   // ya está
+  const html = bloqueOrigenesHTML_();
+  if (!html) return;
+  const wrap = document.createElement('div');
+  wrap.id = 'bloque-origenes';
+  wrap.innerHTML = html;
+  cont.querySelector('.earn-wrap').appendChild(wrap);
 }
 
 </script>
