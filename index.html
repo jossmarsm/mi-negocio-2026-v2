@@ -895,8 +895,26 @@ body {
   box-shadow: 0 12px 30px -16px rgba(0,149,246,.55);
 }
 /* La tarjeta pasa a dos filas: los datos arriba, el ciclo abajo */
-.cliente-card{ display: block !important; padding: 14px 16px 0 !important; }
-.cc-top{ display: flex; align-items: center; gap: 14px; }
+.cliente-card{ display: block !important; padding: 13px 15px 0 !important; }
+.cc-top{ display: flex; align-items: center; gap: 13px; }
+/* Anillo con el avatar de color adentro */
+.ring-wrap.ring-av{ width: 46px; height: 46px; }
+.ring-wrap.ring-av svg{ width: 46px; height: 46px; }
+.ring-cara{
+  position: absolute; inset: 5px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12.5px; font-weight: 700; letter-spacing: -.01em;
+}
+/* Punto del color de cada plataforma, antes del nombre del paquete */
+.cc-dot{ display: inline-block; width: 6px; height: 6px; border-radius: 2px; margin-right: 5px; vertical-align: middle; }
+.cc-precio{ font-size: 16.5px; font-weight: 800; letter-spacing: -.02em; white-space: nowrap; }
+.cc-deja{ font-size: 11px; color: var(--green); font-weight: 600; margin-top: 2px; white-space: nowrap; }
+.cc-vend{ display: flex; align-items: center; gap: 5px; font-size: 10.5px; color: var(--text3); white-space: nowrap; }
+.cc-vend i{
+  width: 17px; height: 17px; border-radius: 50%; font-style: normal;
+  font-size: 8px; font-weight: 800; display: flex; align-items: center; justify-content: center;
+}
+.derecha{ text-align: right; flex-shrink: 0; }
 .cc-foot{
   display: flex; align-items: center; gap: 11px;
   margin-top: 12px; padding: 9px 0 11px; border-top: 1px solid var(--border);
@@ -1010,6 +1028,294 @@ body {
 /* ---------- Tour ---------- */
 .tour-card{ border-radius: 18px; }
 .tour-next{ border-radius: 99px; padding: 10px 20px; }
+
+/* ---------- Cuentas: grilla de tarjetas (rediseño Nova) ---------- */
+/* Prefijo ca- para no chocar con las clases viejas .cuenta-* que siguen
+   usándose en el detalle desplegable (correo, clave, slots, acciones). */
+.ca-grupo{ margin: 0 0 22px; }
+.ca-grupo-head{ display:flex; align-items:center; gap:9px; margin:0 0 10px; }
+.ca-grupo-dot{ width:12px; height:12px; border-radius:4px; flex-shrink:0; }
+.ca-grupo-nom{ font-size:13px; font-weight:700; color:var(--text); letter-spacing:-.01em; }
+.ca-grupo-meta{ margin-left:auto; font-size:11.5px; color:var(--text3); font-weight:600; }
+.ca-grid{ display:grid; grid-template-columns:1fr 1fr; gap:12px; align-items:start; }
+@media (max-width: 760px){ .ca-grid{ grid-template-columns:1fr; } }
+/* La tarjeta reusa .cuenta-card (borde, hover, avisos de llena/casi) pero
+   dentro de la grilla el margen inferior sobra: lo pone el gap. */
+.ca-card{ margin-bottom:0; }
+.ca-head{ position:relative; display:flex; align-items:center; gap:10px; padding:12px 13px; cursor:pointer; overflow:hidden; }
+/* El degradado del color de plataforma va en un ::after a baja opacidad para
+   que el texto de arriba mantenga contraste sin recalcular colores. */
+.ca-head::after{ content:""; position:absolute; inset:0; background:var(--ca-grad); opacity:.16; pointer-events:none; }
+.ca-head > *{ position:relative; z-index:1; }
+.ca-ini{ width:32px; height:32px; border-radius:9px; display:flex; align-items:center; justify-content:center;
+  font-size:14px; font-weight:800; color:#fff; flex-shrink:0; }
+.ca-nom{ font-size:13px; font-weight:700; color:var(--text); line-height:1.2; word-break:break-word; }
+.ca-sub{ font-size:11px; color:var(--text3); margin-top:2px; }
+.ca-pill{ flex-shrink:0; font-size:10px; font-weight:800; padding:3px 9px; border-radius:99px;
+  text-transform:uppercase; letter-spacing:.04em; background:var(--surface); color:var(--text2); border:1px solid var(--border); }
+.ca-pill.amber{ background:var(--amber-bg); color:var(--amber); border-color:rgba(251,191,36,.3); }
+.ca-pill.red{ background:var(--red-bg); color:var(--red); border-color:rgba(251,113,133,.3); }
+.ca-copy{ flex-shrink:0; width:30px; height:30px; border-radius:9px; background:var(--surface);
+  border:1px solid var(--border-strong); color:var(--text2); font-size:14px; line-height:1; cursor:pointer; }
+.ca-slots{ display:flex; gap:6px; padding:0 13px 12px; }
+.ca-slot{ flex:1; min-width:0; height:32px; border-radius:7px; display:flex; align-items:center; justify-content:center;
+  font-size:10.5px; font-weight:700; padding:0 5px; overflow:hidden; white-space:nowrap; text-overflow:ellipsis; }
+.ca-slot.ocupado{ background:var(--surface-hover); color:var(--text2); }
+.ca-slot.libre{ border:1px dashed var(--border-strong); color:var(--text3); font-weight:600; }
+.ca-slot.bloq{ background:rgba(255,255,255,.03); color:var(--text3); }
+.ca-pie{ display:flex; justify-content:space-between; gap:10px; padding:9px 13px;
+  border-top:1px solid var(--border); font-size:11px; color:var(--text3); }
+.ca-pie span{ overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+
+/* ---------- Catálogo: grilla de tarjetas (rediseño Nova) ---------- */
+.ct-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:12px; align-items:start; }
+@media (max-width: 1100px){ .ct-grid{ grid-template-columns:1fr 1fr; } }
+@media (max-width: 700px){ .ct-grid{ grid-template-columns:1fr; } }
+.ct-card{ position:relative; margin-bottom:0; padding:14px 15px; }
+.ct-icons{ display:flex; gap:5px; flex-wrap:wrap; margin-bottom:10px; }
+.ct-ico{ width:26px; height:26px; border-radius:8px; display:flex; align-items:center; justify-content:center;
+  font-size:12px; font-weight:800; color:#fff; flex-shrink:0; }
+.ct-nom{ font-size:13.5px; font-weight:700; color:var(--text); line-height:1.25; word-break:break-word; padding-right:64px; }
+.ct-sub{ font-size:11px; color:var(--text3); margin-top:3px; }
+.ct-sep{ height:1px; background:var(--border); margin:11px 0 8px; }
+.ct-fila{ display:flex; align-items:baseline; justify-content:space-between; gap:8px; padding:3px 0; }
+.ct-lbl{ font-size:11px; color:var(--text3); }
+.ct-val{ font-family:'Space Grotesk'; font-size:13px; font-weight:700; color:var(--text); white-space:nowrap; }
+.ct-val.grande{ font-size:19px; }
+.ct-val.verde{ color:var(--green); }
+.ct-permes{ font-size:10.5px; color:var(--text3); font-weight:600; }
+.ct-disp{ display:flex; align-items:center; gap:6px; margin-top:11px; font-size:11.5px; font-weight:600; color:var(--text2); }
+.ct-dot{ width:7px; height:7px; border-radius:50%; flex-shrink:0; }
+/* Cinta esquinada arriba a la derecha; el nombre reserva su espacio con padding. */
+.ct-cinta{ position:absolute; top:0; right:0; font-size:9px; font-weight:800; letter-spacing:.06em;
+  background:var(--amber-bg); color:var(--amber); padding:4px 9px; border-radius:0 var(--radius-md) 0 10px; }
+
+/* ---------- Historial: diario agrupado por día (rediseño Nova) ---------- */
+/* El historial se lee como un diario: un encabezado por día con el resumen de
+   lo que pasó, y debajo cada movimiento contado en una frase. */
+.hi-dia{ display:flex; align-items:baseline; gap:9px; flex-wrap:wrap; margin:20px 0 7px; }
+.hi-dia-t{ font-size:12px; font-weight:800; color:var(--text); text-transform:uppercase; letter-spacing:.06em; }
+.hi-dia-r{ font-size:11.5px; color:var(--text3); }
+.hi-lista{ display:flex; flex-direction:column; }
+.hi-fila{ display:flex; align-items:flex-start; gap:11px; padding:9px 11px; border-radius:12px;
+  transition:background .14s var(--ease2); }
+.hi-fila.hi-click{ cursor:pointer; }
+.hi-fila.hi-click:hover{ background:var(--surface-hover); }
+/* Cuadrado redondeado de 36px: el color de fondo dice de un vistazo qué tipo
+   de movimiento fue (alta, renovación, pago, baja...). */
+.hi-ico{ width:36px; height:36px; border-radius:11px; flex-shrink:0;
+  display:flex; align-items:center; justify-content:center; font-size:16px; line-height:1; }
+.hi-txt{ flex:1; min-width:0; }
+.hi-frase{ font-size:13px; color:var(--text); line-height:1.35; word-break:break-word; }
+.hi-frase b{ font-weight:700; color:var(--text); }
+.hi-det{ font-size:11.5px; color:var(--text3); margin-top:2px; line-height:1.35; word-break:break-word; }
+.hi-der{ flex-shrink:0; text-align:right; padding-left:4px; }
+.hi-monto{ font-family:'Space Grotesk'; font-size:13.5px; font-weight:700; color:var(--text); white-space:nowrap; }
+.hi-quien{ display:flex; align-items:center; justify-content:flex-end; gap:5px;
+  margin-top:3px; font-size:10.5px; color:var(--text3); white-space:nowrap; }
+.hi-av{ width:16px; height:16px; border-radius:50%; flex-shrink:0;
+  display:flex; align-items:center; justify-content:center; font-size:7.5px; font-weight:800; }
+.hi-pie{ font-size:11.5px; color:var(--text3); text-align:center; margin-top:14px; }
+@media (max-width:560px){
+  .hi-fila{ padding:9px 4px; gap:9px; }
+  .hi-ico{ width:32px; height:32px; border-radius:10px; font-size:15px; }
+}
+
+/* ---------- Tareas de hoy: agrupadas por urgencia (rediseño Nova) ---------- */
+.tk-bloque{ margin-bottom:20px; }
+.tk-head{ display:flex; align-items:center; gap:9px; margin-bottom:9px; }
+.tk-dot{ width:8px; height:8px; border-radius:50%; flex-shrink:0; }
+.tk-tit{ font-size:12.5px; font-weight:800; color:var(--text); }
+.tk-cont{ font-size:10.5px; font-weight:700; color:var(--text2); background:var(--surface);
+  border:1px solid var(--border); padding:2px 9px; border-radius:99px; white-space:nowrap; }
+/* El enlace de aviso masivo va pegado a la derecha del encabezado. */
+.tk-avisar{ margin-left:auto; font-size:12px; font-weight:700; color:var(--blue);
+  cursor:pointer; white-space:nowrap; }
+.tk-avisar:hover{ text-decoration:underline; }
+.tk-lista{ display:flex; flex-direction:column; gap:6px; }
+.tk-fila{ display:flex; align-items:center; gap:11px; padding:10px 13px;
+  background:var(--surface-solid); border:1px solid var(--border); border-radius:var(--radius-md);
+  cursor:pointer; transition:border-color .14s var(--ease2); }
+.tk-fila:hover{ border-color:var(--border-strong); }
+/* Fila atenuada = ya le avisaste hoy. */
+.tk-fila.tk-hecha{ opacity:.55; }
+.tk-av{ width:38px; height:38px; border-radius:50%; flex-shrink:0;
+  display:flex; align-items:center; justify-content:center; font-size:13px; font-weight:800; }
+.tk-info{ flex:1; min-width:0; }
+.tk-nom{ font-size:13.5px; font-weight:700; color:var(--text);
+  display:flex; align-items:center; gap:6px; flex-wrap:wrap; line-height:1.25; }
+.tk-debe{ font-size:9.5px; font-weight:800; color:var(--red); background:var(--red-bg);
+  padding:2px 7px; border-radius:99px; letter-spacing:.03em; }
+.tk-ok{ font-size:9.5px; font-weight:800; color:var(--green); background:var(--green-bg);
+  padding:2px 7px; border-radius:99px; }
+.tk-sub{ font-size:11.5px; color:var(--text3); margin-top:3px; line-height:1.35; word-break:break-word; }
+.tk-monto{ font-family:'Space Grotesk'; font-size:14px; font-weight:700; color:var(--text); white-space:nowrap; }
+@media (max-width:560px){
+  .tk-fila{ padding:10px; gap:9px; }
+  .tk-av{ width:34px; height:34px; font-size:12px; }
+}
+
+/* ---------- Comprobantes: grilla de miniaturas (rediseño Nova) ---------- */
+.cp-grid{ display:grid; grid-template-columns:repeat(4,1fr); gap:12px; align-items:start; }
+@media (max-width:1100px){ .cp-grid{ grid-template-columns:repeat(3,1fr); } }
+@media (max-width:700px){ .cp-grid{ grid-template-columns:repeat(2,1fr); } }
+.cp-card{ display:block; text-decoration:none; color:inherit; overflow:hidden;
+  background:var(--surface-solid); border:1px solid var(--border); border-radius:var(--radius-md);
+  transition:border-color .14s var(--ease2), transform .14s var(--ease2); }
+.cp-card:hover{ border-color:var(--border-strong); transform:translateY(-2px); }
+/* Zona de imagen: patrón diagonal tenue de fondo para que se lea como
+   "espacio de foto" incluso cuando la miniatura de Drive no carga. */
+.cp-thumb{ position:relative; height:94px; display:flex; flex-direction:column;
+  align-items:center; justify-content:center; gap:3px; background:var(--surface);
+  background-image:repeating-linear-gradient(45deg,
+    rgba(255,255,255,.028) 0 7px, transparent 7px 14px); }
+.cp-thumb img{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
+.cp-ph-ico{ font-size:20px; opacity:.45; line-height:1; }
+.cp-ph-txt{ font-size:9px; color:var(--text3); letter-spacing:.02em; }
+.cp-chip{ position:absolute; top:7px; right:7px; z-index:2; font-size:9px; font-weight:800;
+  padding:3px 8px; border-radius:99px; letter-spacing:.03em; }
+.cp-chip.ok{ background:var(--green-bg); color:var(--green); }
+.cp-chip.pend{ background:var(--amber-bg); color:var(--amber); }
+.cp-chip.no{ background:var(--red-bg); color:var(--red); }
+.cp-body{ padding:9px 11px 11px; }
+.cp-nom{ font-size:12.5px; font-weight:700; color:var(--text); line-height:1.25; word-break:break-word; }
+.cp-meta{ font-size:10.5px; color:var(--text3); margin-top:3px; line-height:1.3; word-break:break-word; }
+.cp-monto{ font-family:'Space Grotesk'; font-size:13px; font-weight:700; color:var(--green); margin-top:6px; }
+
+/* ---------- Ganancias (gn-) ----------
+   Todo esto es SOLO presentación: no hay un cálculo de dinero aquí. La idea es
+   que el ojo lea el reparto del dinero como una sola barra continua en vez de
+   tener que sumar tarjetas sueltas. */
+.gn-kpis{ display:grid; grid-template-columns:repeat(3,1fr); gap:10px; }
+.gn-kpi{
+  background:var(--surface-solid); border:1px solid var(--border);
+  border-radius:var(--radius-md); padding:14px 15px; min-width:0;
+}
+/* Cada KPI se tiñe apenas de su color para que el azul/ámbar/verde se lea de
+   lejos sin gritar. */
+.gn-kpi.azul { border-color:rgba(0,149,246,0.35);  background:linear-gradient(135deg,var(--violet-bg),transparent 70%); }
+.gn-kpi.ambar{ border-color:rgba(251,191,36,0.32); background:linear-gradient(135deg,var(--amber-bg),transparent 70%); }
+.gn-kpi.verde{ border-color:rgba(52,211,153,0.32); background:linear-gradient(135deg,var(--green-bg),transparent 70%); }
+.gn-kpi-lbl{ font-size:11.5px; color:var(--text2); font-weight:600; line-height:1.3; }
+.gn-kpi-val{
+  font-family:'Space Grotesk'; font-weight:800; font-size:29px; line-height:1.1;
+  margin-top:6px; font-variant-numeric:tabular-nums; word-break:break-word;
+}
+.gn-kpi-sub{ font-size:11px; color:var(--text3); margin-top:5px; line-height:1.4; }
+
+/* Bloque grande del mes */
+.gn-mes{
+  background:var(--surface-solid); border:1px solid var(--border);
+  border-radius:var(--radius-md); padding:16px 17px;
+}
+.gn-mes-head{ display:flex; justify-content:space-between; align-items:flex-start; gap:14px; flex-wrap:wrap; }
+.gn-mes-lbl{ font-size:12px; color:var(--text2); font-weight:600; }
+.gn-mes-val{
+  font-family:'Space Grotesk'; font-weight:800; font-size:34px; line-height:1.1;
+  margin-top:4px; font-variant-numeric:tabular-nums;
+}
+.gn-mes-sub{ font-size:11.5px; color:var(--text3); margin-top:5px; }
+.gn-limpio{
+  background:var(--green-bg); border:1px solid rgba(52,211,153,0.32);
+  border-radius:var(--radius-sm); padding:10px 14px; text-align:right; flex-shrink:0;
+}
+.gn-limpio-lbl{ font-size:10.5px; color:var(--green); font-weight:800; letter-spacing:.03em; text-transform:uppercase; }
+.gn-limpio-val{ font-family:'Space Grotesk'; font-weight:800; font-size:22px; color:var(--green); margin-top:2px; font-variant-numeric:tabular-nums; }
+
+/* Barra de reparto: los anchos van en línea porque son proporcionales al dinero. */
+.gn-split{ display:flex; height:44px; border-radius:11px; overflow:hidden; margin-top:14px; gap:2px; }
+.gn-seg{
+  display:flex; flex-direction:column; justify-content:center; align-items:center;
+  min-width:0; padding:0 6px; overflow:hidden;
+}
+.gn-seg b{ font-family:'Space Grotesk'; font-size:13.5px; font-weight:800; line-height:1.1; white-space:nowrap; }
+.gn-seg span{ font-size:9.5px; opacity:.75; margin-top:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:100%; }
+.gn-seg.vos  { background:rgba(52,211,153,0.22); color:var(--green); }
+.gn-seg.eq   { background:rgba(251,191,36,0.20); color:var(--amber); }
+.gn-seg.ctas { background:rgba(160,160,171,0.18); color:var(--text2); }
+
+/* Recorrido paso a paso: barra fija a la izquierda, concepto al centro, monto a la derecha. */
+.gn-paso{ display:flex; align-items:center; gap:12px; padding:9px 0; }
+.gn-paso.final{ border-top:1px solid var(--border); margin-top:4px; padding-top:12px; }
+.gn-paso-bar{ width:150px; flex-shrink:0; height:9px; border-radius:99px; background:rgba(255,255,255,0.05); overflow:hidden; }
+.gn-paso-bar i{ display:block; height:100%; border-radius:99px; }
+.gn-paso-txt{ flex:1; min-width:0; }
+.gn-paso-txt b{ font-size:12.5px; font-weight:700; display:block; }
+.gn-paso-txt span{ font-size:10.5px; color:var(--text3); display:block; margin-top:2px; line-height:1.35; }
+.gn-paso-monto{ font-family:'Space Grotesk'; font-weight:800; font-size:14px; font-variant-numeric:tabular-nums; white-space:nowrap; }
+.gn-paso.final .gn-paso-txt b{ font-size:14px; }
+.gn-paso.final .gn-paso-monto{ font-size:19px; }
+
+/* Tarjeta de vendedor: el saldo manda, por eso va grande y a la derecha. */
+.gn-v-head{ display:flex; align-items:center; justify-content:space-between; gap:12px; }
+.gn-v-id{ display:flex; align-items:center; gap:11px; min-width:0; }
+.gn-v-saldo{ text-align:right; flex-shrink:0; }
+.gn-v-saldo b{ font-family:'Space Grotesk'; font-weight:800; font-size:22px; line-height:1.1; font-variant-numeric:tabular-nums; display:block; }
+.gn-v-saldo span{ font-size:10px; text-transform:uppercase; letter-spacing:.04em; font-weight:700; color:var(--text3); }
+.gn-cajas{ display:grid; grid-template-columns:repeat(3,1fr); gap:7px; margin-top:12px; }
+.gn-caja{ background:var(--surface-hover); border:1px solid var(--border); border-radius:10px; padding:9px 10px; min-width:0; }
+.gn-caja-lbl{ font-size:9.5px; text-transform:uppercase; letter-spacing:.04em; color:var(--text3); font-weight:700; }
+.gn-caja-val{ font-family:'Space Grotesk'; font-weight:800; font-size:15px; margin-top:3px; font-variant-numeric:tabular-nums; }
+
+@media (max-width: 720px){
+  .gn-kpis{ grid-template-columns:1fr; }
+  .gn-paso-bar{ width:72px; }
+  .gn-mes-val{ font-size:28px; }
+}
+
+/* ---------- Configuración: dos paneles (cf-) ---------- */
+.cf-wrap{ display:grid; grid-template-columns:236px 1fr; gap:16px; align-items:start; }
+/* La lista de secciones es una columna vertical, no una fila de píldoras: cada
+   entrada puede así mostrar SU valor actual debajo del nombre. */
+.cf-nav{ display:flex; flex-direction:column; gap:7px; }
+/* Se conserva la clase .f-btn (showConfigTab la busca), por eso todo se
+   redefine con doble clase para ganar en especificidad. */
+.cf-wrap .cf-item.f-btn{
+  display:flex; align-items:flex-start; gap:10px; text-align:left; width:100%;
+  padding:11px 12px; border-radius:13px; background:var(--surface-solid);
+  border:1px solid var(--border); color:var(--text); font-size:13px;
+  white-space:normal; box-shadow:none; cursor:pointer;
+}
+.cf-wrap .cf-item.f-btn:hover{ background:var(--surface-hover); border-color:var(--border-strong); }
+.cf-wrap .cf-item.f-btn.active{
+  background:var(--violet-bg); border-color:rgba(0,149,246,0.5); color:var(--text);
+}
+.cf-ico{
+  width:30px; height:30px; flex-shrink:0; border-radius:9px; display:flex;
+  align-items:center; justify-content:center; font-size:15px;
+  background:var(--surface-hover); border:1px solid var(--border);
+}
+.cf-item.active .cf-ico{ background:rgba(0,149,246,0.16); border-color:rgba(0,149,246,0.35); }
+.cf-item-txt{ display:block; min-width:0; flex:1; }
+.cf-item-nom{ display:block; font-size:12.5px; font-weight:700; line-height:1.25; }
+.cf-item-val{ display:block; font-size:10.5px; color:var(--text3); margin-top:3px; line-height:1.35; word-break:break-word; }
+.cf-item.active .cf-item-val{ color:var(--text2); }
+
+.cf-panel{ min-width:0; }
+.cf-titulo{ font-family:'Space Grotesk'; font-size:19px; font-weight:800; }
+.cf-desc{ font-size:12px; color:var(--text2); line-height:1.55; margin:6px 0 16px; }
+
+/* Reparto de cada combo: mismo lenguaje visual que la barra de Ganancias. */
+.cf-combo-split{ display:flex; height:26px; border-radius:8px; overflow:hidden; gap:2px; margin-bottom:10px; }
+.cf-combo-seg{ display:flex; align-items:center; justify-content:center; min-width:0; font-size:10.5px; font-weight:800; white-space:nowrap; overflow:hidden; }
+.cf-combo-seg.eq  { background:rgba(251,191,36,0.20); color:var(--amber); }
+.cf-combo-seg.vos { background:rgba(52,211,153,0.22); color:var(--green); }
+.cf-combo-seg.ctas{ background:rgba(160,160,171,0.18); color:var(--text2); }
+
+/* Stepper de comisión: mismo onchange de siempre, solo cambia cómo se toca. */
+.cf-step{ display:flex; align-items:center; gap:6px; }
+.cf-step button{
+  width:32px; height:32px; flex-shrink:0; border-radius:9px; cursor:pointer;
+  background:var(--surface-hover); border:1px solid var(--border-strong);
+  color:var(--text); font-size:16px; font-weight:700; line-height:1;
+}
+.cf-step button:hover{ background:var(--surface); border-color:var(--violet); }
+.cf-step .form-input{ width:64px; padding:7px 4px; text-align:center; font-weight:700; }
+
+@media (max-width: 720px){
+  .cf-wrap{ grid-template-columns:1fr; }
+  .gn-cajas{ grid-template-columns:1fr; }
+}
 
 /* ---------- Origen del cliente ---------- */
 .orig-grid{ display: flex; gap: 7px; flex-wrap: wrap; }
@@ -2165,24 +2471,33 @@ function badgeEstado(e,d) {
 }
 
 // ===== Anillo de progreso (sustituye la fecha plana) =====
-function anilloHTML(estado, dias) {
+// Anillo de ciclo alrededor del avatar. La parte pintada es lo que le QUEDA
+// del periodo que pagó: lleno = recién renovado, vacío = a punto de vencer.
+// Con `nombre` dibuja el avatar de color adentro (lista de clientes); sin él
+// queda el círculo con la etiqueta de días, como se usaba antes.
+function anilloHTML(estado, dias, nombre, meses) {
   const R = 16, C = 2*Math.PI*R;
+  const total = Math.max(1, (parseInt(meses)||1) * 30);
   let pct, colorClass, label;
   if (estado === 'sin-fecha') {
     pct = 0; colorClass = 'ring-fg-gray'; label = '—';
   } else if (estado === 'vencido') {
-    pct = 1; colorClass = 'ring-fg-red'; label = '!';
-  } else if (estado === 'proximo') {
-    pct = Math.max(0.12, (5-dias)/5); colorClass = 'ring-fg-amber'; label = dias+'d';
+    pct = 0; colorClass = 'ring-fg-red'; label = '!';
   } else {
-    pct = Math.min(0.12, dias/30); colorClass = 'ring-fg-green'; label = dias>99?'99+':dias+'d';
+    // fracción del ciclo que todavía no se consume
+    pct = Math.max(0.04, Math.min(1, dias / total));
+    colorClass = (estado === 'proximo') ? 'ring-fg-amber' : 'ring-fg-green';
+    label = dias > 99 ? '99+' : dias + 'd';
   }
   const offset = C - (pct*C);
-  return `<div class="ring-wrap">
-    <svg viewBox="0 0 40 40"><circle cx="20" cy="20" r="${R}" fill="none" stroke-width="3.5" class="ring-bg-c"/>
-    <circle cx="20" cy="20" r="${R}" fill="none" stroke-width="3.5" class="${colorClass}" stroke-dasharray="${C}" stroke-dashoffset="${offset}" stroke-linecap="round"/></svg>
-    <div class="ring-num">${label}</div>
-  </div>`;
+  const svg = `<svg viewBox="0 0 40 40"><circle cx="20" cy="20" r="${R}" fill="none" stroke-width="3" class="ring-bg-c"/>` +
+    `<circle cx="20" cy="20" r="${R}" fill="none" stroke-width="3" class="${colorClass}" stroke-dasharray="${C}" stroke-dashoffset="${offset}" stroke-linecap="round"/></svg>`;
+  if (nombre) {
+    const col = colorAvatar(nombre);
+    return `<div class="ring-wrap ring-av">${svg}` +
+      `<div class="ring-cara" style="background:${col.bg};color:${col.color};">${iniciales(nombre)}</div></div>`;
+  }
+  return `<div class="ring-wrap">${svg}<div class="ring-num">${label}</div></div>`;
 }
 
 // ===== Toast =====
@@ -2706,25 +3021,185 @@ function renderActividad() {
   const hoyStr = formatoDDMMYYYY(new Date());
   const ayer = new Date(); ayer.setDate(ayer.getDate()-1);
   const ayerStr = formatoDDMMYYYY(ayer);
+
+  // === Ayudantes locales ===
+  // Viven dentro de la función a propósito: son solo del historial y así la
+  // sección queda autocontenida, sin ensuciar el espacio global.
+
+  const MESES_ES = ['enero','febrero','marzo','abril','mayo','junio','julio',
+    'agosto','septiembre','octubre','noviembre','diciembre'];
+
+  // Fondo tenue + color del ícono según el tipo de movimiento.
+  const TONOS = {
+    azul:    ['var(--blue-bg)',    'var(--blue)'],
+    verde:   ['var(--green-bg)',   'var(--green)'],
+    violeta: ['var(--violet-bg)',  'var(--violet)'],
+    rojo:    ['var(--red-bg)',     'var(--red)'],
+    gris:    ['var(--surface-hover)', 'var(--text3)']
+  };
+
+  // El monto puede venir en su propia columna o escrito dentro del texto del
+  // detalle ("... $41"). NO se calcula nada de dinero: solo se LEE lo que ya
+  // está guardado, para poder mostrarlo y sumar el total visible del día.
+  const RE_MONTO = /\$\s*([0-9][0-9.,]*)/;
+  const RE_MILES = /,/g;
+  const montoDe = f => {
+    const crudo = (f.monto !== undefined && f.monto !== '') ? f.monto
+      : ((f.importe !== undefined && f.importe !== '') ? f.importe : '');
+    const directo = parseFloat(crudo);
+    if (!isNaN(directo) && directo > 0) return directo;
+    const m = RE_MONTO.exec(String(f.detalle||'') + ' ' + String(f.referencia||''));
+    if (!m) return 0;
+    const n = parseFloat(String(m[1]).replace(RE_MILES,''));
+    return (isNaN(n) || n <= 0) ? 0 : n;
+  };
+  const dinero = n => '$' + n.toLocaleString('es-MX',{maximumFractionDigits:2});
+
+  // Si la referencia coincide con un cliente de la cartera, la fila se puede
+  // tocar para abrir su ficha. Si no coincide, la fila queda inerte.
+  const buscarCliente = nombre => {
+    const n = String(nombre||'').trim().toLowerCase();
+    if (!n) return null;
+    return todosClientes.find(c => String(c.cliente||'').trim().toLowerCase() === n) || null;
+  };
+
+  const b = t => '<b>' + esc(t) + '</b>';
+  const RE_GUION = /_/g;
+  // Último recurso: convierte "reset_clave_vendedor" en "Reset clave vendedor"
+  // para que ni el caso desconocido se vea como un registro crudo de base de datos.
+  const humanizar = a => {
+    const s = String(a||'movimiento').replace(RE_GUION,' ').trim();
+    return s ? (s.charAt(0).toUpperCase() + s.slice(1)) : 'Movimiento';
+  };
+
+  // Traduce un registro crudo a {ico, tono, frase, det}. La frase se cuenta
+  // como se lo contarías a alguien, con el nombre en negrita.
+  const legible = f => {
+    const acc = String(f.accion||'').trim();
+    const ref = String(f.referencia||'').trim();
+    const det = String(f.detalle||'').trim();
+    const conRef = (txt, sinRef) => ref ? txt : sinRef;
+    switch (acc) {
+      case 'alta_cliente':
+        // "Se sumó como cliente" y no "es cliente nuevo/a": del nombre no se
+        // puede deducir el género, y así la frase funciona para cualquiera.
+        return {ico:'🆕', tono:'azul', frase: conRef(b(ref) + ' se sumó como cliente', 'Se dio de alta un cliente'), det: det};
+      case 'renovacion':
+        return {ico:'🔁', tono:'verde', frase: conRef(b(ref) + ' renovó', 'Hubo una renovación'), det: det};
+      case 'comprobante':
+        return {ico:'💵', tono:'violeta', frase: conRef(b(ref) + ' pagó', 'Llegó un pago'),
+                det: det || 'Subió el comprobante · queda por verificar'};
+      case 'pago_comision':
+        return {ico:'💵', tono:'violeta', frase: conRef('Le pagaste su comisión a ' + b(ref), 'Se pagó una comisión'), det: det};
+      case 'venta_unica':
+        return {ico:'💵', tono:'violeta', frase: conRef('Venta suelta a ' + b(ref), 'Se registró una venta suelta'), det: det};
+      case 'archivar_cliente':
+        return {ico:'📦', tono:'rojo', frase: conRef(b(ref) + ' se archivó', 'Se archivó un cliente'), det: det};
+      case 'eliminar_cuenta':
+        return {ico:'📦', tono:'rojo', frase: conRef('Se eliminó la cuenta ' + b(ref), 'Se eliminó una cuenta'), det: det};
+      case 'edicion_cliente':
+        return {ico:'✏️', tono:'gris', frase: conRef('Se actualizó la ficha de ' + b(ref), 'Se actualizó una ficha'), det: det};
+      case 'ajuste_manual':
+        return {ico:'⚖️', tono:'gris', frase: conRef('Ajuste manual en la cuenta de ' + b(ref), 'Se hizo un ajuste manual'), det: det};
+      case 'nueva_cuenta':
+        return {ico:'🔑', tono:'gris', frase: conRef('Entró la cuenta ' + b(ref), 'Entró una cuenta nueva'), det: det};
+      case 'editar_cuenta':
+        return {ico:'🔑', tono:'gris', frase: conRef('Se cambiaron los datos de ' + b(ref), 'Se editó una cuenta'), det: det};
+      case 'liberar_slot':
+        return {ico:'🔓', tono:'gris', frase: conRef('Se liberó una pantalla en ' + b(ref), 'Se liberó una pantalla'), det: det};
+      case 'nuevo_combo':
+        return {ico:'🧩', tono:'gris', frase: conRef('Nuevo paquete: ' + b(ref), 'Se creó un paquete'), det: det};
+      case 'editar_combo':
+        return {ico:'🧩', tono:'gris', frase: conRef('Se editó el paquete ' + b(ref), 'Se editó un paquete'), det: det};
+      case 'cambio_comision':
+        return {ico:'％', tono:'gris', frase: conRef('Cambió el porcentaje de ' + b(ref), 'Cambió un porcentaje de comisión'), det: det};
+      case 'alta_vendedor':
+        return {ico:'🧑‍💼', tono:'azul', frase: conRef(b(ref) + ' entró al equipo', 'Entró alguien nuevo al equipo'), det: det};
+      case 'reset_clave_vendedor':
+        return {ico:'🔒', tono:'gris', frase: conRef('Se reseteó la clave de ' + b(ref), 'Se reseteó una clave'), det: det};
+      case 'congelar_precios':
+        return {ico:'🧊', tono:'gris', frase:'Se congelaron los precios', det: det};
+      case 'alias_relay': {
+        // Este registro es puramente técnico. El detalle llega como
+        // "plataformas · SPOTIFY · SPOTIFY K6": el último tramo dice para
+        // quién es el alias, así que esa es la parte que vale contar. El
+        // correo generado pasa al renglón gris de abajo.
+        const partes = det.split('·').map(s => s.trim()).filter(Boolean);
+        const destino = partes.length ? partes[partes.length-1] : '';
+        return {ico:'✉️', tono:'gris',
+                frase: destino ? ('Se creó un correo desechable para ' + b(destino)) : 'Se creó un correo desechable',
+                det: ref};
+      }
+      default: {
+        // Acción desconocida: se usa la etiqueta del catálogo si existe y, si
+        // no, el nombre humanizado. Nunca se escupe el registro tal cual.
+        const info = ACTIVIDAD_INFO[acc];
+        const etiqueta = info ? info[1] : humanizar(acc);
+        return {ico: info ? info[0] : '•', tono:'gris',
+                frase: ref ? (esc(etiqueta) + ' · ' + b(ref)) : esc(etiqueta), det: det};
+      }
+    }
+  };
+
+  // Resumen gris del día, al lado del encabezado.
+  const resumenDia = items => {
+    let nuevos = 0, renov = 0, pagos = 0, total = 0;
+    items.forEach(f => {
+      const a = String(f.accion||'').trim();
+      if (a === 'alta_cliente') nuevos++;
+      else if (a === 'renovacion') renov++;
+      else if (a === 'comprobante' || a === 'pago_comision' || a === 'venta_unica') pagos++;
+      total += montoDe(f);
+    });
+    const p = [];
+    if (nuevos) p.push(nuevos + (nuevos !== 1 ? ' clientes nuevos' : ' cliente nuevo'));
+    if (renov) p.push(renov + (renov !== 1 ? ' renovaciones' : ' renovación'));
+    if (pagos) p.push(pagos + (pagos !== 1 ? ' pagos' : ' pago'));
+    if (!p.length) p.push(items.length + (items.length !== 1 ? ' movimientos' : ' movimiento'));
+    if (total > 0) p.push(dinero(total) + ' en movimiento');
+    return p.join(' · ');
+  };
+
+  const etiquetaDia = dia => {
+    if (dia === hoyStr) return 'Hoy';
+    if (dia === ayerStr) return 'Ayer';
+    const d = parseFecha(dia);
+    return d ? (d.getDate() + ' de ' + MESES_ES[d.getMonth()]) : dia;
+  };
+
   cont.innerHTML = porDia.map(g => `
-    <div style="font-size:11.5px;font-weight:800;color:var(--text3);text-transform:uppercase;letter-spacing:0.06em;margin:16px 0 8px;">${g.dia===hoyStr?'Hoy':(g.dia===ayerStr?'Ayer':esc(g.dia))}</div>
-    <div style="display:flex;flex-direction:column;gap:6px;">
+    <div class="hi-dia">
+      <span class="hi-dia-t">${esc(etiquetaDia(g.dia))}</span>
+      <span class="hi-dia-r">${esc(resumenDia(g.items))}</span>
+    </div>
+    <div class="hi-lista">
       ${g.items.map(f => {
-        const info = ACTIVIDAD_INFO[(f.accion||'').trim()] || ['•', (f.accion||'movimiento')];
-        const quien = esc(f.usuario||'?');
-        const vend = (f.vendedor||'').trim();
-        return `<div class="cuenta-card" style="padding:10px 14px;display:flex;align-items:flex-start;gap:10px;">
-          <div style="font-size:16px;line-height:1.3;">${info[0]}</div>
-          <div style="flex:1;min-width:0;">
-            <div style="font-size:13px;font-weight:700;">${info[1]}${f.referencia?` <span style="font-weight:600;color:var(--text3);">· ${esc(f.referencia)}</span>`:''}</div>
-            ${f.detalle?`<div style="font-size:12px;color:var(--text2);margin-top:2px;word-break:break-word;">${esc(f.detalle)}</div>`:''}
-            <div style="font-size:11px;color:var(--text3);margin-top:3px;">por <strong>${quien}</strong>${vend && vend.toLowerCase()!==quien.toLowerCase()?` · vendedor: ${esc(nombreVendedorUI_(vend))}`:''}</div>
+        const L = legible(f);
+        const tono = TONOS[L.tono] || TONOS.gris;
+        const monto = montoDe(f);
+        const cli = buscarCliente(f.referencia);
+        const clase = cli ? 'hi-fila hi-click' : 'hi-fila';
+        const alClic = cli ? `onclick="verDetalle(${esc(JSON.stringify(cli.id))})"` : '';
+        const quien = String(f.vendedor||'').trim() || String(f.usuario||'').trim() || '?';
+        const nombreQuien = quien === '?' ? '?' : nombreVendedorUI_(quien);
+        const colQ = colorAvatar(nombreQuien);
+        return `<div class="${clase}" ${alClic}>
+          <div class="hi-ico" style="background:${tono[0]};color:${tono[1]};">${L.ico}</div>
+          <div class="hi-txt">
+            <div class="hi-frase">${L.frase}</div>
+            ${L.det ? `<div class="hi-det">${esc(L.det)}</div>` : ''}
           </div>
-          <div style="font-size:11.5px;color:var(--text3);white-space:nowrap;">${esc(f.hora||'')}</div>
+          <div class="hi-der">
+            ${monto > 0 ? `<div class="hi-monto">${esc(dinero(monto))}</div>` : ''}
+            <div class="hi-quien">
+              <span class="hi-av" style="background:${colQ.bg};color:${colQ.color};">${esc(iniciales(nombreQuien))}</span>
+              <span>${esc(nombreQuien)}${f.hora ? ' · ' + esc(f.hora) : ''}</span>
+            </div>
+          </div>
         </div>`;
       }).join('')}
     </div>`).join('') +
-    (recortado ? `<div style="font-size:12px;color:var(--text3);text-align:center;margin-top:12px;">Se muestran los últimos ${LIMITE} movimientos${q?' que coinciden':''}.</div>` : '');
+    (recortado ? `<div class="hi-pie">Se muestran los últimos ${LIMITE} movimientos${q?' que coinciden':''}.</div>` : '');
 }
 
 // Carga (o recarga) los datos de la sección de Ganancias en paralelo. Las 3
@@ -3259,57 +3734,111 @@ function irAClientesFiltro(f) {
 // ===== Tareas de hoy =====
 // Tu rutina del día: a quién contactar (vencidos, por vencer) y a quién cobrar
 // (pago pendiente), cada uno con su botón de WhatsApp listo.
+
+// Enlace "Avisar a los N" del encabezado de cada bloque. Abre los chats uno
+// tras otro; se confirma antes porque abrir varias pestañas de golpe es algo
+// que el navegador puede bloquear y no conviene que pase por un clic suelto.
+function avisarLote_(ids) {
+  if (!ids || !ids.length) return;
+  if (ids.length > 1 && !confirm('Se abrirán ' + ids.length + ' chats de WhatsApp, uno por cliente. ¿Seguir?')) return;
+  // Separados unos milisegundos: pedidas todas en el mismo instante, algunos
+  // navegadores descartan todas menos la primera.
+  ids.forEach((id, i) => setTimeout(() => abrirWhatsApp(id), i * 350));
+  // Repintado al final para que las filas ya salgan atenuadas y marcadas.
+  setTimeout(renderTareasHoy, ids.length * 350 + 500);
+}
+
 function renderTareasHoy() {
   const cont = document.getElementById('tareas-content');
   const activos = todosClientes.filter(c => c.estado_raw !== 'ARCHIVADO');
   const dias_ = c => (c.dias===null ? 99 : c.dias);
+  // Tres grados de urgencia en vez de un montón de tarjetas sueltas: lo que ya
+  // se pasó, lo que se cae hoy y lo que viene en camino.
   const vencidos = activos.filter(c => c.estado === 'vencido').sort((a,b)=>dias_(a)-dias_(b));
-  const proximos = activos.filter(c => c.estado === 'proximo').sort((a,b)=>dias_(a)-dias_(b));
-  const deben = activos.filter(c => (c.pago||'').toUpperCase() === 'PENDIENTE');
+  const hoyVencen = activos.filter(c => c.estado === 'proximo' && c.dias === 0);
+  const pronto = activos.filter(c => c.estado === 'proximo' && c.dias !== 0).sort((a,b)=>dias_(a)-dias_(b));
+  // Quien debe dinero pero no está en ninguno de los tres bloques anteriores
+  // seguiría necesitando cobro: se le da su propio bloque para no perderlo.
+  const yaListados = {};
+  vencidos.concat(hoyVencen, pronto).forEach(c => { yaListados[c.id] = true; });
+  const deben = activos.filter(c => (c.pago||'').toUpperCase() === 'PENDIENTE' && !yaListados[c.id]);
 
-  if (!vencidos.length && !proximos.length && !deben.length) {
+  if (!vencidos.length && !hoyVencen.length && !pronto.length && !deben.length) {
     cont.innerHTML = `<div class="empty"><div class="empty-icon">🎉</div><div class="empty-title">Nada pendiente hoy</div><div class="empty-sub">No hay vencidos, por vencer ni pagos pendientes. ¡Disfruta!</div></div>`;
     return;
   }
 
+  // Solo LEE el precio ya guardado para mostrar el total del bloque — no hay
+  // ningún cálculo de dinero nuevo aquí.
+  const precioDe = c => parseFloat(c.precio) || 0;
+  const sumaBloque = arr => arr.reduce((t, c) => t + precioDe(c), 0);
+  const dinero = n => '$' + n.toLocaleString('es-MX',{maximumFractionDigits:2});
+
+  const cuando = c => {
+    if (c.estado === 'vencido') {
+      const d = Math.abs(c.dias);
+      return 'venció hace ' + d + ' día' + (d !== 1 ? 's' : '');
+    }
+    if (c.dias === null) return 'sin fecha de vencimiento';
+    if (c.dias === 0) return 'vence hoy';
+    return 'vence en ' + c.dias + ' día' + (c.dias !== 1 ? 's' : '');
+  };
+
   const fila = c => {
     const col = colorAvatar(c.cliente);
-    const sub = c.estado==='vencido' ? `Venció hace ${Math.abs(c.dias)} día${Math.abs(c.dias)!==1?'s':''}`
-      : c.estado==='proximo' ? (c.dias===0?'Vence hoy':`Vence en ${c.dias} día${c.dias!==1?'s':''}`)
-      : 'Pago pendiente';
     const avisado = contactadoHoy_(c);
-    return `<div class="cliente-card" style="${avisado?'opacity:0.6;':''}" onclick="verDetalle(${esc(JSON.stringify(c.id))})">
-      <div class="avatar" style="background:${col.bg};color:${col.color};">${iniciales(c.cliente)}</div>
-      <div class="info">
-        <div class="nombre">${esc(c.cliente)}${avisado?' <span style="font-size:10px;font-weight:700;color:var(--green);background:var(--green-bg);padding:2px 7px;border-radius:99px;">✓ avisado '+esc(horaContacto_(c))+'</span>':''}</div>
-        <div class="sub">${esc(c.paquete||'Sin paquete')} · ${sub}</div>
+    const idArg = esc(JSON.stringify(c.id));
+    const debe = (c.pago||'').toUpperCase() === 'PENDIENTE';
+    const precio = precioDe(c);
+    // Paquete · cuándo vence · teléfono, todo en el mismo renglón gris para
+    // poder decidir sin abrir la ficha.
+    const sub = [esc(c.paquete || 'Sin paquete'), esc(cuando(c))];
+    if (c.contacto) sub.push(esc(c.contacto));
+    const hora = avisado ? horaContacto_(c) : '';
+    return `<div class="tk-fila${avisado?' tk-hecha':''}" onclick="verDetalle(${idArg})">
+      <div class="tk-av" style="background:${col.bg};color:${col.color};">${iniciales(c.cliente)}</div>
+      <div class="tk-info">
+        <div class="tk-nom">
+          ${esc(c.cliente)}
+          ${debe && precio > 0 ? `<span class="tk-debe">DEBE ${esc(dinero(precio))}</span>` : (debe ? '<span class="tk-debe">DEBE</span>' : '')}
+          ${avisado ? `<span class="tk-ok">✓ avisado${hora ? ' ' + esc(hora) : ''}</span>` : ''}
+        </div>
+        <div class="tk-sub">${sub.join(' · ')}</div>
       </div>
-      ${c.contacto ? `<div class="wa-hit" onclick="abrirWhatsApp(${esc(JSON.stringify(c.id))},event)" title="${contactadoHoy_(c)?'Ya le avisaste hoy':'Escribir por WhatsApp'}"><div class="wa-btn wa-lista${contactadoHoy_(c)?' contactado':''}">💬</div></div>` : ''}
+      ${precio > 0 ? `<div class="tk-monto">${esc(dinero(precio))}</div>` : ''}
+      ${c.contacto ? `<div class="wa-hit" onclick="abrirWhatsApp(${idArg},event)" title="${avisado?'Ya le avisaste hoy':'Escribir por WhatsApp'}"><div class="wa-btn wa-lista${avisado?' contactado':''}">💬</div></div>` : ''}
     </div>`;
   };
 
-  // Los que faltan por avisar van PRIMERO dentro de cada bloque, y el título
-  // lleva el marcador de la ronda del día ("2 por avisar de 5") para saber de
-  // un vistazo cuánto falta sin ir contando a mano.
-  const bloque = (titulo, icono, arr, color, conAviso) => {
+  // Los que faltan por avisar van PRIMERO dentro de cada bloque, para que la
+  // ronda del día se resuelva de arriba hacia abajo.
+  const bloque = (titulo, color, arr, conAviso) => {
     if (!arr.length) return '';
     const ordenados = conAviso ? arr.slice().sort((a,b)=>(contactadoHoy_(a)?1:0)-(contactadoHoy_(b)?1:0)) : arr;
-    const faltan = conAviso ? arr.filter(c=>!contactadoHoy_(c)).length : 0;
-    const marcador = conAviso
-      ? (faltan === 0
-          ? ` <span style="color:var(--green);">· ✓ todos avisados</span>`
-          : ` <span style="color:var(--text3);">· ${faltan} por avisar</span>`)
+    const total = sumaBloque(arr);
+    // Solo tiene sentido ofrecer el aviso masivo a quienes tienen teléfono y
+    // todavía no recibieron el mensaje de hoy.
+    const porAvisar = ordenados.filter(c => c.contacto && (!conAviso || !contactadoHoy_(c)));
+    const idsArg = esc(JSON.stringify(porAvisar.map(c => c.id)));
+    const enlace = porAvisar.length
+      ? `<span class="tk-avisar" onclick="avisarLote_(${idsArg})">Avisar a ${porAvisar.length === 1 ? 'este' : 'los ' + porAvisar.length}</span>`
       : '';
-    return `<div style="margin-bottom:18px;">
-      <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;color:${color};margin-bottom:8px;">${icono} ${titulo} (${arr.length})${marcador}</div>
-      <div class="lista">${ordenados.map(fila).join('')}</div>
+    return `<div class="tk-bloque">
+      <div class="tk-head">
+        <span class="tk-dot" style="background:${color};"></span>
+        <span class="tk-tit">${titulo}</span>
+        <span class="tk-cont">${arr.length}${total > 0 ? ' · ' + esc(dinero(total)) : ''}</span>
+        ${enlace}
+      </div>
+      <div class="tk-lista">${ordenados.map(fila).join('')}</div>
     </div>`;
   };
 
   cont.innerHTML =
-    bloque('Vencidos — renovar', '⏰', vencidos, 'var(--red)', true) +
-    bloque('Por vencer pronto', '⏳', proximos, 'var(--amber)', true) +
-    bloque('Pendientes de cobro', '💵', deben, 'var(--amber)', false);
+    bloque('Ya vencieron', 'var(--red)', vencidos, true) +
+    bloque('Vencen hoy', 'var(--amber)', hoyVencen, true) +
+    bloque('Vencen pronto', 'var(--blue)', pronto, true) +
+    bloque('Pendientes de cobro', 'var(--text3)', deben, false);
 }
 
 // Banner de progreso al abrir Clientes. Solo muestra algo cuando hay una
@@ -3522,26 +4051,45 @@ function filtrar() {
       : c.dias === 0 ? '<b>vence hoy</b>'
       : `quedan <b>${c.dias} días</b>`;
 
+    // Punto del color de la plataforma + nombre del paquete y dónde está.
+    let platsCard = [];
+    try { platsCard = detectarPlataformas(c.paquete) || []; } catch(e) {}
+    const puntoPlat = platsCard.slice(0,3).map(p =>
+      `<span class="cc-dot" style="background:${PLAT_COLORS[p]||'var(--border-strong)'}"></span>`).join('');
+    // Lo que te deja a VOS este cliente (si sos vendedor, tu comisión).
+    let dejaTxt = '';
+    try {
+      const g = montoBaseCliente_(c);
+      if (g) dejaTxt = (MI_ROL === 'admin' ? 'te deja $' : 'te toca $') +
+        g.toLocaleString('es-MX',{maximumFractionDigits:2});
+    } catch(e) {}
+    const vendCorto = esV ? esc(c.vendedor) : 'YO';
+    const colVend = colorAvatar(vendCorto);
+
     return `<div class="cliente-card${modoSeleccion&&sel?' card-sel':''}" style="${esArchivado?'opacity:0.55;':''}" onclick="${accion}">
       <div class="cc-top">
       ${modoSeleccion ? `<div class="sel-check${sel?' on':''}">${sel?'✓':''}</div>` : ''}
-      ${barraPlataformas_(c.paquete)}
-      ${esArchivado ? `<div class="avatar" style="background:var(--surface);color:var(--text3);">${iniciales(c.cliente)}</div>` : anilloHTML(c.estado, c.dias)}
+      ${esArchivado
+        ? `<div class="ring-wrap ring-av"><div class="ring-cara" style="background:var(--surface);color:var(--text3);">${iniciales(c.cliente)}</div></div>`
+        : anilloHTML(c.estado, c.dias, c.cliente, c.meses)}
       <div class="info">
-        <div class="nombre">${esc(c.cliente)}${esV?`<span class="v-badge">${esc(c.vendedor)}</span>`:''}${esArchivado?'<span style="font-size:10px;padding:2px 7px;border-radius:99px;background:var(--surface);color:var(--text3);">Archivado</span>':''}</div>
-        <div class="sub">${esc(c.paquete||'Sin paquete')}${precio?' · '+precio:''}${c.meses>1?' · <span style="color:var(--violet2);font-weight:700;">📆 '+c.meses+' meses</span>':''}</div>
+        <div class="nombre">${esc(c.cliente)}
+          ${esArchivado?'<span class="badge sin-fecha">Archivado</span>':badgeEstado(c.estado,c.dias)}
+          ${!esArchivado && c.pago && c.pago.toUpperCase()==='PENDIENTE' ? '<span class="cc-debe">DEBE</span>' : ''}
+        </div>
+        <div class="sub">${puntoPlat}${esc(c.paquete||'Sin paquete')}${c.cuenta?' · '+esc(String(c.cuenta).split(',')[0].trim()):''}${c.meses>1?' · <span style="color:var(--violet2);font-weight:700;">'+c.meses+' meses</span>':''}</div>
       </div>
       <div class="derecha">
-        ${esArchivado?'<span class="badge sin-fecha">Archivado</span>':badgeEstado(c.estado,c.dias)}
-        ${!esArchivado && avisadoHoy ? `<div style="font-size:10px;font-weight:700;color:var(--green);margin-top:4px;white-space:nowrap;">✓ Avisado ${esc(horaContacto_(c))}</div>` : ''}
-        ${esArchivado && c.fechaArchivado ? `<div style="font-size:10px;color:var(--text3);margin-top:4px;white-space:nowrap;">🗂 ${esc(String(c.fechaArchivado).split(' ')[0])}</div>` : ''}
+        ${precio?`<div class="cc-precio">${precio}</div>`:''}
+        ${dejaTxt?`<div class="cc-deja">${dejaTxt}</div>`:''}
+        ${!esArchivado && avisadoHoy ? `<div style="font-size:10px;font-weight:700;color:var(--green);margin-top:3px;white-space:nowrap;">✓ Avisado</div>` : ''}
       </div>
       ${!esArchivado && !modoSeleccion && c.contacto ? `<div class="wa-hit" onclick="abrirWhatsApp(${idArg},event)" title="${avisadoHoy?'Ya le avisaste hoy — toca para escribirle otra vez':(esClienteReciente(c)?'Enviar bienvenida':'Escribir por WhatsApp')}"><div class="wa-btn wa-lista${avisadoHoy?' contactado':''}">${esClienteReciente(c)?'🎉':'💬'}</div></div>` : ''}
       </div>
       ${esArchivado ? '' : `<div class="cc-foot">
         <div class="cyc${c.estado==='vencido'?' late':''}"><i style="width:${c.estado==='vencido'?100:transcurrido}%;background:${colorCiclo}"></i></div>
         <div class="cc-days">${textoDias}</div>
-        ${c.pago && c.pago.toUpperCase()==='PENDIENTE' ? '<span class="cc-debe">DEBE</span>' : ''}
+        <span class="cc-vend"><i style="background:${colVend.bg};color:${colVend.color};">${iniciales(vendCorto)}</i>${vendCorto}</span>
       </div>`}
     </div>`;
   }).join('');
@@ -4571,7 +5119,7 @@ function renderCatalogo() {
   // Mismo criterio temporal que el panel de novedades: pasada 1 semana, el
   // cambio deja de marcarse como "ACTUALIZADO" (ya es el precio normal).
   const hace7dias = new Date(); hace7dias.setDate(hace7dias.getDate()-7);
-  cont.innerHTML = `<div style="display:flex;flex-direction:column;gap:8px;">` + combos.map(([nombre, d]) => {
+  cont.innerHTML = `<div class="ct-grid">` + combos.map(([nombre, d]) => {
     const disp = disponibilidadCombo(nombre);
     const libres = disp.disponibles;
     const sinStock = libres <= 0;
@@ -4584,32 +5132,39 @@ function renderCatalogo() {
     const miGanancia = esAdmin ? d.gananciaNeta : (d.gananciaAmigo * (miPct/100));
     const plats = detectarPlataformas(nombre);
     const cambioReciente = (todosCambiosCatalogo||[]).some(h => h.nombre === nombre && parseFecha(h.fecha) && parseFecha(h.fecha) >= hace7dias);
-    return `<div class="cuenta-card" style="padding:14px 16px;">
-      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:10px;">
-        <div style="flex:1;">
-          <div style="font-size:13.5px;font-weight:700;display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
-            <span title="${esc(plats.join(', '))}">${plats.map(p=>PLAT_ICONS[p]||'📦').join('')}</span>
-            <span>${esc(nombre)}</span>
-            ${(d.meses||1)>1?`<span style="font-size:11px;color:var(--violet2);font-weight:600;">📆 ${d.meses} meses</span>`:''}
-            ${cambioReciente?'<span style="font-size:10px;font-weight:800;color:var(--amber);background:var(--amber-bg);padding:2px 7px;border-radius:99px;">ACTUALIZADO</span>':''}
-          </div>
-        </div>
-        <div style="text-align:right;white-space:nowrap;">
-          <div style="font-family:'Space Grotesk';font-size:16px;font-weight:700;color:var(--text);">$${d.precio}</div>
-          ${(d.meses||1)>1?`<div style="font-size:10.5px;color:var(--text3);">≈ $${(d.precio/d.meses).toFixed(0)}/mes</div>`:''}
-        </div>
+    const meses = d.meses || 1;
+    // Cuadraditos de color por plataforma del combo. Sin deduplicar a
+    // propósito: si el combo lleva 2 Spotify se ven 2 cuadros, igual que
+    // cuenta 2 slots para venderlo.
+    const iconos = plats.map(p => {
+      const col = PLAT_COLORS[p] || 'var(--border-strong)';
+      const ini = (p||'?').trim().charAt(0).toUpperCase();
+      return `<div class="ct-ico" style="background:${col};" title="${esc(p)}">${esc(ini)}</div>`;
+    }).join('') || `<div class="ct-ico" style="background:var(--border-strong);">?</div>`;
+
+    return `<div class="cuenta-card ct-card">
+      ${cambioReciente?'<div class="ct-cinta">ACTUALIZADO</div>':''}
+      <div class="ct-icons">${iconos}</div>
+      <div class="ct-nom">${esc(nombre)}</div>
+      <div class="ct-sub">${plats.length} plataforma${plats.length!==1?'s':''} · ${meses} ${meses!==1?'meses':'mes'}</div>
+      <div class="ct-sep"></div>
+      <div class="ct-fila">
+        <span class="ct-lbl">Precio público</span>
+        <span class="ct-val grande">$${d.precio}</span>
       </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
-        <div class="cuenta-info-item">
-          <div class="cuenta-info-label">${esAdmin ? 'Tu ganancia neta' : 'Tu comisión'}</div>
-          <div style="font-family:'Space Grotesk';font-size:15px;font-weight:700;color:var(--green);">$${miGanancia.toFixed(2)}</div>
-        </div>
-        <div class="cuenta-info-item">
-          <div class="cuenta-info-label">Disponibilidad</div>
-          <div style="font-size:12.5px;font-weight:600;color:${sinStock?'var(--red)':'var(--green)'};margin-top:2px;" title="Se puede vender completo ${libres} vez/veces (mínimo entre sus plataformas)">${textoDisp}</div>
-        </div>
+      ${meses>1?`<div class="ct-fila"><span class="ct-lbl">Por mes</span><span class="ct-permes">≈ $${(d.precio/meses).toFixed(0)}/mes</span></div>`:''}
+      ${esAdmin ? `<div class="ct-fila">
+        <span class="ct-lbl">Ganancia Amigo</span>
+        <span class="ct-val">$${d.gananciaAmigo}</span>
+      </div>` : ''}
+      <div class="ct-fila">
+        <span class="ct-lbl">${esAdmin ? 'Tu ganancia neta' : 'Tu comisión'}</span>
+        <span class="ct-val verde">$${miGanancia.toFixed(2)}</span>
       </div>
-      ${esAdmin ? `<div style="font-size:11px;color:var(--text3);margin-top:8px;">Ganancia amigo (vendedores): $${d.gananciaAmigo}</div>` : ''}
+      <div class="ct-disp" title="Se puede vender completo ${libres} vez/veces (mínimo entre sus plataformas)">
+        <span class="ct-dot" style="background:${sinStock?'var(--red)':'var(--green)'};"></span>
+        <span style="color:${sinStock?'var(--red)':'var(--text2)'};">${esc(textoDisp)}</span>
+      </div>
     </div>`;
   }).join('') + `</div>`;
 }
@@ -4949,39 +5504,65 @@ function renderCuentas() {
 
   let html = bannerHTML;
   Object.keys(grupos).forEach(plat => {
-    html += `<div style="font-size:12px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:0.05em;margin:18px 0 8px;">${PLAT_ICONS[plat]||'📦'} ${esc(plat)}</div>`;
+    const color = PLAT_COLORS[plat] || 'var(--border-strong)';
+    const inicial = (plat||'?').trim().charAt(0).toUpperCase();
+
+    // Resumen del grupo: cuántas cuentas hay y cuántos slots libres suman —
+    // es el dato con el que se decide si conviene comprar otra cuenta.
+    let libresGrupo = 0;
+    grupos[plat].forEach(c => {
+      const r = c.slots.slice(0, c.slotsTotal);
+      libresGrupo += c.slotsTotal - r.filter(s => s && s!=='x' && s!=='X').length - r.filter(s => s==='x'||s==='X').length;
+    });
+    const nCuentas = grupos[plat].length;
+
+    html += `<div class="ca-grupo">
+      <div class="ca-grupo-head">
+        <div class="ca-grupo-dot" style="background:${color};"></div>
+        <div class="ca-grupo-nom">${esc(plat)}</div>
+        <div class="ca-grupo-meta">${nCuentas} cuenta${nCuentas!==1?'s':''} · ${libresGrupo} libre${libresGrupo!==1?'s':''}</div>
+      </div>
+      <div class="ca-grid">`;
+
     grupos[plat].forEach((c, idx) => {
       const slotsReales = c.slots.slice(0, c.slotsTotal);
       const ocupados = slotsReales.filter(s => s && s !== 'x' && s !== 'X').length;
       const bloqueados = slotsReales.filter(s => s === 'x' || s === 'X').length;
       const libres = c.slotsTotal - ocupados - bloqueados;
-      const slotsMini = c.slots.slice(0, c.slotsTotal).map(s => {
-        if (!s) return '<div class="slot-mini libre" title="Libre"></div>';
-        if (s==='x'||s==='X') return '<div class="slot-mini bloqueado" title="No disponible"></div>';
-        return '<div class="slot-mini ocupado" title="Ocupado"></div>';
-      }).join('');
       const cardId = `cuenta-${plat}-${idx}`.replace(/\s/g,'_');
       const nombreArgCuenta = esc(JSON.stringify(c.nombre||''));
       const claseLlena = libres<=0 ? ' card-llena' : (libres===1 ? ' card-casi' : '');
       const estadoLibres = libres<=0
-        ? '<div class="cuenta-badge llena">LLENA</div>'
+        ? '<div class="ca-pill red">LLENA</div>'
         : (libres===1
-            ? '<div class="cuenta-badge casi">1 libre</div>'
-            : `<div style="font-size:11px;color:var(--green);font-weight:700;">${libres} libres</div>`);
-      html += `<div class="cuenta-card${claseLlena}">
-        <div class="cuenta-header" onclick="toggleCuenta('${cardId}')">
-          <div>
-            <div class="cuenta-plat">${esc(c.nombre)}</div>
-            <div class="cuenta-correo" onclick="event.stopPropagation();copiarCorreoCuenta(${nombreArgCuenta})" style="cursor:pointer;" title="Toca para copiar el correo">${esc(c.correo)} 📋</div>
+            ? '<div class="ca-pill amber">1 libre</div>'
+            : `<div class="ca-pill">${libres} libres</div>`);
+
+      // Fila de bloques: un bloque por slot real. El ocupado muestra el PRIMER
+      // nombre del cliente (el completo no entra en 32px) y el libre queda
+      // punteado para que "hay lugar" se vea de un vistazo sin leer nada.
+      const bloquesSlots = slotsReales.map(s => {
+        if (s === 'x' || s === 'X') return '<div class="ca-slot bloq" title="No disponible">—</div>';
+        if (!s) return '<div class="ca-slot libre" title="Slot libre">libre</div>';
+        const nombreCli = nombreClientePorId_(s) || s;
+        const primerNombre = String(nombreCli).trim().split(' ')[0];
+        return `<div class="ca-slot ocupado" title="${esc(nombreCli)}">${esc(primerNombre)}</div>`;
+      }).join('');
+
+      html += `<div class="cuenta-card ca-card${claseLlena}">
+        <div class="ca-head" style="--ca-grad:linear-gradient(100deg, ${color} 0%, transparent 76%);" onclick="toggleCuenta('${cardId}')">
+          <div class="ca-ini" style="background:${color};">${esc(inicial)}</div>
+          <div style="flex:1;min-width:0;">
+            <div class="ca-nom">${esc(c.nombre)}</div>
+            <div class="ca-sub">${ocupados} de ${c.slotsTotal} ocupada${ocupados!==1?'s':''}${bloqueados?` · ${bloqueados} bloqueada${bloqueados!==1?'s':''}`:''}</div>
           </div>
-          <div style="display:flex;align-items:center;gap:10px;">
-            <div style="text-align:right;">
-              ${estadoLibres}
-              <div style="font-size:11px;color:var(--text3);">${ocupados} ocupado${ocupados!==1?'s':''}</div>
-            </div>
-            <div class="cuenta-slots-summary">${slotsMini}</div>
-            ${MI_ROL==='admin' ? `<button onclick="event.stopPropagation();copiarAcceso(${nombreArgCuenta})" title="Copiar correo y contraseña" style="background:var(--surface);border:1px solid var(--border-strong);border-radius:9px;width:34px;height:34px;font-size:15px;cursor:pointer;color:var(--text2);flex-shrink:0;line-height:1;">📋</button>` : ''}
-          </div>
+          ${estadoLibres}
+          ${MI_ROL==='admin' ? `<button class="ca-copy" onclick="event.stopPropagation();copiarAcceso(${nombreArgCuenta})" title="Copiar correo y contraseña">📋</button>` : ''}
+        </div>
+        <div class="ca-slots">${bloquesSlots}</div>
+        <div class="ca-pie">
+          <span title="Cuenta de pago">💳 ${esc(c.cuentaPago||'—')}</span>
+          <span title="${esc(c.notas||plat)}">${c.notas ? '📝 '+esc(c.notas) : esc(plat)}</span>
         </div>
         <div class="cuenta-body" id="${cardId}">
           <div class="cuenta-info">
@@ -5018,6 +5599,7 @@ function renderCuentas() {
         </div>
       </div>`;
     });
+    html += `</div></div>`; // cierra .ca-grid y .ca-grupo
   });
   document.getElementById('cuentas-content').innerHTML = html;
 }
@@ -5461,7 +6043,10 @@ function renderGanancias() {
   const _mA = _now.getMonth(), _aA = _now.getFullYear();
   const _mP = _mA===0?11:_mA-1, _aP = _mA===0?_aA-1:_aA;
   const _vMio = MI_ROL==='admin' ? 'yo' : MI_VENDEDOR.toLowerCase();
-  let nuevosMes=0, nuevosPrev=0, generadoMes=0;
+  // comisionesMes NO es un cálculo nuevo de dinero: son los MISMOS montos del
+  // libro que ya se recorren aquí, solo que agrupados por "no soy yo" para poder
+  // dibujar el reparto del mes. Ni una fórmula cambia.
+  let nuevosMes=0, nuevosPrev=0, generadoMes=0, comisionesMes=0;
   todasComisiones.forEach(m=>{
     const tipo=(m.tipo||'').toLowerCase();
     if(tipo!=='venta' && tipo!=='renovacion') return;
@@ -5469,32 +6054,107 @@ function renderGanancias() {
     if(f.getMonth()===_mA && f.getFullYear()===_aA){
       nuevosMes++;
       if((m.vendedor||'').toLowerCase()===_vMio) generadoMes += parseFloat(m.monto)||0;
+      else if(resumen[(m.vendedor||'').toLowerCase()]!==undefined) comisionesMes += parseFloat(m.monto)||0;
     } else if(f.getMonth()===_mP && f.getFullYear()===_aP) nuevosPrev++;
   });
   const difMes = nuevosMes - nuevosPrev;
   const _nombresMes = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
   const mesNombre = _nombresMes[_mA];
+  const mesPrevNombre = _nombresMes[_mP];
+
+  // ===== Datos SOLO de presentación para las tres tarjetas de arriba =====
+  // "Por cobrar": lo que los clientes vigentes todavía deben. Es el mismo
+  // criterio de PENDIENTE que usa la lista de clientes, sobre los mismos
+  // _vigentes ya filtrados arriba — no se inventa ninguna regla nueva.
+  let porCobrar = 0, porCobrarCount = 0;
+  _vigentes.forEach(c=>{
+    if((c.pago||'').toUpperCase()==='PENDIENTE'){ porCobrar += parseFloat(c.precio)||0; porCobrarCount++; }
+  });
+  // "Cobrado en el mes" = lo tuyo + lo del equipo, tal como quedó registrado en
+  // el libro este mes. OJO: no incluye el costo de las cuentas de streaming
+  // porque la app hoy NO guarda ese dato en ningún lado.
+  const cobradoMes = generadoMes + comisionesMes;
+  const pctVos = cobradoMes > 0.001 ? (generadoMes/cobradoMes)*100 : 0;
+  const pctEq  = cobradoMes > 0.001 ? (comisionesMes/cobradoMes)*100 : 0;
+  const de10 = (pctVos/10);
+  const _m = n => '$'+Number(n||0).toLocaleString('es-MX',{minimumFractionDigits:0,maximumFractionDigits:2});
+  // Los % de cada vendedor, para explicar de dónde sale el tramo ámbar.
+  const pctsEquipo = vendedores.map(v=>`${esc(nombreVendedorUI_(v))} ${COMISIONES[v]!==undefined?COMISIONES[v]:100}%`).join(' · ');
 
   // ===== HERO: la ganancia REAL del negocio =====
   // El número grande y principal es la ganancia de TODOS los clientes activos
   // (lo que de verdad estás generando ahora mismo). Lo de "este mes" pasa a ser
   // un dato secundario de actividad, para que no compita ni confunda con éste.
-  const heroGananciaHTML = MI_ROL==='admin' ? `
-    <div class="mini-stat" style="background:linear-gradient(135deg,rgba(0,149,246,0.14),rgba(0,149,246,0.05));border:1px solid rgba(0,149,246,0.35);">
-      <div class="lbl">💰 Tu ganancia · ciclos vigentes</div>
-      <div class="val" style="font-size:32px;color:var(--violet2);margin-top:2px;">$${misGanancias.toLocaleString('es-MX',{minimumFractionDigits:0,maximumFractionDigits:2})}</div>
-      <div class="sub" style="margin-top:6px;">Suma lo que te deja el ciclo completo de cada uno de tus ${misClientes} clientes vigentes, ya descontadas las comisiones. Ojo: una venta de 3 meses entra completa, no dividida — por eso este número sube de golpe con las ventas largas y no sirve para comparar un mes contra otro.</div>
-      <div style="font-size:12px;color:var(--text2);margin-top:6px;">${misClientesDirectos} propias directas · ${misClientes-misClientesDirectos} de tus vendedores</div>
-    </div>` : `
-    <div class="mini-stat" style="background:linear-gradient(135deg,rgba(0,149,246,0.14),rgba(0,149,246,0.05));border:1px solid rgba(0,149,246,0.35);">
-      <div class="lbl">💰 Tu comisión · ciclos vigentes</div>
-      <div class="val" style="font-size:32px;color:var(--violet2);margin-top:2px;">$${misGanancias.toLocaleString('es-MX',{minimumFractionDigits:0,maximumFractionDigits:2})}</div>
-      <div class="sub" style="margin-top:6px;">Suma tu comisión del ciclo completo de tus ${misClientes} clientes vigentes. Una venta de varios meses cuenta completa, tal como se te acreditó.</div>
+  // Las tres tarjetas de arriba: el mismo `misGanancias` de siempre, solo que
+  // ahora acompañado de lo que falta cobrar y del margen, para que la primera
+  // pantalla conteste "cuánto gano / cuánto me deben / qué tan bueno es".
+  const heroGananciaHTML = `
+    <div class="gn-kpis">
+      <div class="gn-kpi azul">
+        <div class="gn-kpi-lbl">💰 ${MI_ROL==='admin'?'Tu ganancia':'Tu comisión'} · ciclos vigentes</div>
+        <div class="gn-kpi-val" style="color:var(--violet2);">${_m(misGanancias)}</div>
+        <div class="gn-kpi-sub">${MI_ROL==='admin'
+          ? `${misClientesDirectos} propias directas · ${misClientes-misClientesDirectos} de tus vendedores`
+          : `${misClientes} cliente${misClientes!==1?'s':''} vigente${misClientes!==1?'s':''}`}</div>
+      </div>
+      <div class="gn-kpi ambar">
+        <div class="gn-kpi-lbl">⏳ Por cobrar</div>
+        <div class="gn-kpi-val" style="color:var(--amber);">${_m(porCobrar)}</div>
+        <div class="gn-kpi-sub">${porCobrarCount} cliente${porCobrarCount!==1?'s':''} con pago PENDIENTE</div>
+      </div>
+      <div class="gn-kpi verde">
+        <div class="gn-kpi-lbl">📊 ${MI_ROL==='admin'?'Margen del negocio':`Tu parte de ${mesNombre}`}</div>
+        <div class="gn-kpi-val" style="color:var(--green);">${cobradoMes>0.001?Math.round(pctVos)+'%':'—'}</div>
+        <div class="gn-kpi-sub">${cobradoMes>0.001
+          ? `de cada $10 que cobrás, te quedan $${de10.toFixed(1)}`
+          : `sin movimientos registrados en ${mesNombre}`}</div>
+      </div>
     </div>`;
+
+  // Bloque grande del mes: solo para el admin, porque el reparto entre "vos" y
+  // "equipo" no tiene sentido para un vendedor (él solo ve lo suyo).
+  const mesBloqueHTML = (MI_ROL==='admin' && cobradoMes > 0.001) ? `
+    <div class="gn-mes">
+      <div class="gn-mes-head">
+        <div>
+          <div class="gn-mes-lbl">Cobrado en ${mesNombre}</div>
+          <div class="gn-mes-val">${_m(cobradoMes)}</div>
+          <div class="gn-mes-sub">${nuevosMes} alta${nuevosMes!==1?'s':''} y renovaciones${difMes!==0
+            ? ` · <span style="color:${difMes>0?'var(--green)':'var(--red)'};font-weight:700;">${difMes>0?'+':''}${difMes}</span> vs ${mesPrevNombre}`
+            : ` · igual que ${mesPrevNombre}`}</div>
+        </div>
+        <div class="gn-limpio">
+          <div class="gn-limpio-lbl">Te quedó limpio</div>
+          <div class="gn-limpio-val">${_m(generadoMes)}</div>
+        </div>
+      </div>
+      <div class="gn-split">
+        <div class="gn-seg vos" style="flex:0 0 ${pctVos.toFixed(2)}%;"><b>${_m(generadoMes)}</b><span>para vos</span></div>
+        ${comisionesMes>0.001?`<div class="gn-seg eq" style="flex:0 0 ${pctEq.toFixed(2)}%;"><b>${_m(comisionesMes)}</b><span>equipo</span></div>`:''}
+      </div>
+      <div style="margin-top:14px;">
+        <div class="gn-paso">
+          <div class="gn-paso-bar"><i style="width:100%;background:var(--violet);"></i></div>
+          <div class="gn-paso-txt"><b>Le tocó a ${mesNombre}</b><span>Ventas y renovaciones registradas en el libro este mes</span></div>
+          <div class="gn-paso-monto" style="color:var(--violet2);">${_m(cobradoMes)}</div>
+        </div>
+        <div class="gn-paso">
+          <div class="gn-paso-bar"><i style="width:${pctEq.toFixed(2)}%;background:var(--amber);"></i></div>
+          <div class="gn-paso-txt"><b>− Comisiones del equipo</b><span>${pctsEquipo||'sin vendedores'}</span></div>
+          <div class="gn-paso-monto" style="color:var(--amber);">−${_m(comisionesMes)}</div>
+        </div>
+        <div class="gn-paso final">
+          <div class="gn-paso-bar"><i style="width:${pctVos.toFixed(2)}%;background:var(--green);"></i></div>
+          <div class="gn-paso-txt"><b>Te quedó limpio</b><span>Antes del costo de las cuentas — la app todavía no guarda ese dato</span></div>
+          <div class="gn-paso-monto" style="color:var(--green);">${_m(generadoMes)}</div>
+        </div>
+      </div>
+    </div>` : '';
 
   const heroHTML = `
   <div class="earn-wrap">
     ${heroGananciaHTML}
+    ${mesBloqueHTML}
     <div class="earn-top-grid">
       <div class="pending-hero${todoAlCorriente?' all-paid':''}">
         <div class="ring-wrap">
@@ -5514,12 +6174,13 @@ function renderGanancias() {
           <div class="sub">${heroSub}</div>
         </div>
       </div>
+      ${MI_ROL==='admin' && mesBloqueHTML ? '' : `
       <div class="mini-stat">
         <div class="lbl">📅 ${mesNombre} en curso</div>
         <div class="val">${nuevosMes}</div>
         <div class="sub">altas y renovaciones${difMes!==0?` · <span style="color:${difMes>0?'var(--green)':'var(--red)'};font-weight:700;">${difMes>0?'+':''}${difMes}</span> vs mes pasado`:` · igual que el mes pasado`}</div>
         <div style="font-size:11px;color:var(--text3);margin-top:5px;">$${generadoMes.toLocaleString('es-MX',{maximumFractionDigits:0})} ${MI_ROL==='admin'?'de tus ventas directas':'de comisión ganada'} en ${mesNombre}</div>
-      </div>
+      </div>`}
     </div>
     ${MI_ROL==='admin' ? `
     <div class="mini-stat" style="background:linear-gradient(135deg,rgba(52,211,153,0.12),rgba(52,211,153,0.03));border:1px solid rgba(52,211,153,0.3);">
@@ -5563,13 +6224,13 @@ function vendorCardHTML(v, r, hist) {
   const vu = todasVentasUnicas.filter(x=>(x.vendedor||'').toLowerCase()===v);
   const nombreVisible = nombreVendedorUI_(v);
 
-  const metaParts = [`${r.clientes} cliente${r.clientes!==1?'s':''} activo${r.clientes!==1?'s':''}`, `${pct}% comisión`];
+  const metaParts = [`${r.clientes} cliente${r.clientes!==1?'s':''}`, `se lleva el ${pct}% de la Ganancia Amigo`];
   if (r.ventasUnicas>0) metaParts.push(`${r.ventasUnicas} venta${r.ventasUnicas!==1?'s':''} única${r.ventasUnicas!==1?'s':''} este mes`);
 
   return `
   <div class="vendor-card">
-    <div class="vendor-card-head">
-      <div style="display:flex;align-items:center;gap:12px;">
+    <div class="gn-v-head">
+      <div class="gn-v-id">
         <div class="vendor-mini-ring">
           <svg width="38" height="38" viewBox="0 0 38 38">
             <circle cx="19" cy="19" r="${ringR}" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="5"/>
@@ -5577,30 +6238,34 @@ function vendorCardHTML(v, r, hist) {
               stroke-dasharray="${ringC}" stroke-dashoffset="${ringOffset}" transform="rotate(-90 19 19)" style="transition:stroke-dashoffset 0.6s var(--ease);"/>
           </svg>
         </div>
-        <div>
-          <div class="vendor-card-name">${nombreVisible}</div>
+        <div style="min-width:0;">
+          <div class="vendor-card-name">${esc(nombreVisible)}</div>
           <div class="vendor-card-meta">${metaParts.join(' · ')}</div>
         </div>
       </div>
-      ${MI_ROL==='admin' ? `
-      <div style="display:flex;gap:6px;flex-shrink:0;">
+      <div class="gn-v-saldo">
+        <b style="color:${pend>0.001?'var(--amber)':(sobrepago?'var(--violet2)':'var(--green)')};">$${Math.abs(pend).toFixed(2)}</b>
+        <span>${pend>0.001?'le debés':(sobrepago?'a su favor':'al corriente')}</span>
+      </div>
+    </div>
+    ${MI_ROL==='admin' ? `
+      <div style="display:flex;gap:6px;flex-shrink:0;justify-content:flex-end;margin-top:10px;">
         <button onclick="abrirModalVentaUnica('${v}')" class="btn-primary" style="width:auto;margin-top:0;padding:8px 10px;font-size:12px;background:var(--surface);color:var(--text);border:1px solid var(--border);box-shadow:none;" title="Registrar venta única">🎟️</button>
         <button onclick="abrirModalAjuste('${v}')" class="btn-primary" style="width:auto;margin-top:0;padding:8px 10px;font-size:12px;background:var(--surface);color:var(--text);border:1px solid var(--border);box-shadow:none;" title="Ajuste manual del saldo">⚖️</button>
         <button onclick="abrirModalPago('${v}',${pend.toFixed(2)})" class="btn-primary" style="width:auto;margin-top:0;padding:8px 14px;font-size:12px;">Pagar</button>
       </div>` : ''}
-    </div>
-    <div class="vendor-stat-row">
-      <div class="cuenta-info-item">
-        <div class="cuenta-info-label">Acumulado</div>
-        <div style="font-family:'Space Grotesk';font-size:15px;font-weight:700;color:var(--text);">$${acum.toFixed(2)}</div>
+    <div class="gn-cajas">
+      <div class="gn-caja">
+        <div class="gn-caja-lbl">Abonado</div>
+        <div class="gn-caja-val" style="color:var(--text);">$${acum.toFixed(2)}</div>
       </div>
-      <div class="cuenta-info-item">
-        <div class="cuenta-info-label">Pagado</div>
-        <div style="font-family:'Space Grotesk';font-size:15px;font-weight:700;color:var(--green);">$${pag.toFixed(2)}</div>
+      <div class="gn-caja">
+        <div class="gn-caja-lbl">Pagado</div>
+        <div class="gn-caja-val" style="color:var(--green);">$${pag.toFixed(2)}</div>
       </div>
-      <div class="cuenta-info-item">
-        <div class="cuenta-info-label">${sobrepago?'A favor':'Pendiente'}</div>
-        <div style="font-family:'Space Grotesk';font-size:15px;font-weight:700;color:${pend>0.001?'var(--amber)':(sobrepago?'var(--violet)':'var(--green)')};">$${Math.abs(pend).toFixed(2)}</div>
+      <div class="gn-caja">
+        <div class="gn-caja-lbl">${sobrepago?'A favor':'Saldo'}</div>
+        <div class="gn-caja-val" style="color:${pend>0.001?'var(--amber)':(sobrepago?'var(--violet2)':'var(--green)')};">$${Math.abs(pend).toFixed(2)}</div>
       </div>
     </div>
     ${sobrepago?`<div class="spark-line warn">⚠️ Le pagaste $${Math.abs(pend).toFixed(2)} de más — queda a su favor para el siguiente ciclo.</div>`:''}
@@ -5687,24 +6352,47 @@ function renderComprobantes() {
     cont.innerHTML = `<div class="empty"><div class="empty-icon">📎</div><div class="empty-title">${q?'Sin resultados':'Sin comprobantes todavía'}</div><div class="empty-sub">${q?'Ninguno coincide con tu búsqueda.':'Se suben desde el botón "Subir comprobante" en la ficha de cada cliente.'}</div></div>`;
     return;
   }
-  cont.innerHTML = lista.map(cp => {
+  // El ID del archivo de Drive va dentro de la propia URL (".../d/<ID>/view" o
+  // "?id=<ID>"). Si se puede extraer, se pide la miniatura real; si no, la
+  // tarjeta se queda con el marcador de patrón diagonal.
+  const RE_ID_DRIVE = /[-\w]{25,}/;
+  const idDrive = url => {
+    const m = RE_ID_DRIVE.exec(String(url||''));
+    return m ? m[0] : '';
+  };
+
+  cont.innerHTML = '<div class="cp-grid">' + lista.map(cp => {
     // Estado de validación: los que suben los vendedores llegan PENDIENTE y
     // solo cuentan como buenos cuando el admin los valida. Sin la columna
     // (comprobantes viejos) se tratan como validados de siempre.
     const est = String(cp.estado||'').toUpperCase().trim();
     const chip = est === 'PENDIENTE'
-      ? '<span style="font-size:10px;font-weight:800;color:var(--amber);background:var(--amber-bg);padding:2px 7px;border-radius:99px;">⏳ POR VALIDAR</span>'
-      : (est === 'RECHAZADO' ? '<span style="font-size:10px;font-weight:800;color:var(--red);background:var(--red-bg);padding:2px 7px;border-radius:99px;">✕ RECHAZADO</span>' : '');
+      ? '<span class="cp-chip pend">Por revisar</span>'
+      : (est === 'RECHAZADO' ? '<span class="cp-chip no">Rechazado</span>' : '<span class="cp-chip ok">Verificado</span>');
+    const fid = idDrive(cp.drive_url);
+    // Si la miniatura de Drive falla (permisos, archivo movido), se oculta la
+    // imagen y vuelve a verse el marcador que está debajo.
+    const img = fid
+      ? `<img src="https://drive.google.com/thumbnail?id=${esc(fid)}&sz=w400" loading="lazy" alt="" onerror="this.style.display='none';">`
+      : '';
+    const monto = parseFloat(cp.monto);
+    const meta = [cp.fecha, cp.paquete, (MI_ROL==='admin' && cp.vendedor) ? cp.vendedor : '']
+      .filter(Boolean).map(esc).join(' · ');
     return `
-    <div class="cuenta-card" style="padding:13px 16px;display:flex;align-items:center;gap:12px;${est==='PENDIENTE'?'border-left:3px solid var(--amber);':''}">
-      <div style="flex:1;min-width:0;">
-        <div style="font-size:13.5px;font-weight:700;display:flex;align-items:center;gap:6px;flex-wrap:wrap;">${esc(cp.cliente_nombre||'—')} ${chip}</div>
-        <div style="font-size:12px;color:var(--text2);margin-top:2px;">${esc(cp.paquete||'')}${MI_ROL==='admin'&&cp.vendedor?' · '+esc(cp.vendedor):''} · ${esc(cp.fecha||'')}</div>
+    <a class="cp-card" href="${esc(cp.drive_url)}" target="_blank" rel="noopener" title="Ver comprobante">
+      <div class="cp-thumb">
+        <div class="cp-ph-ico">🖼️</div>
+        <div class="cp-ph-txt">miniatura de Drive</div>
+        ${img}
+        ${chip}
       </div>
-      ${cp.monto&&parseFloat(cp.monto)>0?`<div style="font-family:'Space Grotesk';font-weight:700;color:var(--green);white-space:nowrap;">$${parseFloat(cp.monto).toFixed(2)}</div>`:''}
-      <a href="${esc(cp.drive_url)}" target="_blank" rel="noopener" class="wa-btn" style="background:var(--blue-bg);border-color:rgba(96,165,250,0.35);color:var(--blue);" title="Ver comprobante">👁️</a>
-    </div>`;
-  }).join('');
+      <div class="cp-body">
+        <div class="cp-nom">${esc(cp.cliente_nombre||'—')}</div>
+        ${meta ? `<div class="cp-meta">${meta}</div>` : ''}
+        ${!isNaN(monto) && monto > 0 ? `<div class="cp-monto">$${monto.toFixed(2)}</div>` : ''}
+      </div>
+    </a>`;
+  }).join('') + '</div>';
 }
 
 function abrirModalComprobante(clienteId) {
@@ -5974,20 +6662,45 @@ function renderConfig() {
   // alta desde la app incluidos) aparece aquí para ajustar su comisión.
   const vendedores = vendedoresEquipo_().map(v => ({ nombre: nombreVendedorUI_(v), key: v }));
 
+  // Resúmenes del panel izquierdo: se sacan de lo que la app YA tiene cargado.
+  // Donde no hay dato real (cuántos alias de Relay quedan, cuándo fue el último
+  // respaldo) va una descripción corta — preferible a inventar un número.
+  const _precios = paquetes.map(([,d]) => parseFloat(d.precio)||0).filter(p=>p>0);
+  const resumenCombos = paquetes.length
+    ? `${paquetes.length} combos${_precios.length?` · desde $${Math.min(..._precios)}`:''}`
+    : 'Sin combos todavía';
+  const resumenVendedores = vendedores.length
+    ? vendedores.map(v => `${esc(v.nombre)} ${COMISIONES[v.key]!==undefined?COMISIONES[v.key]:100}%`).join(' · ')
+    : 'Todavía no hay vendedores';
+  // Cada sección del panel izquierdo: id de pestaña, emoji, nombre y su resumen.
+  const secciones = [
+    ['paquetes',     '📦', 'Combos y precios', resumenCombos],
+    ['vendedores',   '👥', 'Vendedores',       resumenVendedores],
+    ['nueva-cuenta', '🔑', 'Nueva cuenta',     'Da de alta una cuenta de streaming'],
+    ['nuevo-combo',  '➕', 'Nuevo combo',      'Arma un paquete y ponle precio'],
+    ['relay',        '🎭', 'Correos Relay',    'Alias desechables para cuentas y clientes'],
+    ['datos',        '💾', 'Datos y respaldo', 'Exporta clientes y cuentas en CSV']
+  ];
+
   document.getElementById('config-content').innerHTML=`
     <div style="font-size:16px;font-weight:700;margin-bottom:16px;font-family:'Space Grotesk';">⚙️ Configuración</div>
 
-    <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;" id="config-tabs">
-      <button class="f-btn active" onclick="showConfigTab('paquetes',this)">📦 Combos y precios</button>
-      <button class="f-btn" onclick="showConfigTab('vendedores',this)">👥 Vendedores</button>
-      <button class="f-btn" onclick="showConfigTab('nueva-cuenta',this)">🔑 Nueva cuenta</button>
-      <button class="f-btn" onclick="showConfigTab('nuevo-combo',this)">➕ Nuevo combo</button>
-      <button class="f-btn" onclick="showConfigTab('relay',this)">🎭 Correos Relay</button>
-      <button class="f-btn" onclick="showConfigTab('datos',this)">💾 Respaldo</button>
+    <div class="cf-wrap">
+    <div class="cf-nav" id="config-tabs">
+      ${secciones.map(([id, ico, nom, val], i) => `
+      <button class="f-btn cf-item${i===0?' active':''}" onclick="showConfigTab('${id}',this)">
+        <span class="cf-ico">${ico}</span>
+        <span class="cf-item-txt">
+          <span class="cf-item-nom">${nom}</span>
+          <span class="cf-item-val">${val}</span>
+        </span>
+      </button>`).join('')}
     </div>
 
+    <div class="cf-panel">
     <div id="config-paquetes">
-      <div style="font-size:12px;color:var(--text2);margin-bottom:12px;">Edita precios y ganancias. Los cambios aplican a nuevos clientes.</div>
+      <div class="cf-titulo">📦 Combos y precios</div>
+      <div class="cf-desc">Cada combo muestra cómo se reparte su precio: lo que se lleva el vendedor (Ganancia Amigo) y lo que te queda a vos. Los cambios aplican a los clientes nuevos.</div>
       <div style="background:var(--blue-bg);border:1px solid rgba(96,165,250,0.35);border-radius:12px;padding:14px 16px;margin-bottom:16px;">
         <div style="font-size:12.5px;font-weight:700;color:var(--blue);margin-bottom:6px;">🔒 Proteger clientes actuales de un aumento de precio</div>
         <div style="font-size:12px;color:var(--text2);margin-bottom:10px;line-height:1.5;">Antes de subir un precio aquí abajo, congela a tus clientes ACTIVOS de hoy: seguirán pagando su precio de siempre hasta la fecha que elijas, sin que tengas que hacer nada ese día. Los clientes nuevos que registres de ahora en adelante ya pagan el precio nuevo, sin protección.</div>
@@ -5997,9 +6710,26 @@ function renderConfig() {
         </div>
       </div>
       <div style="display:flex;flex-direction:column;gap:8px;" id="lista-paquetes">
-        ${paquetes.map(([nombre, datos], i) => `
+        ${paquetes.map(([nombre, datos], i) => {
+          // Barra de reparto: SOLO dos tramos, porque la app no guarda cuánto te
+          // cuesta la cuenta de streaming. Inventar ese tramo sería mentir.
+          const _p = parseFloat(datos.precio)||0;
+          const _a = parseFloat(datos.gananciaAmigo)||0;
+          const _n = parseFloat(datos.gananciaNeta)||0;
+          const _tot = _a + _n;
+          const _pa = _tot>0 ? (_a/_tot)*100 : 0;
+          const _pn = _tot>0 ? (_n/_tot)*100 : 0;
+          return `
           <div class="cuenta-card" style="padding:13px 15px;">
-            <div style="font-size:13px;font-weight:600;margin-bottom:9px;">${esc(nombre)}${(datos.meses||1)>1?` <span style="font-size:11px;color:var(--violet2);font-weight:700;">📆 ${datos.meses} meses</span>`:''}</div>
+            <div style="display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin-bottom:9px;">
+              <div style="font-size:13px;font-weight:600;">${esc(nombre)}${(datos.meses||1)>1?` <span style="font-size:11px;color:var(--violet2);font-weight:700;">📆 ${datos.meses} meses</span>`:''}</div>
+              <div style="font-family:'Space Grotesk';font-size:13px;font-weight:800;white-space:nowrap;">$${_p}</div>
+            </div>
+            ${_tot>0?`
+            <div class="cf-combo-split">
+              <div class="cf-combo-seg eq" style="flex:0 0 ${_pa.toFixed(2)}%;" title="Ganancia Amigo (vendedor)">$${_a}</div>
+              <div class="cf-combo-seg vos" style="flex:0 0 ${_pn.toFixed(2)}%;" title="Tu ganancia neta">$${_n}</div>
+            </div>`:''}
             <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;">
               <div>
                 <div style="font-size:10px;color:var(--text3);text-transform:uppercase;margin-bottom:4px;">Precio público</div>
@@ -6027,11 +6757,13 @@ function renderConfig() {
                 ${[1,2,3,6,12].map(m=>`<option value="${m}"${(datos.meses||1)==m?' selected':''}>${m} ${m===1?'mes':'meses'}</option>`).join('')}
               </select>
             </div>
-          </div>`).join('')}
+          </div>`; }).join('')}
       </div>
     </div>
 
     <div id="config-vendedores" style="display:none;">
+      <div class="cf-titulo">👥 Tu equipo</div>
+      <div class="cf-desc">El % que ves es la parte de la Ganancia Amigo que se queda cada vendedor. Cambialo con − y + (de 5 en 5) y se aplica al instante al calcular ganancias.</div>
       <div style="background:${MI_MODO_APROBACION?'var(--green-bg)':'var(--amber-bg)'};border:1px solid ${MI_MODO_APROBACION?'rgba(52,211,153,0.35)':'rgba(251,191,36,0.35)'};border-radius:12px;padding:14px 16px;margin-bottom:16px;">
         <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;">
           <div style="flex:1;">
@@ -6043,18 +6775,19 @@ function renderConfig() {
           <button class="btn-primary" style="width:auto;margin-top:0;padding:9px 16px;font-size:13px;white-space:nowrap;${MI_MODO_APROBACION?'background:var(--surface);color:var(--text2);border:1px solid var(--border);box-shadow:none;':''}" onclick="cambiarModoAprobacion(${MI_MODO_APROBACION?'false':'true'})">${MI_MODO_APROBACION?'Apagar':'Activar'}</button>
         </div>
       </div>
-      <div style="font-size:12px;color:var(--text2);margin-bottom:12px;">Ajusta el % de comisión real de cada vendedor — se aplica directo al calcular ganancias.</div>
       <div style="display:flex;flex-direction:column;gap:8px;">
         ${vendedores.map(v => `
           <div class="vendor-row">
             <div>
-              <div class="vendor-name">${v.nombre}</div>
+              <div class="vendor-name">${esc(v.nombre)}</div>
               <div class="vendor-pct">Se lleva el % de la Ganancia Amigo</div>
             </div>
-            <div style="display:flex;align-items:center;gap:8px;">
-              <input type="number" class="form-input" style="width:72px;padding:7px 9px;text-align:center;"
+            <div class="cf-step">
+              <button type="button" onclick="ajustarComisionPaso_('${v.key}',-5)" title="Bajar 5%">−</button>
+              <input type="number" class="form-input"
                 id="vend-${v.key}" value="${COMISIONES[v.key]!==undefined?COMISIONES[v.key]:100}" min="0" max="100"
                 onchange="actualizarComision('${v.key}')">
+              <button type="button" onclick="ajustarComisionPaso_('${v.key}',5)" title="Subir 5%">+</button>
               <span style="font-size:13px;color:var(--text2);">%</span>
             </div>
           </div>`).join('')}
@@ -6087,7 +6820,8 @@ function renderConfig() {
     </div>
 
     <div id="config-nueva-cuenta" style="display:none;">
-      <div style="font-size:12px;color:var(--text2);margin-bottom:12px;">Agrega una nueva cuenta de streaming.</div>
+      <div class="cf-titulo">🔑 Nueva cuenta</div>
+      <div class="cf-desc">Da de alta una cuenta de streaming con sus slots. En cuanto la guardes queda disponible para asignarle clientes.</div>
       <div style="display:flex;flex-direction:column;gap:10px;">
         <div class="form-group">
           <label class="form-label">Nombre</label>
@@ -6142,7 +6876,8 @@ function renderConfig() {
     </div>
 
     <div id="config-nuevo-combo" style="display:none;">
-      <div style="font-size:12px;color:var(--text2);margin-bottom:12px;">Crea un combo nuevo. Aparecerá disponible al crear clientes de inmediato.</div>
+      <div class="cf-titulo">➕ Nuevo combo</div>
+      <div class="cf-desc">Crea un paquete nuevo con su precio y su reparto. Aparece disponible al crear clientes de inmediato.</div>
       <div style="display:flex;flex-direction:column;gap:10px;">
         <div class="form-group">
           <label class="form-label">Nombre del combo</label>
@@ -6194,7 +6929,8 @@ function renderConfig() {
     </div>
 
     <div id="config-relay" style="display:none;">
-      <div style="font-size:12px;color:var(--text2);margin-bottom:14px;">Genera correos desechables de Firefox Relay sin salir de aquí. Cada correo generado queda guardado en tu hoja, así siempre sabes cuál es de quién.</div>
+      <div class="cf-titulo">🎭 Correos Relay</div>
+      <div class="cf-desc">Genera correos desechables de Firefox Relay sin salir de aquí. Cada correo generado queda guardado en tu hoja, así siempre sabes cuál es de quién.</div>
       <div style="display:flex;flex-direction:column;gap:12px;">
         <div class="cuenta-card" style="padding:15px 16px;">
           <div style="font-size:13px;font-weight:700;margin-bottom:8px;">🎬 Correo para una plataforma</div>
@@ -6220,7 +6956,8 @@ function renderConfig() {
     </div>
 
     <div id="config-datos" style="display:none;">
-      <div style="font-size:12px;color:var(--text2);margin-bottom:14px;">Descarga un respaldo en CSV (se abre en Excel). Útil por si algo le pasa a la hoja de Google.</div>
+      <div class="cf-titulo">💾 Datos y respaldo</div>
+      <div class="cf-desc">Descarga un respaldo en CSV (se abre en Excel). Útil por si algo le pasa a la hoja de Google.</div>
       <div style="display:flex;flex-direction:column;gap:10px;">
         <div class="cuenta-card" style="padding:14px 15px;">
           <div style="font-size:13px;font-weight:600;margin-bottom:4px;">👥 Clientes</div>
@@ -6233,7 +6970,9 @@ function renderConfig() {
           <button class="btn-primary" onclick="exportarCuentas()" style="background:linear-gradient(135deg,#f59e0b,#f97316);box-shadow:0 6px 18px -4px rgba(245,158,11,0.5);">🔑 Exportar cuentas (CSV)</button>
         </div>
       </div>
-    </div>`;
+    </div>
+    </div><!-- /cf-panel -->
+    </div><!-- /cf-wrap -->`;
   // El select ya existe en el DOM (innerHTML síncrono recién asignado arriba).
   actualizarVisibilidadRelayCuenta_();
 }
@@ -6246,6 +6985,17 @@ function showConfigTab(tab, btn) {
   // La lista del equipo se pide hasta que se abre esta pestaña (carga perezosa).
   if (tab === 'vendedores') cargarEquipo_();
   if (tab === 'relay') cargarAliasRelay_();
+}
+
+// Stepper del % de comisión. NO calcula dinero: solo mueve el mismo input
+// #vend-KEY de siempre y llama a actualizarComision, que es quien guarda.
+// Se topa en 0–100 para no dejar un % imposible en el campo.
+function ajustarComisionPaso_(key, paso) {
+  const el = document.getElementById('vend-'+key);
+  if (!el) return;
+  const actual = parseFloat(el.value);
+  el.value = Math.max(0, Math.min(100, (isNaN(actual)?100:actual) + paso));
+  actualizarComision(key);
 }
 
 // Congela precio/ganancia de TODOS los clientes activos de HOY hasta la
