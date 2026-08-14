@@ -1370,6 +1370,21 @@ body {
   .nv-col-prev{ position: static; order: -1; }
 }
 
+/* ---------- Lo que cuestan los lugares sin vender ---------- */
+.gn-vacios{
+  display:flex; align-items:center; gap:14px; margin-top:14px; padding:13px 15px;
+  background:var(--amber-bg); border:1px solid rgba(251,191,36,0.26); border-radius:12px;
+}
+.gn-vacios-txt{ flex:1; min-width:0; }
+.gn-vacios-txt b{ font-size:12.5px; font-weight:700; color:var(--amber); display:block; }
+.gn-vacios-txt span{ font-size:11px; color:var(--text3); display:block; margin-top:4px; line-height:1.5; }
+.gn-vacios-val{
+  font-family:'Space Grotesk'; font-weight:800; font-size:20px; color:var(--amber);
+  text-align:right; flex-shrink:0; font-variant-numeric:tabular-nums;
+}
+.gn-vacios-val span{ display:block; font-size:10px; color:var(--text3); font-weight:600; }
+@media (max-width:600px){ .gn-vacios{ flex-direction:column; align-items:flex-start; } }
+
 /* ---------- Rentabilidad por cuenta ---------- */
 .rent-fila{ display:flex; align-items:center; gap:12px; padding:10px 0; border-top:1px solid var(--border); cursor:pointer; transition:opacity .15s; }
 .rent-fila:first-of-type{ border-top:none; }
@@ -5902,16 +5917,22 @@ try {
   if (g && typeof g === 'object') COSTOS_PLATAFORMA = Object.assign(COSTOS_PLATAFORMA, g);
 } catch(e){}
 
-// Costo mensual de UNA cuenta concreta.
+// Costo mensual de UNA cuenta. Se define POR PLATAFORMA porque en la práctica
+// todas las Netflix cuestan lo mismo: no tiene sentido cargarlo 33 veces.
+// La columna 'costo_mensual' de la hoja, si existe, manda sobre el típico
+// (por si alguna cuenta suelta se compró a otro precio).
 function costoMensualCuenta_(c) {
   if (!c) return 0;
-  if (c.costoMensual > 0) return c.costoMensual;               // valor propio de la hoja
-  return COSTOS_PLATAFORMA[c.plataforma] || 0;                  // típico de la plataforma
+  if (c.costoMensual > 0) return c.costoMensual;
+  return COSTOS_PLATAFORMA[c.plataforma] || 0;
+}
+// Lugares de la cuenta, según la hoja.
+function lugaresCuenta_(c) {
+  return Math.max(1, parseInt(c && c.slotsTotal) || 1);
 }
 // Lo que cuesta UN lugar de esa cuenta (para repartir el costo por cliente).
 function costoPorLugar_(c) {
-  const total = Math.max(1, parseInt(c && c.slotsTotal) || 1);
-  return costoMensualCuenta_(c) / total;
+  return costoMensualCuenta_(c) / lugaresCuenta_(c);
 }
 // Costo mensual de TODAS las cuentas: el gasto fijo del negocio.
 function costoMensualTotal_() {
@@ -6614,17 +6635,32 @@ function renderGanancias() {
   // el libro este mes. OJO: no incluye el costo de las cuentas de streaming
   // porque la app hoy NO guarda ese dato en ningún lado.
   const cobradoMes = generadoMes + comisionesMes;
-  // Costo fijo del mes: lo que te cuestan TODAS tus cuentas de streaming.
-  // Sale de costoMensualCuenta_ (columna de la hoja si existe, o el costo
-  // típico de la plataforma). Es un gasto real que antes no se descontaba.
-  const costoCuentas = (MI_ROL === 'admin') ? costoMensualTotal_() : 0;
-  const limpioMes = generadoMes - costoCuentas;
+  // OJO — POR QUÉ NO SE RESTA EL COSTO DE LAS CUENTAS ACÁ:
+  // El catálogo ya lo tiene descontado. Verificable con los propios datos:
+  // Netflix 4K → precio 90 = 60 (costo del lugar) + 20 (amigo) + 10 (neta);
+  // Spotify    → precio 60 = 18 (costo del lugar) + 25 (amigo) + 17 (neta).
+  // Es decir, 'gananciaNeta' YA es lo que queda después de pagar la cuenta.
+  // Restarlo otra vez acá lo contaba dos veces y daba resultados negativos.
+  const limpioMes = generadoMes;
   const pctVos    = cobradoMes > 0.001 ? (generadoMes/cobradoMes)*100 : 0;
   const pctEq     = cobradoMes > 0.001 ? (comisionesMes/cobradoMes)*100 : 0;
-  const pctCtas   = cobradoMes > 0.001 ? (costoCuentas/cobradoMes)*100 : 0;
-  const pctLimpio = cobradoMes > 0.001 ? Math.max(0,(limpioMes/cobradoMes)*100) : 0;
-  // El margen ahora sí es real: sobre lo que queda DESPUÉS de pagar todo.
-  const de10 = (pctLimpio/10);
+  const pctLimpio = pctVos;
+  const de10 = (pctVos/10);
+
+  // El costo de las cuentas SÍ importa, pero en otro lado: los lugares que
+  // NO vendiste. Un slot vacío cuesta igual y no genera un peso — esa es la
+  // pérdida real que no se veía en ningún número.
+  let costoVacios = 0, lugaresVacios = 0;
+  if (MI_ROL === 'admin' && cuentasCargadas) {
+    todasCuentas.forEach(c => {
+      const reales = c.slots.slice(0, c.slotsTotal);
+      const ocupados = reales.filter(s => s && s !== 'x' && s !== 'X').length;
+      const bloqueados = reales.filter(s => s === 'x' || s === 'X').length;
+      const libres = Math.max(0, c.slotsTotal - ocupados - bloqueados);
+      lugaresVacios += libres;
+      costoVacios += libres * costoPorLugar_(c);
+    });
+  }
   const _m = n => '$'+Number(n||0).toLocaleString('es-MX',{minimumFractionDigits:0,maximumFractionDigits:2});
   // Los % de cada vendedor, para explicar de dónde sale el tramo ámbar.
   const pctsEquipo = vendedores.map(v=>`${esc(nombreVendedorUI_(v))} ${COMISIONES[v]!==undefined?COMISIONES[v]:100}%`).join(' · ');
@@ -6652,9 +6688,9 @@ function renderGanancias() {
       </div>
       <div class="gn-kpi verde">
         <div class="gn-kpi-lbl">${ico('barras',13)} ${MI_ROL==='admin'?'Margen del negocio':`Tu parte de ${mesNombre}`}</div>
-        <div class="gn-kpi-val" style="color:var(--green);">${cobradoMes>0.001?Math.round(MI_ROL==='admin'?pctLimpio:pctVos)+'%':'—'}</div>
+        <div class="gn-kpi-val" style="color:var(--green);">${cobradoMes>0.001?Math.round(pctVos)+'%':'—'}</div>
         <div class="gn-kpi-sub">${cobradoMes>0.001
-          ? `de cada $10 que cobrás, te quedan $${de10.toFixed(1)}${MI_ROL==='admin'&&costoCuentas>0.001?' ya pagadas las cuentas':''}`
+          ? `de cada $10 de ganancia, te quedan $${de10.toFixed(1)} después del equipo`
           : `sin movimientos registrados en ${mesNombre}`}</div>
       </div>
     </div>`;
@@ -6665,7 +6701,7 @@ function renderGanancias() {
     <div class="gn-mes">
       <div class="gn-mes-head">
         <div>
-          <div class="gn-mes-lbl">Cobrado en ${mesNombre}</div>
+          <div class="gn-mes-lbl">Generado en ${mesNombre}</div>
           <div class="gn-mes-val">${_m(cobradoMes)}</div>
           <div class="gn-mes-sub">${nuevosMes} alta${nuevosMes!==1?'s':''} y renovaciones${difMes!==0
             ? ` · <span style="color:${difMes>0?'var(--green)':'var(--red)'};font-weight:700;">${difMes>0?'+':''}${difMes}</span> vs ${mesPrevNombre}`
@@ -6677,35 +6713,35 @@ function renderGanancias() {
         </div>
       </div>
       <div class="gn-split">
-        <div class="gn-seg vos" style="flex:0 0 ${pctLimpio.toFixed(2)}%;"><b>${_m(limpioMes)}</b><span>para vos</span></div>
+        <div class="gn-seg vos" style="flex:0 0 ${pctVos.toFixed(2)}%;"><b>${_m(generadoMes)}</b><span>para vos</span></div>
         ${comisionesMes>0.001?`<div class="gn-seg eq" style="flex:0 0 ${pctEq.toFixed(2)}%;"><b>${_m(comisionesMes)}</b><span>equipo</span></div>`:''}
-        ${costoCuentas>0.001?`<div class="gn-seg ctas" style="flex:0 0 ${pctCtas.toFixed(2)}%;"><b>${_m(costoCuentas)}</b><span>cuentas</span></div>`:''}
       </div>
       <div style="margin-top:14px;">
         <div class="gn-paso">
           <div class="gn-paso-bar"><i style="width:100%;background:var(--violet);"></i></div>
-          <div class="gn-paso-txt"><b>Le tocó a ${mesNombre}</b><span>Ventas y renovaciones registradas en el libro este mes</span></div>
+          <div class="gn-paso-txt"><b>Generado en ${mesNombre}</b><span>Ganancia de las ventas y renovaciones del mes, con el costo de las cuentas ya descontado por el catálogo</span></div>
           <div class="gn-paso-monto" style="color:var(--violet2);">${_m(cobradoMes)}</div>
         </div>
-        ${costoCuentas>0.001?`
-        <div class="gn-paso">
-          <div class="gn-paso-bar"><i style="width:${pctCtas.toFixed(2)}%;background:var(--text3);"></i></div>
-          <div class="gn-paso-txt"><b>− Pagaste las cuentas</b><span>${todasCuentas.length} cuenta${todasCuentas.length!==1?'s':''} de streaming al mes</span></div>
-          <div class="gn-paso-monto" style="color:var(--text2);">−${_m(costoCuentas)}</div>
-        </div>`:''}
         <div class="gn-paso">
           <div class="gn-paso-bar"><i style="width:${pctEq.toFixed(2)}%;background:var(--amber);"></i></div>
           <div class="gn-paso-txt"><b>− Comisiones del equipo</b><span>${pctsEquipo||'sin vendedores'}</span></div>
           <div class="gn-paso-monto" style="color:var(--amber);">−${_m(comisionesMes)}</div>
         </div>
         <div class="gn-paso final">
-          <div class="gn-paso-bar"><i style="width:${pctLimpio.toFixed(2)}%;background:var(--green);"></i></div>
-          <div class="gn-paso-txt"><b>Te quedó limpio</b><span>${costoCuentas>0.001
-            ? 'Después de pagar las cuentas y las comisiones'
-            : 'Cargá el costo de tus cuentas en Configuración para que esto sea exacto'}</span></div>
+          <div class="gn-paso-bar"><i style="width:${pctVos.toFixed(2)}%;background:var(--green);"></i></div>
+          <div class="gn-paso-txt"><b>Te quedó limpio</b><span>Después de pagarle a tu equipo</span></div>
           <div class="gn-paso-monto" style="color:var(--green);">${_m(limpioMes)}</div>
         </div>
       </div>
+      ${costoVacios>0.001?`
+      <div class="gn-vacios">
+        <div class="gn-vacios-txt">
+          <b>${ico('alerta',14)} Te sobran ${lugaresVacios} lugar${lugaresVacios!==1?'es':''} sin vender</b>
+          <span>Esas pantallas te cuestan igual todos los meses y no te generan un peso.
+          Es la plata que estás dejando en la mesa, y no aparece en ningún otro número.</span>
+        </div>
+        <div class="gn-vacios-val">−${_m(costoVacios)}<span>al mes</span></div>
+      </div>`:''}
     </div>` : '';
 
   const heroHTML = `
@@ -7527,21 +7563,26 @@ function renderConfig() {
 
     <div id="config-costos" style="display:none;">
       <div class="cf-titulo">${ico('dinero',19)} Costo de tus cuentas</div>
-      <div class="cf-desc">Lo que TE cuesta cada plataforma al mes. Sin este dato el margen del negocio
-        es mentira: se ven los ingresos completos y los gastos no. Se aplica a todas las cuentas de
-        esa plataforma; si una cuenta tuya cuesta distinto, podés agregar una columna
-        <b>costo_mensual</b> en la hoja de cuentas y esa manda sobre este valor.</div>
+      <div class="cf-desc">Lo que TE cuesta cada plataforma al mes, una sola vez para todas las cuentas
+        de esa plataforma. Escribí el número y listo — se recalcula todo al instante.</div>
       <div class="cuenta-card" style="padding:14px 16px;">
-        ${Object.keys(COSTOS_PLATAFORMA).sort().map(p => {
+        ${(() => {
+          // Se listan primero las plataformas que REALMENTE tenés (salen de tus
+          // cuentas cargadas) y después las demás conocidas, por si sumás una.
+          const mias = [...new Set((todasCuentas||[]).map(c => c.plataforma).filter(Boolean))].sort();
+          const otras = Object.keys(COSTOS_PLATAFORMA).filter(p => mias.indexOf(p) === -1).sort();
+          return mias.concat(otras);
+        })().map(p => {
           const nCuentas = (todasCuentas||[]).filter(c => c.plataforma === p).length;
           const lugares = (todasCuentas||[]).filter(c => c.plataforma === p)
-            .reduce((s,c) => s + (parseInt(c.slotsTotal)||0), 0);
+            .reduce((s,c) => s + lugaresCuenta_(c), 0);
           const porLugar = lugares ? (COSTOS_PLATAFORMA[p] * nCuentas / lugares) : 0;
-          return `<div class="costo-fila">
-            <div class="costo-nom">${esc(p)}
+          const totalPlat = COSTOS_PLATAFORMA[p] * nCuentas;
+          return `<div class="costo-fila"${nCuentas?'':' style="opacity:.5;"'}>
+            <div class="costo-nom">${esc(PLAT_ICONS[p]||'')} ${esc(p)}
               <div class="costo-sub">${nCuentas
-                ? `${nCuentas} cuenta${nCuentas!==1?'s':''} · ${lugares} lugares · $${porLugar.toFixed(2)} por lugar`
-                : 'sin cuentas cargadas de esta plataforma'}</div>
+                ? `${nCuentas} cuenta${nCuentas!==1?'s':''} · ${lugares} lugares · <b style="color:var(--text2);">$${porLugar.toFixed(2)} por lugar</b> · te sale $${totalPlat.toLocaleString('es-MX',{maximumFractionDigits:0})} al mes en total`
+                : 'no tenés cuentas de esta plataforma'}</div>
             </div>
             <input type="number" class="form-input costo-inp" id="costo-${esc(p).replace(/\\s/g,'_')}"
               value="${COSTOS_PLATAFORMA[p]}" min="0" step="5"
@@ -7550,8 +7591,8 @@ function renderConfig() {
         }).join('')}
       </div>
       <div style="margin-top:12px;padding:11px 14px;background:var(--violet-bg);border-radius:12px;font-size:12px;color:var(--violet);line-height:1.5;">
-        ${ico('foco',13)} Con esto ya funcionan el <b>margen real</b>, el tramo de cuentas en el reparto del mes,
-        y la <b>rentabilidad por cuenta</b> (cuáles te dejan plata y cuáles te la quitan) al final de Ganancias.
+        ${ico('foco',13)} Estos números alimentan el aviso de <b>lugares sin vender</b> y la
+        <b>rentabilidad por cuenta</b> al final de Ganancias. Cambiá uno y se recalcula al instante.
       </div>
     </div>
 
