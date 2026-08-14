@@ -1370,6 +1370,25 @@ body {
   .nv-col-prev{ position: static; order: -1; }
 }
 
+/* ---------- Rentabilidad por cuenta ---------- */
+.rent-fila{ display:flex; align-items:center; gap:12px; padding:10px 0; border-top:1px solid var(--border); cursor:pointer; transition:opacity .15s; }
+.rent-fila:first-of-type{ border-top:none; }
+.rent-fila:hover{ opacity:.75; }
+.rent-ini{ width:32px; height:32px; border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:13px; flex-shrink:0; }
+.rent-txt{ flex:1; min-width:0; }
+.rent-txt b{ font-size:12.5px; font-weight:700; display:block; }
+.rent-txt span{ font-size:11px; color:var(--text3); display:block; margin-top:2px; }
+.rent-tag{ font-size:9.5px; font-weight:800; padding:2px 7px; border-radius:99px; background:var(--red-bg); color:var(--red); vertical-align:1px; }
+.rent-tag.libre{ background:var(--amber-bg); color:var(--amber); }
+.rent-margen{ font-family:'Space Grotesk'; font-weight:800; font-size:14.5px; text-align:right; flex-shrink:0; font-variant-numeric:tabular-nums; }
+.rent-margen span{ display:block; font-size:9.5px; color:var(--text3); font-weight:600; }
+/* Costos por plataforma en Configuración */
+.costo-fila{ display:flex; align-items:center; gap:12px; padding:11px 0; border-bottom:1px solid var(--border); }
+.costo-fila:last-child{ border-bottom:none; }
+.costo-nom{ flex:1; font-size:13px; font-weight:600; }
+.costo-sub{ font-size:11px; color:var(--text3); font-weight:400; margin-top:2px; }
+.costo-inp{ width:96px; }
+
 /* ---------- Barra de orden y acciones de Clientes ---------- */
 .toolbar-compacta{ display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
 .tb-acciones{ margin-left: auto; display: flex; gap: 8px; align-items: center; }
@@ -5868,6 +5887,37 @@ function cargarCuentas(forzar) {
 
 // Mapeo compartido de filas de la hoja 'cuentas' al objeto que usa la app.
 // Antes este bloque estaba duplicado en cargarCuentas y cargarCuentasBackground.
+// ===== Costo mensual de cada cuenta =====
+// Es lo que TE cuesta mantenerla, no lo que cobras. Sin este dato el margen
+// del negocio es mentira: los ingresos se ven completos y los gastos no.
+// Se usa el valor de la hoja si existe la columna 'costo_mensual'; si no,
+// cae al costo típico de esa plataforma (tabla de abajo, editable en
+// Configuración). Así funciona desde el primer día sin tocar el Sheet.
+let COSTOS_PLATAFORMA = {
+  'NETFLIX': 240, 'DISNEY': 150, 'HBO': 140, 'PARAMOUNT': 90,
+  'SPOTIFY': 90, 'YOUTUBE PREM': 120, 'YOUTUBE': 120, 'CRUNCHYROLL': 75, 'VIX': 60,
+};
+try {
+  const g = JSON.parse(localStorage.getItem('costos_plataforma')||'null');
+  if (g && typeof g === 'object') COSTOS_PLATAFORMA = Object.assign(COSTOS_PLATAFORMA, g);
+} catch(e){}
+
+// Costo mensual de UNA cuenta concreta.
+function costoMensualCuenta_(c) {
+  if (!c) return 0;
+  if (c.costoMensual > 0) return c.costoMensual;               // valor propio de la hoja
+  return COSTOS_PLATAFORMA[c.plataforma] || 0;                  // típico de la plataforma
+}
+// Lo que cuesta UN lugar de esa cuenta (para repartir el costo por cliente).
+function costoPorLugar_(c) {
+  const total = Math.max(1, parseInt(c && c.slotsTotal) || 1);
+  return costoMensualCuenta_(c) / total;
+}
+// Costo mensual de TODAS las cuentas: el gasto fijo del negocio.
+function costoMensualTotal_() {
+  return (todasCuentas||[]).reduce((s,c) => s + costoMensualCuenta_(c), 0);
+}
+
 function mapearCuentas_(filas) {
   return (filas||[]).map(f => ({
     nombre: f['nombre']||'',
@@ -5878,6 +5928,8 @@ function mapearCuentas_(filas) {
     slotsTotal: parseInt(f['slots_total']||'0'),
     slots: [f['slot1']||'',f['slot2']||'',f['slot3']||'',f['slot4']||'',f['slot5']||''],
     notas: f['notas']||'',
+    // Opcional: si algún día agregás la columna, manda sobre el típico.
+    costoMensual: parseFloat(f['costo_mensual']||'0') || 0,
   })).filter(c => c.nombre);
 }
 
@@ -6562,9 +6614,17 @@ function renderGanancias() {
   // el libro este mes. OJO: no incluye el costo de las cuentas de streaming
   // porque la app hoy NO guarda ese dato en ningún lado.
   const cobradoMes = generadoMes + comisionesMes;
-  const pctVos = cobradoMes > 0.001 ? (generadoMes/cobradoMes)*100 : 0;
-  const pctEq  = cobradoMes > 0.001 ? (comisionesMes/cobradoMes)*100 : 0;
-  const de10 = (pctVos/10);
+  // Costo fijo del mes: lo que te cuestan TODAS tus cuentas de streaming.
+  // Sale de costoMensualCuenta_ (columna de la hoja si existe, o el costo
+  // típico de la plataforma). Es un gasto real que antes no se descontaba.
+  const costoCuentas = (MI_ROL === 'admin') ? costoMensualTotal_() : 0;
+  const limpioMes = generadoMes - costoCuentas;
+  const pctVos    = cobradoMes > 0.001 ? (generadoMes/cobradoMes)*100 : 0;
+  const pctEq     = cobradoMes > 0.001 ? (comisionesMes/cobradoMes)*100 : 0;
+  const pctCtas   = cobradoMes > 0.001 ? (costoCuentas/cobradoMes)*100 : 0;
+  const pctLimpio = cobradoMes > 0.001 ? Math.max(0,(limpioMes/cobradoMes)*100) : 0;
+  // El margen ahora sí es real: sobre lo que queda DESPUÉS de pagar todo.
+  const de10 = (pctLimpio/10);
   const _m = n => '$'+Number(n||0).toLocaleString('es-MX',{minimumFractionDigits:0,maximumFractionDigits:2});
   // Los % de cada vendedor, para explicar de dónde sale el tramo ámbar.
   const pctsEquipo = vendedores.map(v=>`${esc(nombreVendedorUI_(v))} ${COMISIONES[v]!==undefined?COMISIONES[v]:100}%`).join(' · ');
@@ -6592,9 +6652,9 @@ function renderGanancias() {
       </div>
       <div class="gn-kpi verde">
         <div class="gn-kpi-lbl">${ico('barras',13)} ${MI_ROL==='admin'?'Margen del negocio':`Tu parte de ${mesNombre}`}</div>
-        <div class="gn-kpi-val" style="color:var(--green);">${cobradoMes>0.001?Math.round(pctVos)+'%':'—'}</div>
+        <div class="gn-kpi-val" style="color:var(--green);">${cobradoMes>0.001?Math.round(MI_ROL==='admin'?pctLimpio:pctVos)+'%':'—'}</div>
         <div class="gn-kpi-sub">${cobradoMes>0.001
-          ? `de cada $10 que cobrás, te quedan $${de10.toFixed(1)}`
+          ? `de cada $10 que cobrás, te quedan $${de10.toFixed(1)}${MI_ROL==='admin'&&costoCuentas>0.001?' ya pagadas las cuentas':''}`
           : `sin movimientos registrados en ${mesNombre}`}</div>
       </div>
     </div>`;
@@ -6613,12 +6673,13 @@ function renderGanancias() {
         </div>
         <div class="gn-limpio">
           <div class="gn-limpio-lbl">Te quedó limpio</div>
-          <div class="gn-limpio-val">${_m(generadoMes)}</div>
+          <div class="gn-limpio-val">${_m(limpioMes)}</div>
         </div>
       </div>
       <div class="gn-split">
-        <div class="gn-seg vos" style="flex:0 0 ${pctVos.toFixed(2)}%;"><b>${_m(generadoMes)}</b><span>para vos</span></div>
+        <div class="gn-seg vos" style="flex:0 0 ${pctLimpio.toFixed(2)}%;"><b>${_m(limpioMes)}</b><span>para vos</span></div>
         ${comisionesMes>0.001?`<div class="gn-seg eq" style="flex:0 0 ${pctEq.toFixed(2)}%;"><b>${_m(comisionesMes)}</b><span>equipo</span></div>`:''}
+        ${costoCuentas>0.001?`<div class="gn-seg ctas" style="flex:0 0 ${pctCtas.toFixed(2)}%;"><b>${_m(costoCuentas)}</b><span>cuentas</span></div>`:''}
       </div>
       <div style="margin-top:14px;">
         <div class="gn-paso">
@@ -6626,15 +6687,23 @@ function renderGanancias() {
           <div class="gn-paso-txt"><b>Le tocó a ${mesNombre}</b><span>Ventas y renovaciones registradas en el libro este mes</span></div>
           <div class="gn-paso-monto" style="color:var(--violet2);">${_m(cobradoMes)}</div>
         </div>
+        ${costoCuentas>0.001?`
+        <div class="gn-paso">
+          <div class="gn-paso-bar"><i style="width:${pctCtas.toFixed(2)}%;background:var(--text3);"></i></div>
+          <div class="gn-paso-txt"><b>− Pagaste las cuentas</b><span>${todasCuentas.length} cuenta${todasCuentas.length!==1?'s':''} de streaming al mes</span></div>
+          <div class="gn-paso-monto" style="color:var(--text2);">−${_m(costoCuentas)}</div>
+        </div>`:''}
         <div class="gn-paso">
           <div class="gn-paso-bar"><i style="width:${pctEq.toFixed(2)}%;background:var(--amber);"></i></div>
           <div class="gn-paso-txt"><b>− Comisiones del equipo</b><span>${pctsEquipo||'sin vendedores'}</span></div>
           <div class="gn-paso-monto" style="color:var(--amber);">−${_m(comisionesMes)}</div>
         </div>
         <div class="gn-paso final">
-          <div class="gn-paso-bar"><i style="width:${pctVos.toFixed(2)}%;background:var(--green);"></i></div>
-          <div class="gn-paso-txt"><b>Te quedó limpio</b><span>Antes del costo de las cuentas — la app todavía no guarda ese dato</span></div>
-          <div class="gn-paso-monto" style="color:var(--green);">${_m(generadoMes)}</div>
+          <div class="gn-paso-bar"><i style="width:${pctLimpio.toFixed(2)}%;background:var(--green);"></i></div>
+          <div class="gn-paso-txt"><b>Te quedó limpio</b><span>${costoCuentas>0.001
+            ? 'Después de pagar las cuentas y las comisiones'
+            : 'Cargá el costo de tus cuentas en Configuración para que esto sea exacto'}</span></div>
+          <div class="gn-paso-monto" style="color:var(--green);">${_m(limpioMes)}</div>
         </div>
       </div>
     </div>` : '';
@@ -6694,7 +6763,13 @@ function renderGanancias() {
   </div>`;
 
   document.getElementById('ganancias-content').innerHTML = heroHTML;
-  // Estadística de canales: va al final, y solo si hay algo que contar.
+  // Rentabilidad por cuenta y de dónde vienen los clientes: van al final,
+  // después de lo del equipo, y solo si hay algo que contar.
+  const _wrap = document.querySelector('#ganancias-content .earn-wrap');
+  if (_wrap && typeof bloqueRentabilidadHTML_ === 'function') {
+    const _r = bloqueRentabilidadHTML_();
+    if (_r) { const d = document.createElement('div'); d.innerHTML = _r; _wrap.appendChild(d.firstElementChild); }
+  }
   if (typeof inyectarOrigenesEnGanancias_ === 'function') inyectarOrigenesEnGanancias_();
 }
 
@@ -7161,12 +7236,19 @@ function renderConfig() {
     ? vendedores.map(v => `${esc(v.nombre)} ${COMISIONES[v.key]!==undefined?COMISIONES[v.key]:100}%`).join(' · ')
     : 'Todavía no hay vendedores';
   // Cada sección del panel izquierdo: id de pestaña, ícono, nombre y su resumen.
+  // Resumen del costo total mensual, para verlo sin entrar a la sección.
+  const _costoTot = costoMensualTotal_();
+  const resumenCostos = _costoTot > 0
+    ? `$${_costoTot.toLocaleString('es-MX',{maximumFractionDigits:0})} al mes en ${todasCuentas.length} cuenta${todasCuentas.length!==1?'s':''}`
+    : 'Cargá lo que te cuesta cada plataforma';
+
   const secciones = [
     ['paquetes',     ico('paquete',18), 'Combos y precios', resumenCombos],
     ['vendedores',   ico('personas',18), 'Vendedores',       resumenVendedores],
     ['nueva-cuenta', ico('llave',18), 'Nueva cuenta',     'Da de alta una cuenta de streaming'],
     ['nuevo-combo',  ico('mas',18), 'Nuevo combo',      'Arma un paquete y ponle precio'],
     ['relay',        ico('mascara',18), 'Correos Relay',    'Alias desechables para cuentas y clientes'],
+    ['costos',       ico('dinero',18), 'Costo de tus cuentas', resumenCostos],
     ['datos',        ico('disco',18), 'Datos y respaldo', 'Exporta clientes y cuentas en CSV']
   ];
 
@@ -7443,6 +7525,36 @@ function renderConfig() {
       </div>
     </div>
 
+    <div id="config-costos" style="display:none;">
+      <div class="cf-titulo">${ico('dinero',19)} Costo de tus cuentas</div>
+      <div class="cf-desc">Lo que TE cuesta cada plataforma al mes. Sin este dato el margen del negocio
+        es mentira: se ven los ingresos completos y los gastos no. Se aplica a todas las cuentas de
+        esa plataforma; si una cuenta tuya cuesta distinto, podés agregar una columna
+        <b>costo_mensual</b> en la hoja de cuentas y esa manda sobre este valor.</div>
+      <div class="cuenta-card" style="padding:14px 16px;">
+        ${Object.keys(COSTOS_PLATAFORMA).sort().map(p => {
+          const nCuentas = (todasCuentas||[]).filter(c => c.plataforma === p).length;
+          const lugares = (todasCuentas||[]).filter(c => c.plataforma === p)
+            .reduce((s,c) => s + (parseInt(c.slotsTotal)||0), 0);
+          const porLugar = lugares ? (COSTOS_PLATAFORMA[p] * nCuentas / lugares) : 0;
+          return `<div class="costo-fila">
+            <div class="costo-nom">${esc(p)}
+              <div class="costo-sub">${nCuentas
+                ? `${nCuentas} cuenta${nCuentas!==1?'s':''} · ${lugares} lugares · $${porLugar.toFixed(2)} por lugar`
+                : 'sin cuentas cargadas de esta plataforma'}</div>
+            </div>
+            <input type="number" class="form-input costo-inp" id="costo-${esc(p).replace(/\\s/g,'_')}"
+              value="${COSTOS_PLATAFORMA[p]}" min="0" step="5"
+              onchange="guardarCostoPlataforma_('${esc(p)}', this.value)">
+          </div>`;
+        }).join('')}
+      </div>
+      <div style="margin-top:12px;padding:11px 14px;background:var(--violet-bg);border-radius:12px;font-size:12px;color:var(--violet);line-height:1.5;">
+        ${ico('foco',13)} Con esto ya funcionan el <b>margen real</b>, el tramo de cuentas en el reparto del mes,
+        y la <b>rentabilidad por cuenta</b> (cuáles te dejan plata y cuáles te la quitan) al final de Ganancias.
+      </div>
+    </div>
+
     <div id="config-datos" style="display:none;">
       <div class="cf-titulo">${ico('disco',19)} Datos y respaldo</div>
       <div class="cf-desc">Descarga un respaldo en CSV (se abre en Excel). Útil por si algo le pasa a la hoja de Google.</div>
@@ -7465,8 +7577,19 @@ function renderConfig() {
   actualizarVisibilidadRelayCuenta_();
 }
 
+// Guarda el costo mensual de una plataforma. Vive en localStorage porque es
+// una configuración tuya, no un dato de negocio que deba viajar al servidor.
+function guardarCostoPlataforma_(plat, valor) {
+  const n = parseFloat(valor);
+  if (isNaN(n) || n < 0) return;
+  COSTOS_PLATAFORMA[plat] = n;
+  try { localStorage.setItem('costos_plataforma', JSON.stringify(COSTOS_PLATAFORMA)); } catch(e){}
+  toast(esc(plat)+' cuesta $'+n+' al mes');
+  if (gananciasCargadas) renderGanancias();   // el margen se recalcula al vuelo
+}
+
 function showConfigTab(tab, btn) {
-  document.querySelectorAll('#config-paquetes,#config-vendedores,#config-nueva-cuenta,#config-nuevo-combo,#config-relay,#config-datos').forEach(el => el.style.display='none');
+  document.querySelectorAll('#config-paquetes,#config-vendedores,#config-nueva-cuenta,#config-nuevo-combo,#config-relay,#config-costos,#config-datos').forEach(el => el.style.display='none');
   document.getElementById('config-'+tab).style.display='block';
   document.querySelectorAll('#config-tabs .f-btn').forEach(b => b.classList.remove('active'));
   if (btn) btn.classList.add('active');
@@ -9055,6 +9178,55 @@ function abrirAvisos() {
   ov.classList.add('on');
 }
 function cerrarAvisos() { const o = document.getElementById('avisos-ov'); if (o) o.classList.remove('on'); }
+
+/* ===== 4. Rentabilidad por cuenta =====
+   Cuánto te cuesta cada cuenta contra lo que te generan los clientes que
+   la ocupan. Es lo que revela una cuenta a medio llenar que te está
+   costando dinero en vez de dártelo. */
+function bloqueRentabilidadHTML_() {
+  if (MI_ROL !== 'admin' || !cuentasCargadas || !todasCuentas.length) return '';
+  const filas = todasCuentas.map(c => {
+    const costo = costoMensualCuenta_(c);
+    const reales = c.slots.slice(0, c.slotsTotal);
+    const ocupados = reales.filter(s => s && s !== 'x' && s !== 'X');
+    // Ingreso: el precio POR MES de cada cliente que ocupa un lugar, repartido
+    // entre las plataformas de su paquete (un combo paga varias cuentas).
+    let ingreso = 0;
+    ocupados.forEach(id => {
+      const cli = todosClientes.find(x => x.id === id && x.estado_raw !== 'ARCHIVADO');
+      if (!cli) return;
+      let nPlats = 1;
+      try { nPlats = Math.max(1, (detectarPlataformas(cli.paquete)||[]).length); } catch(e) {}
+      const meses = Math.max(1, parseInt(cli.meses)||1);
+      ingreso += (parseFloat(cli.precio)||0) / nPlats / meses;
+    });
+    const libres = c.slotsTotal - reales.filter(s => s && s !== 'x' && s !== 'X').length
+                                - reales.filter(s => s === 'x' || s === 'X').length;
+    return { c, costo, ingreso, margen: ingreso - costo, libres, ocupados: ocupados.length };
+  }).sort((a,b) => a.margen - b.margen);   // las que peor están, primero
+
+  const _m = n => '$'+Number(n||0).toLocaleString('es-MX',{maximumFractionDigits:0});
+  const enRojo = filas.filter(f => f.margen < 0).length;
+
+  return `<div class="mini-stat" style="margin-top:14px;">
+    <div class="lbl">${ico('barras',13)} Rentabilidad por cuenta</div>
+    <div style="font-size:11.5px;color:var(--text3);margin:6px 0 12px;line-height:1.5;">
+      Lo que te cuesta cada una contra lo que te generan sus clientes.
+      ${enRojo ? `<b style="color:var(--red);">${enRojo} cuenta${enRojo!==1?'s':''} te está${enRojo!==1?'n':''} costando más de lo que deja${enRojo!==1?'n':''}.</b>` : 'Todas dejan ganancia.'}
+    </div>
+    ${filas.map(f => {
+      const color = f.margen < 0 ? 'var(--red)' : 'var(--green)';
+      return `<div class="rent-fila" onclick="abrirFichaCuenta(${esc(JSON.stringify(f.c.nombre))})">
+        <div class="rent-ini" style="background:${PLAT_COLORS[f.c.plataforma]||'var(--border-strong)'};">${esc(PLAT_ICONS[f.c.plataforma]||f.c.plataforma.charAt(0))}</div>
+        <div class="rent-txt">
+          <b>${esc(f.c.nombre)}${f.margen<0?' <span class="rent-tag">pierde plata</span>':(f.libres>0?` <span class="rent-tag libre">${f.libres} sin vender</span>`:'')}</b>
+          <span>te cuesta ${_m(f.costo)} · te generan ${_m(f.ingreso)} al mes</span>
+        </div>
+        <div class="rent-margen" style="color:${color};">${f.margen>=0?'+':''}${_m(f.margen)}<span>margen</span></div>
+      </div>`;
+    }).join('')}
+  </div>`;
+}
 
 /* ===== 2c. Vista previa viva del modal "Nuevo cliente" =====
    Mientras escribís, a la derecha se arma la tarjeta tal como va a quedar,
