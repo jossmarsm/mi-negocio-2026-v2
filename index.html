@@ -6,68 +6,53 @@
 <title>Cuentas Streaming</title>
 <!-- PWA: instalable en el celular como app -->
 <link rel="manifest" href="manifest.webmanifest">
-<meta name="theme-color" content="#14100c">
+<meta name="theme-color" content="#0a0a0c">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Cuentas">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 /* ============================================
-   NOVA — Sistema visual "Cartelera" para Cuentas Streaming
-   ============================================
-   Rediseño ago-2026. Identidad sacada del mundo real del producto: guías de
-   programación, carteleras de cine, boletos de entrada — NO de un dashboard
-   fintech genérico. Firma visual: tarjetas tipo "boleto" con muescas
-   perforadas en los bordes (cliente-card, cuenta-card, combos del catálogo,
-   vendor-card). Fondo charcoal CÁLIDO (no gris/azul neutro), acento dorado de
-   "bombilla de marquesina", y los colores reales de cada plataforma como
-   acento de contenido en catálogo/cuentas. Las variables --violet/--violet2
-   conservan su nombre por los cientos de usos en el JS, pero ahora son el
-   dorado de marca — NO un azul. */
+   NOVA — Sistema visual para Cuentas Streaming
+   ============================================ */
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
+/* Rediseño jul-2026 "premium neutro" (ref: Amex/Instagram/Revolut oscuro):
+   fondo negro NEUTRO (sin tinte violeta), superficies sólidas (sin vidrio ni
+   blur), un solo acento azul sobrio, y cero glows. Las variables --violet/
+   --violet2 conservan su nombre para no tocar cientos de usos, pero ahora son
+   el azul de acento. */
 :root {
-  --bg: #14100c;
-  --bg-glow-1: #14100c;
-  --bg-glow-2: #14100c;
-  --surface: #1e1810;
-  --surface-solid: #1e1810;
-  --surface-hover: #271f16;
-  --border: #382c1f;
-  --border-strong: #4f3f2c;
-  --text: #f6efe2;
-  --text2: #b6a68e;
-  --text3: #85735d;
+  --bg: #0a0a0c;
+  --bg-glow-1: #0a0a0c;
+  --bg-glow-2: #0a0a0c;
+  --surface: #131317;
+  --surface-solid: #131317;
+  --surface-hover: #1b1b21;
+  --border: #232329;
+  --border-strong: #34343d;
+  --text: #f5f5f7;
+  --text2: #a0a0ab;
+  --text3: #6e6e78;
 
-  /* Acento de marca: dorado "bombilla de marquesina" — reemplaza el azul. */
-  --violet: #e0a526;
-  --violet2: #c9860f;
-  --violet-bg: rgba(224,165,38,0.14);
+  --violet: #0095f6;
+  --violet2: #0095f6;
+  --violet-bg: rgba(0,149,246,0.12);
 
-  --green: #34c785;
-  --green-bg: rgba(52,199,133,0.14);
-  --amber: #fb923c;
-  --amber-bg: rgba(251,146,60,0.14);
-  --red: #ef4444;
-  --red-bg: rgba(239,68,68,0.14);
-  --blue: #4fb0e0;
-  --blue-bg: rgba(79,176,224,0.14);
+  --green: #34d399;
+  --green-bg: rgba(52,211,153,0.12);
+  --amber: #fbbf24;
+  --amber-bg: rgba(251,191,36,0.12);
+  --red: #fb7185;
+  --red-bg: rgba(251,113,133,0.12);
+  --blue: #60a5fa;
+  --blue-bg: rgba(96,165,250,0.12);
 
-  /* Colores reales de plataformas — se usan como contenido, no decoración. */
-  --p-netflix: #e50914;
-  --p-disney: #113ccf;
-  --p-hbo: #7b2ff7;
-  --p-spotify: #1db954;
-  --p-prime: #00a8e1;
-
-  --font-display: 'Oswald', 'Arial Narrow', sans-serif;
-  --font-body: 'Manrope', -apple-system, BlinkMacSystemFont, sans-serif;
-
-  --radius-lg: 18px;
-  --radius-md: 14px;
-  --radius-sm: 10px;
+  --radius-lg: 20px;
+  --radius-md: 16px;
+  --radius-sm: 11px;
   --ease: cubic-bezier(.22,.85,.32,1);
 }
 
@@ -78,14 +63,14 @@
 html { scroll-behavior: smooth; }
 
 body {
-  font-family: var(--font-body), -apple-system, BlinkMacSystemFont, sans-serif;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   background: var(--bg);
   color: var(--text);
   min-height: 100vh;
   position: relative;
 }
 
-.display { font-family: 'Oswald', sans-serif; }
+.display { font-family: 'Space Grotesk', sans-serif; }
 
 /* Números estilo fintech: dígitos tabulares (columnas estables) y tracking
    apretado en las cifras grandes — el número es el protagonista. */
@@ -118,13 +103,12 @@ body {
 }
 .topbar-brand { display: flex; align-items: center; gap: 10px; }
 .topbar-icon {
-  width: 34px; height: 34px; border-radius: 9px;
-  background: linear-gradient(155deg, #f0c356, var(--violet2));
-  box-shadow: 0 0 0 1px rgba(0,0,0,0.25) inset, 0 2px 8px -2px rgba(224,165,38,0.55);
-  color: #1a1208; display: flex; align-items: center; justify-content: center;
-  font-family: 'Oswald'; font-size: 17px; font-weight: 700; letter-spacing: 0.02em;
+  width: 34px; height: 34px; border-radius: 10px;
+  background: #f5f5f7;
+  color: var(--bg); display: flex; align-items: center; justify-content: center;
+  font-family: 'Space Grotesk'; font-size: 16px; font-weight: 700;
 }
-.topbar-title { font-family: 'Oswald'; font-size: 15px; font-weight: 600; letter-spacing: 0.01em; }
+.topbar-title { font-family: 'Space Grotesk'; font-size: 15px; font-weight: 600; }
 .topbar-sub { font-size: 11px; color: var(--text3); margin-top: 1px; display: flex; align-items: center; gap: 5px; }
 .topbar-sub .dot { width: 5px; height: 5px; border-radius: 50%; background: var(--green); animation: pulseRing 2s ease-in-out infinite; }
 .topbar-right { display: flex; align-items: center; gap: 8px; }
@@ -158,7 +142,7 @@ body {
 .notif-item:active { transform: scale(0.99); }
 .notif-item.notif-rojo { border-left-color: var(--red); }
 .notif-item.notif-ambar { border-left-color: var(--amber); }
-.notif-item.notif-azul { border-left-color: var(--blue); }
+.notif-item.notif-azul { border-left-color: var(--violet2); }
 .notif-item.notif-verde { border-left-color: var(--green); }
 .notif-icon { font-size: 22px; flex-shrink: 0; }
 .notif-titulo { font-size: 14px; font-weight: 700; color: var(--text); }
@@ -172,19 +156,17 @@ body {
   position: sticky; top: calc(61px + env(safe-area-inset-top, 0px)); z-index: 99;
 }
 .nav-tab {
-  padding: 9px 14px; font-size: 12.5px; font-weight: 600; color: var(--text3); cursor: pointer;
-  white-space: nowrap; border-radius: 8px; transition: all 0.2s var(--ease); position: relative;
-  font-family: var(--font-display); text-transform: uppercase; letter-spacing: 0.03em;
+  padding: 9px 14px; font-size: 13px; font-weight: 500; color: var(--text3); cursor: pointer;
+  white-space: nowrap; border-radius: 10px; transition: all 0.2s var(--ease); position: relative;
 }
 .nav-tab:hover { color: var(--text2); background: var(--surface); }
-/* Activo = pastilla dorada de "canal sintonizado" — reemplaza la píldora blanca. */
-.nav-tab.active { color: #1a1208; background: linear-gradient(155deg, #f0c356, var(--violet2)); box-shadow: 0 2px 8px -2px rgba(224,165,38,0.5); font-weight: 700; }
+/* Activo = píldora blanca con texto negro (lenguaje premium, sin glow). */
+.nav-tab.active { color: var(--bg); background: #f5f5f7; box-shadow: none; font-weight: 600; }
 
 /* ===== Metrics ===== */
 .metrics { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; padding: 18px 20px 8px; max-width: 960px; margin: 0 auto; }
 .metric {
   background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-md);
-  border-top: 2px solid var(--border-strong);
   padding: 14px 16px; transition: transform 0.2s var(--ease), border-color 0.2s;
   animation: fadeUp 0.5s var(--ease) both;
 }
@@ -198,7 +180,7 @@ body {
 .metric-atencion { animation: breatheAmber 2.6s ease-in-out infinite; }
 
 .metric-label { font-size: 10.5px; color: var(--text3); font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 6px; }
-.metric-value { font-family: 'Oswald'; font-size: 26px; font-weight: 700; transition: color 0.3s; }
+.metric-value { font-family: 'Space Grotesk'; font-size: 26px; font-weight: 700; transition: color 0.3s; }
 .metric-value.green { color: var(--green); }
 .metric-value.amber { color: var(--amber); }
 .metric-value.red { color: var(--red); }
@@ -215,8 +197,8 @@ body {
   display: flex; align-items: center; gap: 10px; padding: 11px 16px; border-radius: var(--radius-sm);
   font-size: 13px; font-weight: 500; animation: fadeUp 0.4s var(--ease) both;
 }
-.racha-banner.racha { background: linear-gradient(135deg, rgba(52,199,133,0.16), rgba(52,199,133,0.04)); border: 1px solid rgba(52,199,133,0.3); color: #7fe0af; }
-.racha-banner.momentum { background: rgba(224,165,38,0.12); border: 1px solid rgba(224,165,38,0.3); color: #f0c356; }
+.racha-banner.racha { background: linear-gradient(135deg, rgba(52,211,153,0.14), rgba(52,211,153,0.04)); border: 1px solid rgba(52,211,153,0.28); color: #6ee7b7; }
+.racha-banner.momentum { background: rgba(0,149,246,0.10); border: 1px solid rgba(0,149,246,0.28); color: #7cc4fa; }
 .racha-banner strong { font-weight: 700; }
 .racha-emoji { font-size: 16px; flex-shrink: 0; }
 
@@ -227,7 +209,7 @@ body {
   width: 100%; padding: 11px 14px 11px 38px; border: 1px solid var(--border); border-radius: var(--radius-sm);
   font-size: 14px; background: var(--surface); color: var(--text); outline: none; transition: all 0.2s var(--ease);
 }
-.search-wrap input:focus { border-color: var(--violet); background: var(--surface-hover); box-shadow: 0 0 0 3px rgba(224,165,38,0.16); }
+.search-wrap input:focus { border-color: var(--violet); background: var(--surface-hover); box-shadow: 0 0 0 3px rgba(0,149,246,0.12); }
 .search-icon { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text3); pointer-events: none; font-size: 14px; }
 
 .filters { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 16px; }
@@ -236,7 +218,7 @@ body {
   font-size: 12px; font-weight: 600; color: var(--text2); cursor: pointer; transition: all 0.2s var(--ease);
 }
 .f-btn:hover { background: var(--surface-hover); border-color: var(--border-strong); }
-.f-btn.active { background: linear-gradient(155deg, #f0c356, var(--violet2)); color: #1a1208; border-color: transparent; box-shadow: 0 2px 8px -2px rgba(224,165,38,0.5); }
+.f-btn.active { background: #f5f5f7; color: var(--bg); border-color: transparent; box-shadow: none; }
 
 /* Selector "Ordenar por" (en la barra de búsqueda) */
 .orden-select {
@@ -254,7 +236,7 @@ body {
 }
 .accion-btn:hover { background: var(--surface-hover); border-color: var(--border-strong); }
 .accion-btn:active { transform: scale(0.94); }
-.accion-btn.active { background: linear-gradient(155deg, #f0c356, var(--violet2)); color: #1a1208; border-color: transparent; }
+.accion-btn.active { background: #f5f5f7; color: var(--bg); border-color: transparent; }
 
 /* Círculo de selección en cada tarjeta (modo selección múltiple) */
 .sel-check {
@@ -263,7 +245,7 @@ body {
   font-size: 14px; font-weight: 700; color: #fff; transition: all 0.15s var(--ease);
 }
 .sel-check.on { background: var(--violet); border-color: var(--violet); }
-.cliente-card.card-sel { border-color: var(--violet); background: rgba(224,165,38,0.08); }
+.cliente-card.card-sel { border-color: var(--violet); background: rgba(0,149,246,0.08); }
 
 /* Barra flotante con el conteo y el botón de envío */
 #barra-seleccion {
@@ -283,28 +265,11 @@ body {
 }
 
 /* ===== Client list & cards ===== */
-.lista { display: flex; flex-direction: column; gap: 10px; }
-/* Firma "boleto": muescas perforadas mordiendo el borde izq/der (dos círculos
-   del color de fondo de la página, ya que estas tarjetas siempre se apoyan
-   sobre --bg) + un filo dentado arriba, como el talón de una entrada. */
-.cliente-card, .cuenta-card, .vendor-card {
-  position: relative;
-  isolation: isolate;
-}
-.cliente-card::before, .cliente-card::after,
-.cuenta-card::before, .cuenta-card::after,
-.vendor-card::before, .vendor-card::after {
-  content: ''; position: absolute; top: 50%; margin-top: -7px;
-  width: 14px; height: 14px; border-radius: 50%; background: var(--bg);
-  border: 1px solid var(--border); z-index: 2; pointer-events: none;
-}
-.cliente-card::before, .cuenta-card::before, .vendor-card::before { left: -8px; }
-.cliente-card::after, .cuenta-card::after, .vendor-card::after { right: -8px; }
+.lista { display: flex; flex-direction: column; gap: 8px; }
 .cliente-card {
   background: var(--surface-solid); border: 1px solid var(--border); border-radius: var(--radius-md);
-  padding: 13px 16px; display: flex; align-items: center; gap: 13px; cursor: pointer;
+  padding: 13px 14px; display: flex; align-items: center; gap: 13px; cursor: pointer;
   transition: border-color 0.2s var(--ease), transform 0.2s var(--ease), background 0.2s;
-  border-top: 2px dashed var(--border-strong);
   /* content-visibility: el navegador no dibuja las tarjetas que están fuera de
      la pantalla, así el scroll de listas largas es fluido. contain-intrinsic-size
      reserva el alto aproximado para que la barra de scroll no salte. */
@@ -317,7 +282,7 @@ body {
      que la barra de scroll pegue saltos en listas largas. */
   contain-intrinsic-size: auto 80px;
 }
-.cliente-card:hover { border-color: rgba(224,165,38,0.5); background: var(--surface-hover); transform: translateY(-1px); }
+.cliente-card:hover { border-color: rgba(0,149,246,0.45); background: var(--surface-hover); transform: translateY(-1px); }
 .cliente-card:active { transform: scale(0.98) translateY(0); transition: transform 0.08s var(--ease); }
 
 .cuenta-header:active { background: rgba(255,255,255,0.03); }
@@ -337,13 +302,13 @@ body {
 .ring-wrap { width: 44px; height: 44px; flex-shrink: 0; position: relative; }
 .ring-wrap svg { transform: rotate(-90deg); width: 44px; height: 44px; }
 .ring-bg-c { stroke: rgba(255,255,255,0.08); }
-.ring-fg-green { stroke: var(--green); filter: drop-shadow(0 0 4px rgba(52,199,133,0.5)); }
-.ring-fg-amber { stroke: var(--amber); filter: drop-shadow(0 0 4px rgba(251,146,60,0.5)); }
-.ring-fg-red { stroke: var(--red); filter: drop-shadow(0 0 4px rgba(239,68,68,0.5)); }
+.ring-fg-green { stroke: var(--green); filter: drop-shadow(0 0 4px rgba(52,211,153,0.5)); }
+.ring-fg-amber { stroke: var(--amber); filter: drop-shadow(0 0 4px rgba(251,191,36,0.5)); }
+.ring-fg-red { stroke: var(--red); filter: drop-shadow(0 0 4px rgba(251,113,133,0.5)); }
 .ring-fg-gray { stroke: var(--text3); }
 .ring-num {
   position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
-  font-family: 'Oswald'; font-size: 11px; font-weight: 700;
+  font-family: 'Space Grotesk'; font-size: 11px; font-weight: 700;
 }
 
 .avatar {
@@ -410,7 +375,7 @@ body {
   box-shadow: 0 30px 80px -20px rgba(0,0,0,0.6);
 }
 .modal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
-.modal-title { font-family: 'Oswald'; font-size: 17px; font-weight: 700; }
+.modal-title { font-family: 'Space Grotesk'; font-size: 17px; font-weight: 700; }
 .modal-close {
   background: var(--surface); border: 1px solid var(--border); width: 30px; height: 30px; border-radius: 10px;
   font-size: 16px; cursor: pointer; color: var(--text2); transition: all 0.2s var(--ease);
@@ -427,25 +392,24 @@ body {
   background: var(--surface-solid); color: var(--text); padding: 8px;
 }
 .form-select option:disabled { color: var(--text3); }
-.form-input:focus, .form-select:focus { border-color: var(--violet); box-shadow: 0 0 0 3px rgba(224,165,38,0.16); }
+.form-input:focus, .form-select:focus { border-color: var(--violet); box-shadow: 0 0 0 3px rgba(0,149,246,0.12); }
 .form-input[readonly] { background: rgba(255,255,255,0.02); color: var(--text2); }
 .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 .comp-dropzone {
   border: 1.5px dashed var(--border-strong); border-radius: var(--radius-sm); padding: 16px 12px;
   text-align: center; transition: all 0.15s var(--ease); background: var(--surface);
 }
-.comp-dropzone.dragover { border-color: var(--violet); background: rgba(224,165,38,0.08); }
+.comp-dropzone.dragover { border-color: var(--violet); background: rgba(0,149,246,0.08); }
 .comp-dropzone .comp-dropzone-hint { font-size: 12px; color: var(--text2); margin-top: 6px; pointer-events: none; }
 .comp-dropzone .form-input { border: none; padding: 0; background: transparent; }
 
 .btn-primary {
   width: 100%; padding: 13px; border-radius: var(--radius-sm);
-  background: linear-gradient(155deg, #f0c356, var(--violet2)); color: #1a1208; border: none;
-  font-family: var(--font-display); text-transform: uppercase; letter-spacing: 0.03em;
-  font-size: 13.5px; font-weight: 600; cursor: pointer; margin-top: 6px;
+  background: var(--violet); color: #fff; border: none;
+  font-size: 14px; font-weight: 700; cursor: pointer; margin-top: 6px;
   transition: all 0.2s var(--ease);
 }
-.btn-primary:hover { transform: translateY(-1px); filter: brightness(1.08); }
+.btn-primary:hover { transform: translateY(-1px); background: #1ba3ff; }
 .btn-primary:active { transform: scale(0.98); }
 .btn-primary:disabled { background: var(--text3); cursor: not-allowed; box-shadow: none; transform: none; }
 
@@ -463,7 +427,7 @@ body {
   padding: 13px 15px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;
 }
 .ganancia-label { font-size: 11.5px; color: var(--green); font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; }
-.ganancia-value { font-family: 'Oswald'; font-size: 21px; color: var(--green); font-weight: 700; }
+.ganancia-value { font-family: 'Space Grotesk'; font-size: 21px; color: var(--green); font-weight: 700; }
 
 .success-box {
   background: var(--green-bg); border: 1px solid rgba(52,211,153,0.3); border-radius: var(--radius-sm);
@@ -482,8 +446,8 @@ body {
 /* ===== FAB ===== */
 .fab {
   position: fixed; bottom: calc(24px + env(safe-area-inset-bottom, 0px)); right: 24px; width: 58px; height: 58px; border-radius: 50%;
-  background: linear-gradient(155deg, #f0c356, var(--violet2)); color: #1a1208; border: none;
-  font-size: 26px; cursor: pointer; box-shadow: 0 10px 26px -8px rgba(0,0,0,0.7), 0 0 0 1px rgba(0,0,0,0.2) inset;
+  background: #f5f5f7; color: var(--bg); border: none;
+  font-size: 26px; cursor: pointer; box-shadow: 0 10px 26px -8px rgba(0,0,0,0.7);
   display: flex; align-items: center; justify-content: center; z-index: 150;
   transition: transform 0.25s var(--ease), box-shadow 0.25s var(--ease);
 }
@@ -507,10 +471,8 @@ body {
 /* ===== Accounts ===== */
 .cuenta-card {
   background: var(--surface-solid); border: 1px solid var(--border); border-radius: var(--radius-md);
-  margin-bottom: 10px; transition: border-color 0.2s;
-  border-top: 2px dashed var(--border-strong);
+  margin-bottom: 10px; overflow: hidden; transition: border-color 0.2s;
 }
-.cuenta-header, .cuenta-body { border-radius: inherit; }
 .cuenta-card:hover { border-color: var(--border-strong); }
 /* Aviso de cuentas llenas / por llenarse */
 .cuenta-card.card-llena { border-color: rgba(251,113,133,0.5); box-shadow: inset 3px 0 0 var(--red); }
@@ -551,7 +513,7 @@ body {
   font-size: 12px; font-weight: 600; color: var(--text2); cursor: pointer; transition: all 0.2s var(--ease);
 }
 .plat-filter:hover { background: var(--surface-hover); }
-.plat-filter.active { background: linear-gradient(155deg, #f0c356, var(--violet2)); color: #1a1208; border-color: transparent; box-shadow: none; }
+.plat-filter.active { background: #f5f5f7; color: var(--bg); border-color: transparent; box-shadow: none; }
 
 .delete-acc-btn {
   font-size: 11px; padding: 5px 10px; border-radius: 8px; border: 1px solid rgba(251,113,133,0.3);
@@ -569,12 +531,12 @@ body {
 
 /* ===== Earnings hero ===== */
 .earn-hero {
-  background: linear-gradient(135deg, rgba(224,165,38,0.16), rgba(224,165,38,0.06));
-  border: 1px solid rgba(224,165,38,0.28); border-radius: var(--radius-lg); padding: 20px;
+  background: linear-gradient(135deg, rgba(0,149,246,0.16), rgba(0,149,246,0.06));
+  border: 1px solid rgba(0,149,246,0.28); border-radius: var(--radius-lg); padding: 20px;
   animation: fadeUp 0.4s var(--ease) both;
 }
-.earn-hero .lbl { font-size: 11px; color: var(--text3); text-transform: uppercase; letter-spacing: 0.06em; font-weight: 700; }
-.earn-hero .big { font-family: 'Oswald'; font-size: 30px; font-weight: 700; margin-top: 6px; }
+.earn-hero .lbl { font-size: 11px; color: #9d9bb5; text-transform: uppercase; letter-spacing: 0.06em; font-weight: 700; }
+.earn-hero .big { font-family: 'Space Grotesk'; font-size: 30px; font-weight: 700; margin-top: 6px; }
 
 /* ===== Earnings v2: pending-first hero with progress ring ===== */
 .earn-wrap { display: flex; flex-direction: column; gap: 14px; }
@@ -585,7 +547,7 @@ body {
 .resumen-mes { background: var(--surface-solid); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 14px 16px; }
 .resumen-mes .rm-title { font-size: 12px; font-weight: 700; color: var(--text2); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 12px; }
 .resumen-mes .rm-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
-.resumen-mes .rm-num { font-family: 'Oswald'; font-size: 24px; font-weight: 700; line-height: 1; margin-bottom: 5px; }
+.resumen-mes .rm-num { font-family: 'Space Grotesk'; font-size: 24px; font-weight: 700; line-height: 1; margin-bottom: 5px; }
 .resumen-mes .rm-lbl { font-size: 11.5px; color: var(--text3); line-height: 1.4; }
 @media (max-width: 420px) { .resumen-mes .rm-grid { grid-template-columns: 1fr; gap: 12px; } }
 
@@ -599,33 +561,27 @@ body {
 .gb-lbl { font-size: 11px; color: var(--text3); margin-top: 6px; }
 .grafica-nota { font-size: 11px; color: var(--text3); margin-top: 12px; }
 
-/* Tarjeta héroe "función principal de la cartelera": superficie elevada,
-   franja de barcode decorativa abajo (textura de boleto), el número manda. */
+/* Tarjeta héroe estilo fintech: superficie elevada sólida, el número manda. */
 .pending-hero {
   position: relative; overflow: hidden;
-  background: #241d13;
+  background: #17171d;
   border: 1px solid var(--border-strong); border-radius: var(--radius-lg);
   padding: 22px; display: flex; align-items: center; gap: 18px;
   animation: fadeUp 0.4s var(--ease) both;
-}
-.pending-hero::after {
-  content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: 5px;
-  background: repeating-linear-gradient(90deg, rgba(246,239,226,0.28) 0 2px, transparent 2px 5px, rgba(246,239,226,0.16) 5px 6px, transparent 6px 10px);
-  opacity: 0.5;
 }
 .ring-wrap { position: relative; width: 92px; height: 92px; flex-shrink: 0; }
 .ring-wrap svg { transform: rotate(-90deg); }
 .ring-track { fill: none; stroke: rgba(255,255,255,0.08); stroke-width: 9; }
 .ring-progress { fill: none; stroke: url(#ringGrad); stroke-width: 9; stroke-linecap: round; transition: stroke-dashoffset 0.7s var(--ease); }
-.ring-center { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-family: 'Oswald'; font-size: 13px; font-weight: 700; color: var(--text2); }
-.pending-hero .lbl { font-size: 11px; color: var(--text3); text-transform: uppercase; letter-spacing: 0.07em; font-weight: 700; }
-.pending-hero .big { font-family: 'Oswald'; font-size: 32px; font-weight: 700; margin-top: 4px; line-height: 1; }
+.ring-center { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-family: 'Space Grotesk'; font-size: 13px; font-weight: 700; color: var(--text2); }
+.pending-hero .lbl { font-size: 11px; color: #9d9bb5; text-transform: uppercase; letter-spacing: 0.07em; font-weight: 700; }
+.pending-hero .big { font-family: 'Space Grotesk'; font-size: 32px; font-weight: 700; margin-top: 4px; line-height: 1; }
 .pending-hero .sub { font-size: 12px; color: var(--text2); margin-top: 6px; }
 .pending-hero.all-paid .big { color: var(--green); }
 
 .mini-stat { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 16px; display: flex; flex-direction: column; justify-content: center; animation: fadeUp 0.4s var(--ease) both; }
 .mini-stat .lbl { font-size: 10.5px; color: var(--text3); text-transform: uppercase; letter-spacing: 0.06em; font-weight: 700; }
-.mini-stat .val { font-family: 'Oswald'; font-size: 21px; font-weight: 700; margin-top: 5px; }
+.mini-stat .val { font-family: 'Space Grotesk'; font-size: 21px; font-weight: 700; margin-top: 5px; }
 
 .spark-line { font-size: 11.5px; color: var(--text2); display: flex; align-items: center; gap: 6px; padding: 2px 0; }
 .spark-line.warn { color: var(--amber); }
@@ -633,7 +589,7 @@ body {
 
 .vendor-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 16px; animation: fadeUp 0.4s var(--ease) both; }
 .vendor-card-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 12px; }
-.vendor-card-name { font-family: 'Oswald'; font-size: 14.5px; font-weight: 700; text-transform: capitalize; }
+.vendor-card-name { font-family: 'Space Grotesk'; font-size: 14.5px; font-weight: 700; text-transform: capitalize; }
 .vendor-card-meta { font-size: 11.5px; color: var(--text2); margin-top: 2px; }
 .vendor-mini-ring { width: 38px; height: 38px; flex-shrink: 0; }
 .vendor-mini-ring svg { transform: rotate(-90deg); }
@@ -650,7 +606,7 @@ body {
 .tour-overlay.open { display: block; }
 .tour-spotlight {
   position: absolute; border-radius: 14px; pointer-events: none;
-  box-shadow: 0 0 0 4000px rgba(4,4,8,0.78), 0 0 0 3px rgba(224,165,38,0.7), 0 0 24px rgba(224,165,38,0.5);
+  box-shadow: 0 0 0 4000px rgba(4,4,8,0.78), 0 0 0 3px rgba(0,149,246,0.7), 0 0 24px rgba(0,149,246,0.5);
   transition: top 0.35s var(--ease), left 0.35s var(--ease), width 0.35s var(--ease), height 0.35s var(--ease);
 }
 .tour-card {
@@ -660,13 +616,13 @@ body {
   z-index: 601;
 }
 .tour-step-label { font-size: 10.5px; color: var(--violet); font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 6px; }
-.tour-title { font-family: 'Oswald'; font-size: 15px; font-weight: 700; margin-bottom: 6px; }
+.tour-title { font-family: 'Space Grotesk'; font-size: 15px; font-weight: 700; margin-bottom: 6px; }
 .tour-text { font-size: 13px; color: var(--text2); line-height: 1.5; margin-bottom: 14px; }
 .tour-actions { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
 .tour-skip { background: none; border: none; color: var(--text3); font-size: 12.5px; cursor: pointer; padding: 6px 4px; }
 .tour-skip:hover { color: var(--text2); }
 .tour-next {
-  background: linear-gradient(155deg, #f0c356, var(--violet2)); color: #1a1208; border: none;
+  background: var(--violet); color: #fff; border: none;
   padding: 9px 18px; border-radius: 10px; font-size: 13px; font-weight: 700; cursor: pointer;
   transition: transform 0.15s var(--ease);
 }
@@ -730,19 +686,203 @@ body {
   padding: 32px 26px; width: 100%; max-width: 380px;
   animation: scaleIn 0.4s var(--ease); position: relative; z-index: 2;
 }
-.login-card h2 { font-family: 'Oswald'; font-size: 22px; font-weight: 600; letter-spacing: 0.01em; margin-bottom: 6px; }
+.login-card h2 { font-family: 'Space Grotesk'; font-size: 20px; margin-bottom: 6px; }
 .login-card p { font-size: 13px; color: var(--text2); margin-bottom: 20px; }
-.login-card::before {
-  content: 'PASE DE ACCESO'; position: absolute; top: 14px; right: -34px; width: 140px;
-  background: linear-gradient(155deg, #f0c356, var(--violet2)); color: #1a1208;
-  font-family: var(--font-display); font-size: 10px; font-weight: 700; letter-spacing: 0.08em;
-  text-align: center; padding: 4px 0; transform: rotate(38deg); box-shadow: 0 2px 6px rgba(0,0,0,0.35);
-}
-.login-overlay { overflow: hidden; }
-.login-card { overflow: hidden; }
 .login-error { color: var(--red); font-size: 13px; margin-top: 10px; display: none; animation: scaleIn 0.2s; }
-</style>
 
+/* ============================================================
+   ===== REDISEÑO ago-2026 — capa de estilo ===================
+   ============================================================
+   Va al final a propósito: solo redefine apariencia sobre las
+   mismas clases, sin tocar la estructura ni el JS. Si algo se ve
+   mal, borrando este bloque la app vuelve exacta a como estaba.
+   ============================================================ */
+
+:root{
+  --r-lg:20px; --r-md:14px; --r-sm:11px; --r-xs:8px;
+  --ease2:cubic-bezier(.22,.85,.32,1);
+  --pc:var(--violet);
+}
+.num, .metric-value, .ganancia-value, .rm-num, .gb-val,
+.pending-hero .big, .mini-stat .val, .earn-hero .big,
+.vendor-card-name, .detalle-value { font-variant-numeric: tabular-nums; }
+
+/* ---------- Movimiento: entradas escalonadas ---------- */
+@keyframes cardIn2{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:none;}}
+.lista .cliente-card, .cuenta-card, .vendor-card, .mini-stat, .metric{
+  animation: cardIn2 .42s var(--ease2) both;
+}
+.lista .cliente-card:nth-child(1){animation-delay:.02s}
+.lista .cliente-card:nth-child(2){animation-delay:.05s}
+.lista .cliente-card:nth-child(3){animation-delay:.08s}
+.lista .cliente-card:nth-child(4){animation-delay:.11s}
+.lista .cliente-card:nth-child(5){animation-delay:.14s}
+.lista .cliente-card:nth-child(6){animation-delay:.17s}
+.lista .cliente-card:nth-child(n+7){animation-delay:.2s}
+.cuenta-card:nth-child(2){animation-delay:.05s}
+.cuenta-card:nth-child(3){animation-delay:.09s}
+.cuenta-card:nth-child(n+4){animation-delay:.13s}
+
+/* ---------- Barra superior ---------- */
+.topbar{ padding-top: calc(15px + env(safe-area-inset-top,0px)); border-bottom-color: var(--border); }
+.topbar-icon{ border-radius: 11px; }
+.user-chip{ border-radius: 99px; transition: all .18s var(--ease2); }
+.user-chip:hover{ background: var(--surface-hover); border-color: var(--border-strong); }
+.refresh-btn{ border-radius: 50%; width: 34px; height: 34px; padding: 0;
+  display: inline-flex; align-items: center; justify-content: center; }
+
+/* ---------- Pestañas ---------- */
+.nav-tabs{ padding: 8px 16px; gap: 5px; }
+.nav-tab{ padding: 9px 15px; border-radius: 99px; font-size: 12.5px; font-weight: 600; }
+.nav-tab.active{ font-weight: 700; }
+
+/* ---------- Métricas ---------- */
+.metrics{ gap: 11px; padding: 18px 20px 10px; }
+.metric{
+  border-radius: var(--r-md); padding: 15px 16px;
+  transition: transform .2s var(--ease2), border-color .2s var(--ease2), box-shadow .25s var(--ease2);
+}
+.metric:hover{ transform: translateY(-2px); border-color: var(--border-strong);
+  box-shadow: 0 10px 26px -14px rgba(0,0,0,.85); }
+.metric-label{ font-size: 11px; letter-spacing: .04em; }
+.metric-value{ font-size: 27px; letter-spacing: -.025em; }
+
+/* ---------- Racha ---------- */
+.racha-banner{ border-radius: var(--r-md); padding: 13px 16px; }
+.racha-emoji{ font-size: 17px; animation: flick2 2.6s ease-in-out infinite; }
+@keyframes flick2{0%,100%{transform:scale(1) rotate(-2deg)}50%{transform:scale(1.12) rotate(3deg)}}
+
+/* ---------- Buscador y filtros ---------- */
+.search-wrap input{ border-radius: 99px; padding: 12px 16px 12px 40px; font-size: 13.5px; }
+.search-icon{ left: 15px; }
+.orden-select{ border-radius: 99px; padding: 10px 13px; font-size: 12.5px; }
+.f-btn, .plat-filter, .accion-btn{
+  border-radius: 99px; font-size: 12px; font-weight: 600;
+  transition: all .16s var(--ease2);
+}
+.f-btn:active, .plat-filter:active, .accion-btn:active{ transform: scale(.95); }
+
+/* ---------- Tarjeta de cliente ---------- */
+.cliente-card{
+  border-radius: var(--r-md); padding: 14px 16px; gap: 14px;
+  position: relative; overflow: hidden;
+  transition: transform .2s var(--ease2), border-color .2s var(--ease2), box-shadow .25s var(--ease2);
+}
+/* filo de color a la izquierda: da identidad sin ocupar espacio */
+.cliente-card::before{
+  content:""; position:absolute; left:0; top:0; bottom:0; width:2px;
+  background: var(--border-strong); opacity:.9;
+}
+.cliente-card:has(.badge.activo)::before{ background: var(--green); }
+.cliente-card:has(.badge.proximo)::before{ background: var(--amber); }
+.cliente-card:has(.badge.vencido)::before{ background: var(--red); }
+.cliente-card:hover{
+  transform: translateY(-2px);
+  box-shadow: 0 12px 30px -16px rgba(0,149,246,.55);
+}
+.nombre{ font-size: 14.5px; font-weight: 700; letter-spacing: -.01em; }
+.sub{ font-size: 12px; margin-top: 3px; }
+.avatar{ border-radius: 14px; font-size: 13px; }
+.badge{ font-size: 10px; padding: 3px 9px; text-transform: none; letter-spacing: 0; font-weight: 700; }
+.ring-num{ font-size: 11.5px; font-weight: 800; }
+/* el resplandor de los anillos se va: ensuciaba el número del centro */
+.ring-fg-green, .ring-fg-amber, .ring-fg-red{ filter: none; }
+
+/* ---------- WhatsApp ---------- */
+.wa-btn{ border-radius: 14px; }
+.wa-btn.wa-lista{ border-radius: 15px; box-shadow: none; }
+.wa-btn:hover{ transform: scale(1.06); }
+
+/* ---------- Cuentas ---------- */
+.cuenta-card{ border-radius: var(--r-md); transition: transform .2s var(--ease2), border-color .2s; }
+.cuenta-card:hover{ transform: translateY(-2px); }
+.cuenta-header{ padding: 14px 16px; }
+.cuenta-plat{ font-size: 14px; letter-spacing: -.01em; }
+.cuenta-correo{ font-size: 11.5px; transition: color .16s; }
+.cuenta-correo:hover{ color: var(--violet); }
+.slot-mini{ width: 8px; height: 20px; border-radius: 3px; }
+.slot-mini.libre{ background: transparent; border: 1px dashed var(--border-strong); }
+.slot-mini.ocupado{ background: var(--violet); }
+.cuenta-info-item{ background: var(--bg); border: 1px solid var(--border); border-radius: var(--r-xs); }
+.cuenta-info-value{ font-size: 12.5px; }
+.acc-btn{ border-radius: 99px; }
+.slot-action, .delete-acc-btn{ border-radius: 99px; }
+.cuentas-alerta{ border-radius: var(--r-sm); }
+
+/* ---------- Ganancias ---------- */
+.pending-hero{ border-radius: var(--r-md); background: var(--surface-solid); }
+.pending-hero .big{ font-size: 34px; letter-spacing: -.03em; }
+.mini-stat{ border-radius: var(--r-md); padding: 17px; }
+.mini-stat .lbl{ font-size: 11px; text-transform: none; letter-spacing: 0; font-weight: 600; color: var(--text3); }
+.mini-stat .val{ font-size: 24px; letter-spacing: -.025em; margin-top: 6px; }
+.earn-hero{ border-radius: var(--r-md); }
+.vendor-card{ border-radius: var(--r-md); }
+.vendor-card-name{ font-size: 15px; text-transform: none; }
+.resumen-mes, .grafica-wrap{ border-radius: var(--r-md); }
+.gb-bar{ border-radius: 7px 7px 0 0; background: var(--violet); }
+.ganancia-box{ border-radius: var(--r-md); }
+.ganancia-value{ font-size: 23px; letter-spacing: -.02em; }
+
+/* ---------- Modales ---------- */
+.modal-overlay{ backdrop-filter: blur(3px); background: rgba(0,0,0,.68); }
+.modal{ border-radius: var(--r-lg); padding: 22px; }
+.modal-title{ font-size: 18px; letter-spacing: -.02em; }
+.modal-close{ border-radius: 50%; background: var(--surface); transition: all .18s var(--ease2); }
+.modal-close:hover{ transform: rotate(90deg); }
+.form-label{ text-transform: none; letter-spacing: 0; font-size: 12px; font-weight: 600; color: var(--text2); }
+.form-input, .form-select{ border-radius: var(--r-sm); padding: 12px 13px; background: var(--bg); }
+.form-input:focus, .form-select:focus{ box-shadow: 0 0 0 4px rgba(0,149,246,.13); }
+.btn-primary{ border-radius: var(--r-sm); padding: 14px; font-size: 14.5px; }
+.btn-secondary{ border-radius: var(--r-sm); }
+.detalle-value{ font-size: 14px; font-weight: 600; }
+.detalle-label{ text-transform: none; letter-spacing: 0; font-size: 11px; }
+
+/* ---------- FAB ---------- */
+.fab{
+  width: 56px; height: 56px; border-radius: 19px;
+  background: var(--violet); color: #fff;
+  box-shadow: 0 12px 28px -8px rgba(0,149,246,.75);
+}
+.fab:hover{ box-shadow: 0 16px 34px -8px rgba(0,149,246,.9); }
+
+/* ---------- Toast ---------- */
+.toast{ border-radius: 99px; padding: 11px 20px 11px 11px; }
+
+/* ---------- Vacíos ---------- */
+.empty-icon{ border-radius: 18px; width: 56px; height: 56px; }
+.empty-title{ font-size: 15px; font-weight: 700; color: var(--text2); }
+
+/* ---------- Notificaciones ---------- */
+.notif-item{ border-radius: var(--r-sm); padding: 14px 15px; }
+.notif-titulo{ font-size: 13.5px; }
+
+/* ---------- Login con orbes de las plataformas ---------- */
+.login-overlay{ background: #000; }
+.login-overlay::before, .login-overlay::after{
+  content:""; position:absolute; border-radius:50%; filter: blur(60px); opacity:.17;
+  animation: drift2 22s ease-in-out infinite; pointer-events:none; z-index:1;
+}
+.login-overlay::before{ width:300px; height:300px; background:#e50914; top:-80px; left:-60px; }
+.login-overlay::after{ width:260px; height:260px; background:#0095f6; bottom:-70px; right:-50px; animation-delay:-8s; }
+@keyframes drift2{0%,100%{transform:translate(0,0) scale(1)}33%{transform:translate(26px,-22px) scale(1.09)}66%{transform:translate(-20px,18px) scale(.94)}}
+.login-card{
+  border-radius: 24px; padding: 34px 30px 28px;
+  background: rgba(19,19,23,.86); backdrop-filter: blur(20px);
+  box-shadow: 0 34px 80px -22px rgba(0,0,0,.85);
+}
+.login-card h2{ font-size: 22px; letter-spacing: -.025em; }
+.login-error{ background: var(--red-bg); border: 1px solid rgba(251,113,133,.26);
+  border-radius: var(--r-sm); padding: 11px 13px; margin-top: 14px; }
+
+/* ---------- Tour ---------- */
+.tour-card{ border-radius: 18px; }
+.tour-next{ border-radius: 99px; padding: 10px 20px; }
+
+/* ---------- Respeta "reducir movimiento" ---------- */
+@media (prefers-reduced-motion: reduce){
+  .lista .cliente-card, .cuenta-card, .vendor-card, .mini-stat, .metric, .racha-emoji,
+  .login-overlay::before, .login-overlay::after{ animation: none !important; }
+}
 </style>
 </head>
 <body>
@@ -811,7 +951,7 @@ body {
         <span style="font-size:11.5px;color:var(--text3);" id="meta-bar-texto">—</span>
       </div>
       <div style="background:var(--surface);border-radius:999px;height:6px;margin-top:5px;overflow:hidden;">
-        <div id="meta-bar-fill" style="height:100%;border-radius:999px;width:0%;background:linear-gradient(90deg,#f0c356,#c9860f);transition:width .4s;"></div>
+        <div id="meta-bar-fill" style="height:100%;border-radius:999px;width:0%;background:linear-gradient(90deg,#8b5cf6,#6366f1);transition:width .4s;"></div>
       </div>
     </div>
   </div>
@@ -862,7 +1002,7 @@ body {
 <!-- SECCIÓN TAREAS DE HOY -->
 <div id="sec-hoy" class="section-hidden">
   <div class="content" style="padding-top:20px;">
-    <div style="font-size:16px;font-weight:700;font-family:'Oswald';margin-bottom:4px;">📋 Tareas de hoy</div>
+    <div style="font-size:16px;font-weight:700;font-family:'Space Grotesk';margin-bottom:4px;">📋 Tareas de hoy</div>
     <div style="font-size:13px;color:var(--text2);margin-bottom:16px;">A quién contactar hoy. Toca 💬 para abrir el WhatsApp con el mensaje listo.</div>
     <div id="tareas-content"><div class="loading">Cargando...</div></div>
   </div>
@@ -872,7 +1012,7 @@ body {
 <div id="sec-cuentas" class="section-hidden">
   <div class="content" style="padding-top:20px;">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
-      <div style="font-size:16px;font-weight:700;font-family:'Oswald';">Cuentas</div>
+      <div style="font-size:16px;font-weight:700;font-family:'Space Grotesk';">Cuentas</div>
       <button id="btn-nueva-cuenta" onclick="abrirModalNuevaCuenta()" class="btn-primary" style="width:auto;margin-top:0;padding:9px 16px;font-size:13px;">+ Nueva cuenta</button>
     </div>
     <div class="search-wrap" style="margin-bottom:12px;">
@@ -888,7 +1028,7 @@ body {
 <div id="sec-catalogo" class="section-hidden">
   <div class="content" style="padding-top:20px;">
     <div style="margin-bottom:16px;">
-      <div style="font-size:16px;font-weight:700;font-family:'Oswald';">Catálogo y comisiones</div>
+      <div style="font-size:16px;font-weight:700;font-family:'Space Grotesk';">Catálogo y comisiones</div>
       <div style="font-size:12.5px;color:var(--text2);margin-top:3px;" id="catalogo-sub">Precios actualizados y lo que te toca por cada venta</div>
     </div>
     <div id="catalogo-novedades"></div>
@@ -905,7 +1045,7 @@ body {
 <div id="sec-comprobantes" class="section-hidden">
   <div class="content" style="padding-top:20px;">
     <div style="margin-bottom:16px;">
-      <div style="font-size:16px;font-weight:700;font-family:'Oswald';">Comprobantes de pago</div>
+      <div style="font-size:16px;font-weight:700;font-family:'Space Grotesk';">Comprobantes de pago</div>
       <div style="font-size:12.5px;color:var(--text2);margin-top:3px;">Se suben desde la ficha de cada cliente · guardados en tu Drive</div>
     </div>
     <div class="search-wrap" style="margin-bottom:16px;">
@@ -936,7 +1076,7 @@ body {
 <div id="sec-autorizar" class="section-hidden">
   <div class="content" style="padding-top:20px;">
     <div style="margin-bottom:16px;">
-      <div style="font-size:16px;font-weight:700;font-family:'Oswald';" id="autorizar-titulo">Cambios por autorizar</div>
+      <div style="font-size:16px;font-weight:700;font-family:'Space Grotesk';" id="autorizar-titulo">Cambios por autorizar</div>
       <div style="font-size:12.5px;color:var(--text2);margin-top:3px;" id="autorizar-sub">Nada se aplica hasta que tú lo apruebes</div>
     </div>
     <div id="autorizar-content"><div class="loading">Cargando...</div></div>
@@ -956,7 +1096,7 @@ body {
       <input class="form-input" id="rechazar-motivo" placeholder="Ej. ya lo registré yo, el monto no cuadra...">
     </div>
     <input type="hidden" id="rechazar-id">
-    <button class="btn-primary" id="btn-rechazar-confirm" onclick="confirmarRechazo()" style="background:linear-gradient(135deg,#f87171,#ef4444);color:#fff;box-shadow:0 6px 18px -4px rgba(248,113,113,0.5);">Rechazar cambio</button>
+    <button class="btn-primary" id="btn-rechazar-confirm" onclick="confirmarRechazo()" style="background:linear-gradient(135deg,#f87171,#ef4444);box-shadow:0 6px 18px -4px rgba(248,113,113,0.5);">Rechazar cambio</button>
     <button class="btn-secondary" onclick="cerrarModal('modal-rechazar')">Cancelar</button>
   </div>
 </div>
@@ -965,7 +1105,7 @@ body {
 <div id="sec-historial" class="section-hidden">
   <div class="content" style="padding-top:20px;">
     <div style="margin-bottom:16px;">
-      <div style="font-size:16px;font-weight:700;font-family:'Oswald';">Historial de movimientos</div>
+      <div style="font-size:16px;font-weight:700;font-family:'Space Grotesk';">Historial de movimientos</div>
       <div style="font-size:12.5px;color:var(--text2);margin-top:3px;" id="historial-sub">Quién hizo qué y cuándo — altas, renovaciones, pagos y cambios</div>
     </div>
     <div class="search-wrap" style="margin-bottom:16px;">
@@ -1095,7 +1235,7 @@ body {
       </div>
       <div id="comision-wrap" style="display:none;text-align:right;">
         <div class="ganancia-label" style="color:var(--amber);">Comisión vendedor</div>
-        <div style="font-family:'Oswald';font-size:17px;color:var(--amber);font-weight:700;" id="g-com">$0</div>
+        <div style="font-family:'Space Grotesk';font-size:17px;color:var(--amber);font-weight:700;" id="g-com">$0</div>
       </div>
     </div>
     <div class="form-group">
@@ -1346,7 +1486,7 @@ body {
     </div>
     <div id="renovar-protegido-nota" style="display:none;background:var(--blue-bg);border:1px solid rgba(96,165,250,0.35);border-radius:12px;padding:10px 12px;font-size:12px;color:var(--blue);margin:-6px 0 14px;"></div>
     <input type="hidden" id="renovar-id">
-    <button class="btn-primary" id="btn-renovar" onclick="guardarRenovacion()" style="background:linear-gradient(135deg,#34d399,#10b981);color:#fff;box-shadow:0 6px 18px -4px rgba(52,211,153,0.5);">Confirmar renovación</button>
+    <button class="btn-primary" id="btn-renovar" onclick="guardarRenovacion()" style="background:linear-gradient(135deg,#34d399,#10b981);box-shadow:0 6px 18px -4px rgba(52,211,153,0.5);">Confirmar renovación</button>
   </div>
 </div>
 
@@ -2416,16 +2556,16 @@ function renderHistorialMensual() {
             </div>
             <div class="cuenta-info-item">
               <div class="cuenta-info-label">Generado</div>
-              <div style="font-family:'Oswald';font-size:14px;font-weight:700;color:var(--text);">$${parseFloat(f['generado_mes']||0).toFixed(2)}</div>
+              <div style="font-family:'Space Grotesk';font-size:14px;font-weight:700;color:var(--text);">$${parseFloat(f['generado_mes']||0).toFixed(2)}</div>
             </div>
             ${esYo ? '' : `
             <div class="cuenta-info-item">
               <div class="cuenta-info-label">Pagado</div>
-              <div style="font-family:'Oswald';font-size:14px;font-weight:700;color:var(--green);">$${parseFloat(f['pagado_mes']||0).toFixed(2)}</div>
+              <div style="font-family:'Space Grotesk';font-size:14px;font-weight:700;color:var(--green);">$${parseFloat(f['pagado_mes']||0).toFixed(2)}</div>
             </div>
             <div class="cuenta-info-item">
               <div class="cuenta-info-label">Pendiente acum.</div>
-              <div style="font-family:'Oswald';font-size:14px;font-weight:700;color:${parseFloat(f['pendiente_acumulado']||0)>0.001?'var(--amber)':'var(--green)'};">$${parseFloat(f['pendiente_acumulado']||0).toFixed(2)}</div>
+              <div style="font-family:'Space Grotesk';font-size:14px;font-weight:700;color:${parseFloat(f['pendiente_acumulado']||0)>0.001?'var(--amber)':'var(--green)'};">$${parseFloat(f['pendiente_acumulado']||0).toFixed(2)}</div>
             </div>`}
           </div>`;
         }).join('')}
@@ -3119,27 +3259,33 @@ function verDetalle(id) {
   // combo mensual), la comisión mostrada escala igual que la abonada.
   const factorMesesFicha = paqData ? Math.max(1, parseInt(c.meses)||1) / Math.max(1, parseInt(paqData.meses)||1) : 1;
   const comisionVend = esVendedor && paqData ? paqData.gananciaAmigo * (pctVendedor/100) * factorMesesFicha : 0;
-  // Desglose visible solo en ventas de varios meses (donde el reparto confunde):
-  // deja claro qué es pago ÚNICO (la comisión del vendedor) y qué se REPARTE por
-  // mes. Funciona con cualquier combo de N meses, usando sus propias cantidades.
+  // Desglose visible solo en ventas de varios meses. IMPORTANTE: el dinero NO se
+  // reparte entre los meses — se abona completo el día de la venta, en un solo
+  // asiento del libro (ver abonarComision_ / registrarMovimientoYo_ en Code.gs).
+  // Antes esta caja decía "$X/mes × N", lo cual era falso: ningún código sumaba
+  // esa parte en los meses siguientes. Ahora dice lo que de verdad pasa.
   const mesesDet = Math.max(1, parseInt(c.meses)||1);
+  // Referencia por mes: solo informativa, para comparar con una venta mensual.
   const ganMesDet = mesesDet>0 ? ganancia/mesesDet : ganancia;
   let repartoHTML = '';
   if (mesesDet > 1) {
     const rowStyle = 'display:flex;justify-content:space-between;font-size:13px;margin-bottom:5px;';
     const rowLast = 'display:flex;justify-content:space-between;font-size:13px;padding-top:6px;border-top:1px dashed var(--border);';
-    const boxOpen = '<div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:12px 14px;margin-bottom:12px;"><div style="font-size:12px;font-weight:700;color:var(--violet2);margin-bottom:8px;">📆 Reparto de esta venta · '+mesesDet+' meses</div>';
+    const nota = '<div style="font-size:11.5px;color:var(--text3);line-height:1.5;margin-top:8px;padding-top:8px;border-top:1px solid var(--border);">Se cobró y se acreditó todo de una, el día de la venta. Los meses que vienen no suman nada por esta venta.</div>';
+    const boxOpen = '<div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:12px 14px;margin-bottom:12px;"><div style="font-size:12px;font-weight:700;color:var(--violet2);margin-bottom:8px;">📆 Venta de '+mesesDet+' meses · cobro adelantado</div>';
     if (MI_ROL === 'admin') {
       repartoHTML = boxOpen +
         (esVendedor ? '<div style="'+rowStyle+'"><span style="color:var(--text2);">Comisión '+c.vendedor+'</span><span style="color:var(--amber);font-weight:600;">$'+comisionVend.toFixed(2)+' · pago único ✓</span></div>' : '') +
         '<div style="'+rowStyle+'"><span style="color:var(--text2);">Tu parte neta total</span><span style="color:var(--text);font-weight:600;">$'+ganancia.toFixed(2)+'</span></div>' +
-        '<div style="'+rowLast+'"><span style="color:var(--text2);">Se suma a tu mes</span><span style="color:var(--green);font-weight:700;">$'+ganMesDet.toFixed(2)+'/mes × '+mesesDet+'</span></div>' +
-        '</div>';
+        '<div style="'+rowLast+'"><span style="color:var(--text2);">Se te acreditó completo</span><span style="color:var(--green);font-weight:700;">$'+ganancia.toFixed(2)+' el '+esc(c.inicio||'día de la venta')+'</span></div>' +
+        '<div style="'+rowStyle+'margin-top:5px;"><span style="color:var(--text3);font-size:12px;">Equivale a</span><span style="color:var(--text3);font-size:12px;">$'+ganMesDet.toFixed(2)+'/mes si lo comparás con una venta mensual</span></div>' +
+        nota + '</div>';
     } else {
       repartoHTML = boxOpen +
         '<div style="'+rowStyle+'"><span style="color:var(--text2);">Tu comisión</span><span style="color:var(--amber);font-weight:600;">$'+comisionVend.toFixed(2)+' · pago único ✓</span></div>' +
-        '<div style="'+rowLast+'"><span style="color:var(--text2);">En tu resumen mensual</span><span style="color:var(--green);font-weight:700;">$'+(comisionVend/mesesDet).toFixed(2)+'/mes × '+mesesDet+'</span></div>' +
-        '</div>';
+        '<div style="'+rowLast+'"><span style="color:var(--text2);">Se te acreditó completo</span><span style="color:var(--green);font-weight:700;">$'+comisionVend.toFixed(2)+' el '+esc(c.inicio||'día de la venta')+'</span></div>' +
+        '<div style="'+rowStyle+'margin-top:5px;"><span style="color:var(--text3);font-size:12px;">Equivale a</span><span style="color:var(--text3);font-size:12px;">$'+(comisionVend/mesesDet).toFixed(2)+'/mes si lo comparás con una mensual</span></div>' +
+        nota + '</div>';
     }
   }
   // ===== Historial de ciclos =====
@@ -3162,7 +3308,7 @@ function verDetalle(id) {
         return `<div class="slot-row">
           <div class="slot-num" style="width:auto;color:var(--text2);">${esc(m.fecha||'—')}</div>
           <div class="slot-cliente" style="font-size:12px;">${esAlta?'🟢 Alta':'🔁 Renovación'}${m.nota?` · <span style="color:var(--text3);">${esc(m.nota)}</span>`:''}</div>
-          <div style="font-family:'Oswald';font-weight:700;color:var(--green);font-size:13px;" title="${etiquetaMonto}">$${(parseFloat(m.monto)||0).toFixed(2)}</div>
+          <div style="font-family:'Space Grotesk';font-weight:700;color:var(--green);font-size:13px;" title="${etiquetaMonto}">$${(parseFloat(m.monto)||0).toFixed(2)}</div>
         </div>`;
       }).join('')}
       <div style="font-size:10.5px;color:var(--text3);padding:6px 0 2px;">Montos: ${etiquetaMonto} por ciclo. El registro por fechas existe desde jul-2026.</div>
@@ -3192,7 +3338,7 @@ function verDetalle(id) {
     <div style="display:flex;align-items:center;gap:14px;margin-bottom:20px;">
       <div class="avatar" style="width:52px;height:52px;font-size:18px;background:${col.bg};color:${col.color};">${iniciales(c.cliente)}</div>
       <div style="flex:1;">
-        <div style="font-size:16px;font-weight:700;font-family:'Oswald';">${esc(c.cliente)}</div>
+        <div style="font-size:16px;font-weight:700;font-family:'Space Grotesk';">${esc(c.cliente)}</div>
         <div style="font-size:13px;color:var(--text2);">${esc(c.id)} · ${esc(c.contacto||'Sin contacto')}</div>
         <div style="margin-top:4px;">${c.estado_raw==='ARCHIVADO' ? '<span class="badge sin-fecha">Archivado</span>' : badgeEstado(c.estado,c.dias)}</div>
       </div>
@@ -3257,7 +3403,7 @@ function verDetalle(id) {
   document.getElementById('d-contenido').innerHTML += esArchivado ? `
     <button onclick="reactivarCliente('${c.id}')" class="btn-secondary green" style="margin-top:4px;">✅ Reactivar cliente</button>` : `
     ${(c.pago||'').toUpperCase()==='PENDIENTE' ? `<button onclick="marcarPagado('${c.id}')" class="btn-secondary green" style="margin-top:4px;">✅ Marcar como pagado</button>` : ''}
-    <button onclick="abrirRenovar('${c.id}')" class="btn-primary" style="margin-top:8px;background:linear-gradient(135deg,#34d399,#10b981);color:#fff;box-shadow:0 6px 18px -4px rgba(52,211,153,0.5);">🔁 Renovar cliente</button>
+    <button onclick="abrirRenovar('${c.id}')" class="btn-primary" style="margin-top:8px;background:linear-gradient(135deg,#34d399,#10b981);box-shadow:0 6px 18px -4px rgba(52,211,153,0.5);">🔁 Renovar cliente</button>
     <button onclick="abrirEditar('${c.id}')" class="btn-primary" style="margin-top:8px;">✏️ Editar cliente</button>
     <button onclick="abrirModalComprobante('${c.id}')" class="btn-primary" style="margin-top:8px;background:var(--surface);color:var(--text);border:1px solid var(--border);box-shadow:none;">📎 Subir comprobante</button>
     <button onclick="confirmarArchivar('${c.id}')" class="btn-secondary">Archivar cliente</button>`;
@@ -3486,7 +3632,7 @@ function pintarListaBorradores_() {
         const activo = d.bid === borradorActivoId;
         return `<span onclick="abrirBorrador_(${esc(JSON.stringify(d.bid))})" title="${esc(tituloBorrador_(d))}"
           style="display:inline-flex;align-items:center;gap:5px;font-size:11.5px;font-weight:600;padding:5px 9px;border-radius:99px;cursor:pointer;max-width:170px;
-          background:${activo?'rgba(224,165,38,0.18)':'var(--surface)'};border:1px solid ${activo?'rgba(224,165,38,0.5)':'var(--border)'};color:${activo?'var(--blue)':'var(--text2)'};">
+          background:${activo?'rgba(0,149,246,0.18)':'var(--surface)'};border:1px solid ${activo?'rgba(0,149,246,0.5)':'var(--border)'};color:${activo?'var(--blue)':'var(--text2)'};">
           <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${activo?'✏️ ':''}${esc(tituloBorrador_(d))}</span>
           <span onclick="eliminarBorrador_(${esc(JSON.stringify(d.bid))},event)" title="Descartar esta venta" style="color:var(--text3);font-weight:800;padding:0 2px;">✕</span>
         </span>`;
@@ -3815,7 +3961,7 @@ function renderCatalogo() {
     // Estilo tipo banner (mismo lenguaje que la racha de clientes nuevos):
     // borde y fondo azules, para que resalte de las tarjetas normales de abajo.
     novedadesEl.innerHTML = !cambiosRecientes.length ? '' : `
-      <div style="background:linear-gradient(135deg,rgba(224,165,38,0.14),rgba(224,165,38,0.04));border:1px solid rgba(224,165,38,0.35);border-radius:var(--radius-md);padding:14px 16px;margin-bottom:14px;">
+      <div style="background:linear-gradient(135deg,rgba(0,149,246,0.14),rgba(0,149,246,0.04));border:1px solid rgba(0,149,246,0.35);border-radius:var(--radius-md);padding:14px 16px;margin-bottom:14px;">
         <div style="font-size:12px;font-weight:700;color:var(--violet2);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:10px;">🔔 Novedades del catálogo <span style="font-weight:600;color:var(--text3);text-transform:none;letter-spacing:0;">· últimos 7 días</span></div>
         <div style="display:flex;flex-direction:column;gap:8px;">
           ${cambiosRecientes.map(({h, f, frase}) => {
@@ -3883,14 +4029,14 @@ function renderCatalogo() {
           </div>
         </div>
         <div style="text-align:right;white-space:nowrap;">
-          <div style="font-family:'Oswald';font-size:16px;font-weight:700;color:var(--text);">$${d.precio}</div>
+          <div style="font-family:'Space Grotesk';font-size:16px;font-weight:700;color:var(--text);">$${d.precio}</div>
           ${(d.meses||1)>1?`<div style="font-size:10.5px;color:var(--text3);">≈ $${(d.precio/d.meses).toFixed(0)}/mes</div>`:''}
         </div>
       </div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
         <div class="cuenta-info-item">
           <div class="cuenta-info-label">${esAdmin ? 'Tu ganancia neta' : 'Tu comisión'}</div>
-          <div style="font-family:'Oswald';font-size:15px;font-weight:700;color:var(--green);">$${miGanancia.toFixed(2)}</div>
+          <div style="font-family:'Space Grotesk';font-size:15px;font-weight:700;color:var(--green);">$${miGanancia.toFixed(2)}</div>
         </div>
         <div class="cuenta-info-item">
           <div class="cuenta-info-label">Disponibilidad</div>
@@ -4092,7 +4238,7 @@ async function guardarCliente() {
             <p>✅ Cliente guardado correctamente</p>
           </div>
           ${tieneTelefono ? `
-          <button type="button" class="btn-primary" style="background:linear-gradient(135deg,#34d399,#10b981);color:#fff;box-shadow:0 6px 18px -4px rgba(52,211,153,0.5);margin-bottom:8px;" onclick="abrirWhatsAppBienvenida(ultimoClienteGuardado)">
+          <button type="button" class="btn-primary" style="background:linear-gradient(135deg,#34d399,#10b981);box-shadow:0 6px 18px -4px rgba(52,211,153,0.5);margin-bottom:8px;" onclick="abrirWhatsAppBienvenida(ultimoClienteGuardado)">
             💬 Enviar bienvenida por WhatsApp
           </button>
           <button type="button" class="btn-primary" style="background:var(--surface);color:var(--text2);box-shadow:none;border:1px solid var(--border);" onclick="cerrarModal('modal-nuevo');cargarDatos();">
@@ -4648,7 +4794,7 @@ function actualizarMetaGananciaGlobal_() {
     `$${generadoMes.toLocaleString('es-MX',{maximumFractionDigits:0})} de $${meta.toLocaleString('es-MX',{maximumFractionDigits:0})} · ${Math.round(pct)}%${cumplida?' 🎉':''}`;
   const fill = document.getElementById('meta-bar-fill');
   fill.style.width = pct + '%';
-  fill.style.background = cumplida ? 'linear-gradient(90deg,#34d399,#10b981)' : 'linear-gradient(90deg,#f0c356,#c9860f)';
+  fill.style.background = cumplida ? 'linear-gradient(90deg,#34d399,#10b981)' : 'linear-gradient(90deg,#8b5cf6,#6366f1)';
   bar.style.display = '';
 }
 
@@ -4705,7 +4851,20 @@ function renderGanancias() {
   });
   Object.keys(historialPorVendedor).forEach(v => historialPorVendedor[v].reverse());
 
-  const total=todosClientes.reduce((s,c)=>s+(parseFloat(c.precio)||0),0);
+  // Valor de la CARTERA (no es un acumulado histórico y nunca lo fue: al renovar,
+  // la columna 'precio' se sobrescribe, así que un cliente con 12 renovaciones
+  // aporta un solo precio). Antes se sumaban TODAS las filas —incluidos vencidos
+  // y archivados— bajo el rótulo "todo lo cobrado", que era falso.
+  // Ahora: solo clientes vigentes, y dos lecturas distintas.
+  const _vigentes = todosClientes.filter(c => c.estado_raw !== 'ARCHIVADO' && c.estado !== 'vencido');
+  // a) Valor del ciclo actual: lo que pagó cada quien por su periodo (1 o N meses).
+  const totalCiclo = _vigentes.reduce((s,c)=>s+(parseFloat(c.precio)||0),0);
+  // b) Valor POR MES: divide las ventas multi-mes. Es el único comparable entre
+  //    meses, porque no se dispara cuando toca un mes con ventas trimestrales.
+  const totalMensual = _vigentes.reduce((s,c)=>{
+    const m = Math.max(1, parseInt(c.meses)||1);
+    return s + (parseFloat(c.precio)||0)/m;
+  },0);
 
   // Totales del hero, directos del libro.
   let pendienteTotal = 0, acumuladoTotal = 0, pagadoTotal = 0;
@@ -4753,16 +4912,16 @@ function renderGanancias() {
   // (lo que de verdad estás generando ahora mismo). Lo de "este mes" pasa a ser
   // un dato secundario de actividad, para que no compita ni confunda con éste.
   const heroGananciaHTML = MI_ROL==='admin' ? `
-    <div class="mini-stat" style="background:linear-gradient(135deg,rgba(224,165,38,0.14),rgba(224,165,38,0.05));border:1px solid rgba(224,165,38,0.35);">
-      <div class="lbl">💰 Tu ganancia · clientes activos</div>
+    <div class="mini-stat" style="background:linear-gradient(135deg,rgba(0,149,246,0.14),rgba(0,149,246,0.05));border:1px solid rgba(0,149,246,0.35);">
+      <div class="lbl">💰 Tu ganancia · ciclos vigentes</div>
       <div class="val" style="font-size:32px;color:var(--violet2);margin-top:2px;">$${misGanancias.toLocaleString('es-MX',{minimumFractionDigits:0,maximumFractionDigits:2})}</div>
-      <div class="sub" style="margin-top:6px;">Es el total que te dejan ahora mismo tus ${misClientes} clientes activos, ya descontadas las comisiones de tus vendedores.</div>
+      <div class="sub" style="margin-top:6px;">Suma lo que te deja el ciclo completo de cada uno de tus ${misClientes} clientes vigentes, ya descontadas las comisiones. Ojo: una venta de 3 meses entra completa, no dividida — por eso este número sube de golpe con las ventas largas y no sirve para comparar un mes contra otro.</div>
       <div style="font-size:12px;color:var(--text2);margin-top:6px;">${misClientesDirectos} propias directas · ${misClientes-misClientesDirectos} de tus vendedores</div>
     </div>` : `
-    <div class="mini-stat" style="background:linear-gradient(135deg,rgba(224,165,38,0.14),rgba(224,165,38,0.05));border:1px solid rgba(224,165,38,0.35);">
-      <div class="lbl">💰 Tu ganancia · clientes activos</div>
+    <div class="mini-stat" style="background:linear-gradient(135deg,rgba(0,149,246,0.14),rgba(0,149,246,0.05));border:1px solid rgba(0,149,246,0.35);">
+      <div class="lbl">💰 Tu comisión · ciclos vigentes</div>
       <div class="val" style="font-size:32px;color:var(--violet2);margin-top:2px;">$${misGanancias.toLocaleString('es-MX',{minimumFractionDigits:0,maximumFractionDigits:2})}</div>
-      <div class="sub" style="margin-top:6px;">Es lo que te corresponde ahora mismo de tus ${misClientes} clientes activos.</div>
+      <div class="sub" style="margin-top:6px;">Suma tu comisión del ciclo completo de tus ${misClientes} clientes vigentes. Una venta de varios meses cuenta completa, tal como se te acreditó.</div>
     </div>`;
 
   const heroHTML = `
@@ -4773,8 +4932,8 @@ function renderGanancias() {
         <div class="ring-wrap">
           <svg width="92" height="92" viewBox="0 0 92 92">
             <defs><linearGradient id="ringGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stop-color="${todoAlCorriente?'#34d399':'#e0a526'}"/>
-              <stop offset="100%" stop-color="${todoAlCorriente?'#34d399':'#e0a526'}"/>
+              <stop offset="0%" stop-color="${todoAlCorriente?'#34d399':'#0095f6'}"/>
+              <stop offset="100%" stop-color="${todoAlCorriente?'#34d399':'#0095f6'}"/>
             </linearGradient></defs>
             <circle class="ring-track" cx="46" cy="46" r="${ringR}"/>
             <circle class="ring-progress" cx="46" cy="46" r="${ringR}" stroke-dasharray="${ringC}" stroke-dashoffset="${ringOffset}"/>
@@ -4807,8 +4966,10 @@ function renderGanancias() {
     </div>` : ''}
     ${MI_ROL==='admin' ? `
     <div class="mini-stat">
-      <div class="lbl">🏦 Ingresos totales del negocio (todo lo cobrado)</div>
-      <div class="val">$${total.toLocaleString('es-MX',{minimumFractionDigits:0,maximumFractionDigits:2})}</div>
+      <div class="lbl">📈 Tu cartera vale por mes</div>
+      <div class="val">$${totalMensual.toLocaleString('es-MX',{minimumFractionDigits:0,maximumFractionDigits:2})}</div>
+      <div class="sub" style="margin-top:6px;">Lo que te dejan tus clientes vigentes cada mes, con las ventas de varios meses ya divididas. Es el número que sí podés comparar contra el mes pasado para ver si creces.</div>
+      <div style="font-size:11px;color:var(--text3);margin-top:6px;">Sumando el ciclo completo que pagó cada uno: $${totalCiclo.toLocaleString('es-MX',{maximumFractionDigits:0})}</div>
     </div>` : ''}
     <div style="display:flex;flex-direction:column;gap:10px;">
       ${vendedores.map(v => vendorCardHTML(v, resumen[v], historialPorVendedor[v])).join('')}
@@ -4842,7 +5003,7 @@ function vendorCardHTML(v, r, hist) {
         <div class="vendor-mini-ring">
           <svg width="38" height="38" viewBox="0 0 38 38">
             <circle cx="19" cy="19" r="${ringR}" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="5"/>
-            <circle cx="19" cy="19" r="${ringR}" fill="none" stroke="${alCorriente?'#34d399':'#e0a526'}" stroke-width="5" stroke-linecap="round"
+            <circle cx="19" cy="19" r="${ringR}" fill="none" stroke="${alCorriente?'#34d399':'#0095f6'}" stroke-width="5" stroke-linecap="round"
               stroke-dasharray="${ringC}" stroke-dashoffset="${ringOffset}" transform="rotate(-90 19 19)" style="transition:stroke-dashoffset 0.6s var(--ease);"/>
           </svg>
         </div>
@@ -4861,15 +5022,15 @@ function vendorCardHTML(v, r, hist) {
     <div class="vendor-stat-row">
       <div class="cuenta-info-item">
         <div class="cuenta-info-label">Acumulado</div>
-        <div style="font-family:'Oswald';font-size:15px;font-weight:700;color:var(--text);">$${acum.toFixed(2)}</div>
+        <div style="font-family:'Space Grotesk';font-size:15px;font-weight:700;color:var(--text);">$${acum.toFixed(2)}</div>
       </div>
       <div class="cuenta-info-item">
         <div class="cuenta-info-label">Pagado</div>
-        <div style="font-family:'Oswald';font-size:15px;font-weight:700;color:var(--green);">$${pag.toFixed(2)}</div>
+        <div style="font-family:'Space Grotesk';font-size:15px;font-weight:700;color:var(--green);">$${pag.toFixed(2)}</div>
       </div>
       <div class="cuenta-info-item">
         <div class="cuenta-info-label">${sobrepago?'A favor':'Pendiente'}</div>
-        <div style="font-family:'Oswald';font-size:15px;font-weight:700;color:${pend>0.001?'var(--amber)':(sobrepago?'var(--violet)':'var(--green)')};">$${Math.abs(pend).toFixed(2)}</div>
+        <div style="font-family:'Space Grotesk';font-size:15px;font-weight:700;color:${pend>0.001?'var(--amber)':(sobrepago?'var(--violet)':'var(--green)')};">$${Math.abs(pend).toFixed(2)}</div>
       </div>
     </div>
     ${sobrepago?`<div class="spark-line warn">⚠️ Le pagaste $${Math.abs(pend).toFixed(2)} de más — queda a su favor para el siguiente ciclo.</div>`:''}
@@ -4881,7 +5042,7 @@ function vendorCardHTML(v, r, hist) {
         <div class="slot-row">
           <div class="slot-num" style="width:auto;color:var(--text2);">${p.fecha||'—'}</div>
           <div class="slot-cliente" style="font-size:12px;color:var(--text3);">${esc(p.notas||p.concepto||'')}</div>
-          <div style="font-family:'Oswald';font-weight:700;color:var(--green);font-size:13px;">$${parseFloat(p.monto||0).toFixed(2)}</div>
+          <div style="font-family:'Space Grotesk';font-weight:700;color:var(--green);font-size:13px;">$${parseFloat(p.monto||0).toFixed(2)}</div>
         </div>`).join('') : `<div style="font-size:11.5px;color:var(--text3);padding:6px 0;">Sin pagos registrados aún.</div>`}
     </div>
     ${vu.length ? `
@@ -4893,7 +5054,7 @@ function vendorCardHTML(v, r, hist) {
         <div class="slot-row">
           <div class="slot-num" style="width:auto;color:var(--text2);">${p.fecha||'—'}</div>
           <div class="slot-cliente" style="font-size:12px;color:var(--text3);">${esc(p.notas||'Venta única')} · total $${t.toFixed(2)}</div>
-          <div style="font-family:'Oswald';font-weight:700;color:var(--amber);font-size:13px;">$${(t/2).toFixed(2)}</div>
+          <div style="font-family:'Space Grotesk';font-weight:700;color:var(--amber);font-size:13px;">$${(t/2).toFixed(2)}</div>
         </div>`; }).join('')}
     </div>` : ''}
     ${(()=>{ 
@@ -4909,7 +5070,7 @@ function vendorCardHTML(v, r, hist) {
           <div class="slot-row">
             <div class="slot-num" style="width:auto;color:var(--text2);">${a.fecha||'—'}</div>
             <div class="slot-cliente" style="font-size:12px;color:var(--text3);">${esc(a.nota||'Ajuste')}</div>
-            <div style="font-family:'Oswald';font-weight:700;color:${m>=0?'var(--green)':'var(--red)'};font-size:13px;">${m>=0?'+':'−'}$${Math.abs(m).toFixed(2)}</div>
+            <div style="font-family:'Space Grotesk';font-weight:700;color:${m>=0?'var(--green)':'var(--red)'};font-size:13px;">${m>=0?'+':'−'}$${Math.abs(m).toFixed(2)}</div>
           </div>`; }).join('')}
       </div>`;
     })()}
@@ -4970,7 +5131,7 @@ function renderComprobantes() {
         <div style="font-size:13.5px;font-weight:700;display:flex;align-items:center;gap:6px;flex-wrap:wrap;">${esc(cp.cliente_nombre||'—')} ${chip}</div>
         <div style="font-size:12px;color:var(--text2);margin-top:2px;">${esc(cp.paquete||'')}${MI_ROL==='admin'&&cp.vendedor?' · '+esc(cp.vendedor):''} · ${esc(cp.fecha||'')}</div>
       </div>
-      ${cp.monto&&parseFloat(cp.monto)>0?`<div style="font-family:'Oswald';font-weight:700;color:var(--green);white-space:nowrap;">$${parseFloat(cp.monto).toFixed(2)}</div>`:''}
+      ${cp.monto&&parseFloat(cp.monto)>0?`<div style="font-family:'Space Grotesk';font-weight:700;color:var(--green);white-space:nowrap;">$${parseFloat(cp.monto).toFixed(2)}</div>`:''}
       <a href="${esc(cp.drive_url)}" target="_blank" rel="noopener" class="wa-btn" style="background:var(--blue-bg);border-color:rgba(96,165,250,0.35);color:var(--blue);" title="Ver comprobante">👁️</a>
     </div>`;
   }).join('');
@@ -5244,7 +5405,7 @@ function renderConfig() {
   const vendedores = vendedoresEquipo_().map(v => ({ nombre: nombreVendedorUI_(v), key: v }));
 
   document.getElementById('config-content').innerHTML=`
-    <div style="font-size:16px;font-weight:700;margin-bottom:16px;font-family:'Oswald';">⚙️ Configuración</div>
+    <div style="font-size:16px;font-weight:700;margin-bottom:16px;font-family:'Space Grotesk';">⚙️ Configuración</div>
 
     <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;" id="config-tabs">
       <button class="f-btn active" onclick="showConfigTab('paquetes',this)">📦 Combos y precios</button>
@@ -5475,7 +5636,7 @@ function renderConfig() {
           <div style="font-size:13px;font-weight:700;margin-bottom:8px;">👤 Correo para un cliente</div>
           <div style="font-size:11.5px;color:var(--text3);margin-bottom:10px;">Usa tu segunda cuenta de Relay, la de clientes.</div>
           <input class="form-input" id="relay-etq-clientes" placeholder="¿De quién? Ej. María López" style="margin-bottom:9px;">
-          <button class="btn-primary" id="btn-relay-clientes" onclick="generarAliasRelay_('clientes')" style="background:linear-gradient(135deg,#f0c356,#c9860f);color:#1a1208;box-shadow:0 6px 18px -4px rgba(224,165,38,0.5);">🎭 Generar correo de cliente</button>
+          <button class="btn-primary" id="btn-relay-clientes" onclick="generarAliasRelay_('clientes')" style="background:linear-gradient(135deg,#8b5cf6,#6366f1);box-shadow:0 6px 18px -4px rgba(139,92,246,0.5);">🎭 Generar correo de cliente</button>
         </div>
         <div id="relay-resultado"></div>
         <div id="relay-estado" style="font-size:11.5px;color:var(--text3);"></div>
@@ -5499,7 +5660,7 @@ function renderConfig() {
         <div class="cuenta-card" style="padding:14px 15px;">
           <div style="font-size:13px;font-weight:600;margin-bottom:4px;">🔑 Cuentas</div>
           <div style="font-size:11.5px;color:var(--text3);margin-bottom:10px;">Correos, contraseñas, cuenta de pago y ocupación de slots de cada cuenta.</div>
-          <button class="btn-primary" onclick="exportarCuentas()" style="background:linear-gradient(135deg,#f59e0b,#f97316);color:#fff;box-shadow:0 6px 18px -4px rgba(245,158,11,0.5);">🔑 Exportar cuentas (CSV)</button>
+          <button class="btn-primary" onclick="exportarCuentas()" style="background:linear-gradient(135deg,#f59e0b,#f97316);box-shadow:0 6px 18px -4px rgba(245,158,11,0.5);">🔑 Exportar cuentas (CSV)</button>
         </div>
       </div>
     </div>`;
@@ -5593,7 +5754,7 @@ function generarAliasRelay_(tipo) {
       // hace falta hacer con él.
       res.innerHTML = `<div style="background:var(--green-bg);border:1px solid rgba(52,211,153,0.4);border-radius:12px;padding:14px 16px;">
         <div style="font-size:11.5px;color:var(--text2);margin-bottom:6px;">Correo nuevo${etq?' para '+esc(etq):''} — toca para copiarlo</div>
-        <div onclick="copiarTexto_(${esc(JSON.stringify(r.alias))},'Correo copiado')" style="font-family:'Oswald';font-size:15px;font-weight:700;color:var(--green);cursor:pointer;word-break:break-all;">${esc(r.alias)} 📋</div>
+        <div onclick="copiarTexto_(${esc(JSON.stringify(r.alias))},'Correo copiado')" style="font-family:'Space Grotesk';font-size:15px;font-weight:700;color:var(--green);cursor:pointer;word-break:break-all;">${esc(r.alias)} 📋</div>
         ${r.aviso?`<div style="font-size:11.5px;color:var(--amber);margin-top:8px;">⚠️ ${esc(r.aviso)}</div>`:''}
       </div>`;
       toast('Correo generado y copiado a tu lista', 'success', '🎭');
@@ -5673,7 +5834,7 @@ function generarAliasParaCliente_() {
 function _relayTintCard_(tipo) {
   return tipo === 'clientes'
     ? 'border-color: rgba(139,92,246,0.3); background: rgba(139,92,246,0.06);'
-    : 'border-color: rgba(224,165,38,0.3); background: rgba(224,165,38,0.06);';
+    : 'border-color: rgba(0,149,246,0.3); background: rgba(0,149,246,0.06);';
 }
 function _relayAliasCardHTML_(a) {
   return `<div class="cuenta-card" style="padding:10px 13px;display:flex;align-items:center;gap:10px;${_relayTintCard_(a.tipo)}">
@@ -6860,7 +7021,7 @@ if ('serviceWorker' in navigator) {
       <button class="modal-close" onclick="cerrarColaWhatsApp(false)">✕</button>
     </div>
     <p id="cola-wa-info" style="color:var(--text2);font-size:14px;line-height:1.5;margin-bottom:18px;"></p>
-    <button class="btn-primary" id="btn-cola-siguiente" onclick="abrirSiguienteWhatsApp()" style="background:linear-gradient(135deg,#34d399,#10b981);color:#fff;box-shadow:0 6px 18px -4px rgba(52,211,153,0.5);margin-bottom:8px;">Abrir el siguiente ▶</button>
+    <button class="btn-primary" id="btn-cola-siguiente" onclick="abrirSiguienteWhatsApp()" style="background:linear-gradient(135deg,#34d399,#10b981);box-shadow:0 6px 18px -4px rgba(52,211,153,0.5);margin-bottom:8px;">Abrir el siguiente ▶</button>
     <button class="btn-secondary" id="btn-cola-terminar" onclick="cerrarColaWhatsApp(true)">Terminar</button>
   </div>
 </div>
