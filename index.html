@@ -1186,6 +1186,61 @@ body {
    Todo esto es SOLO presentación: no hay un cálculo de dinero aquí. La idea es
    que el ojo lea el reparto del dinero como una sola barra continua en vez de
    tener que sumar tarjetas sueltas. */
+/* ===== P&L del mes (Ganancias) ===== */
+.pl-wrap{ background:var(--surface-solid); border:1px solid var(--border); border-radius:var(--radius-md); padding:16px; margin-bottom:12px; }
+.pl-head{ display:flex; justify-content:space-between; align-items:flex-start; gap:12px; flex-wrap:wrap; margin-bottom:14px; }
+.pl-title{ font-size:14px; font-weight:700; font-family:'Space Grotesk'; }
+.pl-sub{ font-size:11.5px; color:var(--text3); margin-top:3px; line-height:1.4; }
+.pl-select{ width:auto; min-width:150px; margin:0; padding:8px 10px; font-size:12.5px; }
+.pl-grid{ display:grid; grid-template-columns:repeat(4,1fr); gap:10px; }
+.pl-card{ background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:13px 14px; }
+.pl-card-total{ border-color:rgba(52,211,153,0.4); background:linear-gradient(135deg,var(--green-bg),transparent 70%); }
+.pl-lbl{ font-size:11.5px; color:var(--text2); font-weight:600; line-height:1.3; }
+.pl-val{ font-family:'Space Grotesk'; font-size:25px; font-weight:700; line-height:1.1; margin-top:7px; font-variant-numeric:tabular-nums; letter-spacing:-0.02em; }
+.pl-note{ font-size:11px; color:var(--text3); margin-top:5px; line-height:1.4; }
+.pl-aviso{ display:flex; gap:9px; align-items:flex-start; margin-top:12px; padding:11px 13px; border-radius:12px;
+  background:var(--amber-bg); border:1px solid rgba(251,191,36,0.35); color:var(--amber); font-size:12px; line-height:1.5; }
+.pl-det{ margin-top:12px; font-size:12px; }
+.pl-det summary{ cursor:pointer; color:var(--text2); font-weight:600; padding:6px 0; }
+.pl-det-fila{ display:flex; justify-content:space-between; gap:10px; padding:7px 0; border-top:1px solid var(--border); }
+.pl-det-fila i{ display:block; font-style:normal; font-size:11px; color:var(--text3); margin-top:2px; }
+.pl-det-pie{ font-size:11px; color:var(--text3); margin-top:8px; line-height:1.4; }
+.pl-det-vacio{ margin-top:12px; padding:11px 13px; border-radius:12px; background:var(--violet-bg); color:var(--violet); font-size:12px; line-height:1.5; }
+
+/* ===== Métricas de contexto: NUNCA son ganancia ===== */
+.ctx-wrap{ background:var(--surface-solid); border:1px solid var(--border); border-radius:var(--radius-md); padding:15px 16px; margin-bottom:12px; }
+.ctx-title{ font-size:12px; font-weight:700; color:var(--text2); text-transform:uppercase; letter-spacing:0.05em; }
+.ctx-sub{ font-size:11.5px; color:var(--text3); margin:5px 0 12px; line-height:1.45; }
+.ctx-grid{ display:grid; grid-template-columns:repeat(4,1fr); gap:10px; }
+.ctx-card{ background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:12px 13px; }
+.ctx-lbl{ font-size:11.5px; color:var(--text2); font-weight:600; line-height:1.3; }
+.ctx-val{ font-family:'Space Grotesk'; font-size:21px; font-weight:700; line-height:1.1; margin-top:6px; font-variant-numeric:tabular-nums; }
+.ctx-note{ font-size:10.5px; color:var(--text3); margin-top:5px; line-height:1.45; }
+
+/* ===== Configuración → Costos de plataformas ===== */
+.cst-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:10px; }
+.cst-lbl{ font-size:11.5px; color:var(--text2); font-weight:600; margin-bottom:5px; display:block; }
+.cst-preview{ margin:12px 0; padding:11px 13px; border-radius:12px; background:var(--surface); border:1px dashed var(--border-strong);
+  font-size:12px; color:var(--text3); line-height:1.5; }
+.cst-preview.ok{ border-style:solid; border-color:rgba(52,211,153,0.4); background:var(--green-bg); color:var(--text2); }
+.cst-preview.aviso{ border-style:solid; border-color:rgba(251,191,36,0.4); background:var(--amber-bg); color:var(--amber); }
+.cst-preview b{ display:block; font-family:'Space Grotesk'; font-size:19px; color:var(--text); margin-bottom:4px; }
+.cst-preview span{ display:block; font-size:11.5px; margin-top:3px; }
+.cst-plat{ margin-bottom:12px; }
+.cst-plat-nom{ font-size:13px; font-weight:700; margin-bottom:6px; }
+.cst-fila{ display:flex; justify-content:space-between; align-items:center; gap:10px; padding:10px 13px; border-radius:12px;
+  background:var(--surface); border:1px solid var(--border); margin-bottom:6px; }
+.cst-fila.vigente{ border-color:rgba(52,211,153,0.4); }
+.cst-fila b{ font-size:13.5px; }
+.cst-fila span{ display:block; font-size:11px; color:var(--text3); margin-top:2px; }
+.cst-vig{ font-size:11.5px; color:var(--text2); text-align:right; white-space:nowrap; }
+.cst-tag{ display:block; font-style:normal; font-size:10px; font-weight:700; color:var(--green); text-transform:uppercase; letter-spacing:0.04em; }
+.cst-tag.fut{ color:var(--text3); }
+.cst-vacio{ padding:14px; border-radius:12px; background:var(--surface); border:1px dashed var(--border-strong);
+  font-size:12px; color:var(--text3); line-height:1.5; }
+@media (max-width: 900px){ .pl-grid, .ctx-grid{ grid-template-columns:1fr 1fr; } .cst-grid{ grid-template-columns:1fr 1fr; } }
+@media (max-width: 560px){ .pl-grid, .ctx-grid, .cst-grid{ grid-template-columns:1fr; } .pl-select{ width:100%; } }
+
 .gn-kpis{ display:grid; grid-template-columns:repeat(3,1fr); gap:10px; }
 .gn-kpi{
   background:var(--surface-solid); border:1px solid var(--border);
@@ -1369,6 +1424,15 @@ body {
   .nv-grid{ grid-template-columns: 1fr; }
   .nv-col-prev{ position: static; order: -1; }
 }
+
+/* ---------- Aviso del hueco del libro ---------- */
+.gn-hueco{
+  display:flex; gap:11px; align-items:flex-start; margin-top:12px; padding:12px 14px;
+  background:var(--violet-bg); border:1px solid rgba(0,149,246,0.26); border-radius:12px;
+  font-size:11.5px; color:var(--text2); line-height:1.55;
+}
+.gn-hueco b{ color:var(--violet); }
+.gn-hueco svg{ color:var(--violet); flex-shrink:0; margin-top:1px; }
 
 /* ---------- Lo que cuestan los lugares sin vender ---------- */
 .gn-vacios{
@@ -3669,6 +3733,211 @@ function cargarGanancias() {
     });
 }
 
+// ============================================================
+// RESUMEN MENSUAL (P&L) — el backend manda
+// ============================================================
+// Ingresos, comisiones, costos y ganancia NO se calculan acá. Salen tal cual
+// de obtenerResumenMensual, que aplica contabilidad de CAJA: una venta se
+// reconoce UNA vez (el mes que se cobra) y una comisión UNA vez (el día de la
+// venta). Una venta de 12 meses NO reaparece los 11 meses siguientes.
+// El frontend solo PRESENTA. Si alguna vez estos cuatro números se recalculan
+// acá con fórmulas locales, se vuelve a romper lo mismo que se arregló.
+let resumenGN = null;          // resumen del mes que se está viendo
+let mesSelGN = '';             // 'MM/yyyy' seleccionado
+let cacheResumenGN = {};       // 'MM/yyyy' -> resumen (evita repetir la llamada)
+let cargandoResumenGN = false;
+
+const _MESES_GN = ['enero','febrero','marzo','abril','mayo','junio','julio',
+                   'agosto','septiembre','octubre','noviembre','diciembre'];
+
+// Dinero del P&L. Dos detalles que importan acá:
+//  - el signo va FUERA del símbolo: "−$600", no "$-600";
+//  - si hay centavos se muestran los dos ("$2,573.50", no "$2,573.5"), porque
+//    en una ganancia mensual un centavo colgado se lee como error de cálculo.
+function moneyGN_(n) {
+  const v = Number(n) || 0;
+  const abs = Math.abs(v);
+  const dec = Math.abs(abs - Math.round(abs)) > 0.0001 ? 2 : 0;
+  return (v < 0 ? '−' : '') + '$' + abs.toLocaleString('es-MX',{minimumFractionDigits:dec, maximumFractionDigits:2});
+}
+
+// Mes en curso como 'MM/yyyy'.
+function mesActualMMYYYY_() {
+  const d = new Date();
+  return String(d.getMonth()+1).padStart(2,'0') + '/' + d.getFullYear();
+}
+// 'MM/yyyy' -> "agosto 2026"
+function nombreMesGN_(mm) {
+  const p = String(mm||'').split('/');
+  const i = parseInt(p[0],10) - 1;
+  return (_MESES_GN[i]||'') + ' ' + (p[1]||'');
+}
+// Los últimos N meses hacia atrás desde hoy, para el selector.
+function mesesDisponiblesGN_(n) {
+  const out = [], d = new Date();
+  for (let i = 0; i < n; i++) {
+    out.push(String(d.getMonth()+1).padStart(2,'0') + '/' + d.getFullYear());
+    d.setMonth(d.getMonth() - 1);
+  }
+  return out;
+}
+
+// Pide el resumen de un mes y repinta el bloque. Solo admin: es el P&L del
+// negocio y el backend lo rechaza para vendedores.
+function cargarResumenMes(mes, forzar) {
+  if (MI_ROL !== 'admin') return Promise.resolve(null);
+  mes = mes || mesSelGN || mesActualMMYYYY_();
+  mesSelGN = mes;
+  if (!forzar && cacheResumenGN[mes]) {
+    resumenGN = cacheResumenGN[mes];
+    pintarResumenGN_();
+    return Promise.resolve(resumenGN);
+  }
+  cargandoResumenGN = true;
+  pintarResumenGN_();
+  return postDatos({accion:'obtenerResumenMensual', key:APP_KEY, mes:mes})
+    .then(res => {
+      cargandoResumenGN = false;
+      if (res.status !== 'ok' || !res.resumen) { resumenGN = null; pintarResumenGN_(); return null; }
+      cacheResumenGN[mes] = res.resumen;
+      resumenGN = res.resumen;
+      pintarResumenGN_();
+      return res.resumen;
+    })
+    .catch(() => { cargandoResumenGN = false; resumenGN = null; pintarResumenGN_(); return null; });
+}
+
+// Vuelca el HTML del P&L en su contenedor, si la pantalla está montada.
+function pintarResumenGN_() {
+  const cont = document.getElementById('gn-pl');
+  if (cont) cont.innerHTML = bloquePLHTML_();
+}
+
+// Cambio de mes desde el <select>.
+function cambiarMesGN(mes) { cargarResumenMes(mes, false); }
+
+// Bloque completo: 4 métricas principales (del backend) + 4 secundarias
+// (contexto, calculadas en el cliente y CLARAMENTE separadas del P&L).
+function bloquePLHTML_() {
+  if (MI_ROL !== 'admin') return '';
+  const _m = moneyGN_;
+  const mes = mesSelGN || mesActualMMYYYY_();
+
+  const selector = `
+    <div class="pl-head">
+      <div>
+        <div class="pl-title">${ico('barras',14)} Resultado de ${esc(nombreMesGN_(mes))}</div>
+        <div class="pl-sub">Contabilidad de caja: cada venta cuenta una sola vez, el mes que se cobró.</div>
+      </div>
+      <select class="form-input pl-select" onchange="cambiarMesGN(this.value)" aria-label="Elegir mes">
+        ${mesesDisponiblesGN_(18).map(m =>
+          `<option value="${m}"${m===mes?' selected':''}>${esc(nombreMesGN_(m))}</option>`).join('')}
+      </select>
+    </div>`;
+
+  if (cargandoResumenGN) return `<div class="pl-wrap">${selector}<div class="loading">Calculando el mes...</div></div>`;
+  if (!resumenGN) return `<div class="pl-wrap">${selector}
+    <div class="error-msg" style="margin:0;">${ico('alerta',14)} No se pudo calcular el resumen de este mes.
+      <a href="#" onclick="cargarResumenMes('${mes}',true);return false;" style="color:inherit;text-decoration:underline;">Reintentar</a></div></div>`;
+
+  const r = resumenGN;
+  const gananciaColor = r.ganancia >= 0 ? 'var(--green)' : 'var(--red)';
+  // Un gasto se muestra con el menos adelante, pero un gasto de cero es "$0",
+  // no "−$0" (que se lee como si algo hubiera salido mal).
+  const _g = n => (Math.abs(Number(n)||0) < 0.005 ? _m(0) : '−' + _m(Math.abs(n)));
+
+  // Aviso de datos incompletos. NO se inventa ningún ingreso: se avisa y punto.
+  const avisoSinPrecio = r.sinPrecio > 0 ? `
+    <div class="pl-aviso">
+      ${ico('alerta',14)}
+      <div><b>Los ingresos de ${esc(nombreMesGN_(mes))} pueden estar incompletos.</b>
+      Hay ${r.sinPrecio} movimiento${r.sinPrecio!==1?'s':''} de este mes sin el monto que pagó el cliente
+      (son de antes de que el sistema empezara a guardarlo). Esas ventas cuentan como $0 en ingresos:
+      no se inventa un precio porque sería falsear el libro. Las ventas nuevas ya se guardan completas.</div>
+    </div>` : '';
+
+  // Detalle de costos: qué plataforma y con qué costo vigente entró este mes.
+  const detalle = (r.detalleCostos||[]);
+  const detalleCostos = detalle.length ? `
+    <details class="pl-det">
+      <summary>Ver ${detalle.length===1 ? 'la plataforma' : 'las '+detalle.length+' plataformas'} que pagaste este mes</summary>
+      ${detalle.map(d => `
+        <div class="pl-det-fila">
+          <span>${esc(d.plataforma)} <i>${d.planes} plan${d.planes!==1?'es':''} × ${_m(d.costo_unitario)} ${esc(d.moneda)}${
+            d.moneda!=='MXN' ? ` · TC ${d.tipo_cambio}` : ''}</i></span>
+          <b>${_m(d.costo_mxn)}</b>
+        </div>`).join('')}
+      <div class="pl-det-pie">Vigencias tomadas de <b>costos_plataforma</b>. Un mes histórico conserva el costo que tenía entonces.</div>
+    </details>` : `
+    <div class="pl-det-vacio">${ico('foco',13)} Todavía no cargaste costos de plataformas para este mes.
+      Se registran en <b>Configuración → Costos de plataformas</b>.</div>`;
+
+  return `
+  <div class="pl-wrap">
+    ${selector}
+    <div class="pl-grid">
+      <div class="pl-card">
+        <div class="pl-lbl">${ico('dinero',13)} Ingresos cobrados</div>
+        <div class="pl-val" style="color:var(--violet2);">${_m(r.ingresos)}</div>
+        <div class="pl-note">Dinero que realmente entró este mes</div>
+      </div>
+      <div class="pl-card">
+        <div class="pl-lbl">${ico('personas',13)} Comisiones</div>
+        <div class="pl-val" style="color:var(--amber);">${_g(r.comisiones)}</div>
+        <div class="pl-note">Generadas para tus vendedores este mes</div>
+      </div>
+      <div class="pl-card">
+        <div class="pl-lbl">${ico('llave',13)} Costos de plataformas</div>
+        <div class="pl-val" style="color:var(--amber);">${_g(r.costos)}</div>
+        <div class="pl-note">Gasto fijo del mes, se pague o no se venda</div>
+      </div>
+      <div class="pl-card pl-card-total">
+        <div class="pl-lbl">${ico('barras',13)} Ganancia del mes</div>
+        <div class="pl-val" style="color:${gananciaColor};">${_m(r.ganancia)}</div>
+        <div class="pl-note">Ingresos − comisiones − costos</div>
+      </div>
+    </div>
+    ${avisoSinPrecio}
+    ${detalleCostos}
+  </div>`;
+}
+
+// Métricas SECUNDARIAS: contexto, no resultado. Van en su propio bloque, con
+// su propio encabezado, justamente para que nadie las sume a la ganancia.
+// Ninguna de estas cuatro entra en el P&L de arriba.
+function bloqueContextoHTML_(ctx) {
+  const _m = moneyGN_;
+  return `
+  <div class="ctx-wrap">
+    <div class="ctx-title">${ico('foco',13)} Aparte del resultado del mes</div>
+    <div class="ctx-sub">Estos cuatro números NO son ganancia: son deudas por cobrar, deudas por pagar y servicio ya vendido.</div>
+    <div class="ctx-grid">
+      <div class="ctx-card">
+        <div class="ctx-lbl">${ico('relojArena',13)} Por cobrar</div>
+        <div class="ctx-val" style="color:var(--amber);">${_m(ctx.porCobrar)}</div>
+        <div class="ctx-note">${ctx.porCobrarCount} cliente${ctx.porCobrarCount!==1?'s':''} con pago PENDIENTE.
+          Entra a ingresos el día que pagan, no antes.</div>
+      </div>
+      <div class="ctx-card">
+        <div class="ctx-lbl">${ico('balanza',13)} Comisiones pendientes</div>
+        <div class="ctx-val" style="color:var(--amber);">${_m(ctx.pendienteTotal)}</div>
+        <div class="ctx-note">Lo que aún les debes a tus vendedores. Ya está descontado de la ganancia del mes en que se generó.</div>
+      </div>
+      <div class="ctx-card">
+        <div class="ctx-lbl">${ico('personas',13)} Servicios activos</div>
+        <div class="ctx-val">${ctx.serviciosActivos}</div>
+        <div class="ctx-note">Clientes con servicio vigente ahora mismo.${
+          ctx.lugaresLibres>0 ? ` ${ctx.lugaresLibres} lugar${ctx.lugaresLibres!==1?'es':''} sin ocupar (oportunidad de venta, no pérdida).` : ''}</div>
+      </div>
+      <div class="ctx-card">
+        <div class="ctx-lbl">${ico('calendario',13)} Ventas de varios meses activas</div>
+        <div class="ctx-val">${ctx.multiMes}</div>
+        <div class="ctx-note">Ya cobradas por adelantado y todavía vigentes. Su dinero ya se contó el mes del cobro.</div>
+      </div>
+    </div>
+  </div>`;
+}
+
 // Botón ↻: recarga SOLO lo que se está viendo ahora mismo (antes recargaba solo
 // Clientes aunque estuvieras en otra pestaña — por eso "no funcionaba"). Los
 // clientes son la base, así que también se refrescan siempre.
@@ -3689,6 +3958,9 @@ function recargarVista() {
 function marcarDatosSucios() {
   cuentasCargadas = false;
   gananciasCargadas = false;
+  // El P&L del mes también quedó viejo: una venta nueva cambia ingresos y
+  // comisiones del mes en curso. Se vacía la caché para que se vuelva a pedir.
+  cacheResumenGN = {};
   actividadCargada = false; // el historial también quedó viejo tras un cambio
   solicitudesCargadas = false;
   // El libro de comisiones en memoria también: sin esto, el "Historial de
@@ -5902,41 +6174,30 @@ function cargarCuentas(forzar) {
 
 // Mapeo compartido de filas de la hoja 'cuentas' al objeto que usa la app.
 // Antes este bloque estaba duplicado en cargarCuentas y cargarCuentasBackground.
-// ===== Costo mensual de cada cuenta =====
-// Es lo que TE cuesta mantenerla, no lo que cobras. Sin este dato el margen
-// del negocio es mentira: los ingresos se ven completos y los gastos no.
-// Se usa el valor de la hoja si existe la columna 'costo_mensual'; si no,
-// cae al costo típico de esa plataforma (tabla de abajo, editable en
-// Configuración). Así funciona desde el primer día sin tocar el Sheet.
-let COSTOS_PLATAFORMA = {
-  'NETFLIX': 240, 'DISNEY': 150, 'HBO': 140, 'PARAMOUNT': 90,
-  'SPOTIFY': 90, 'YOUTUBE PREM': 120, 'YOUTUBE': 120, 'CRUNCHYROLL': 75, 'VIX': 60,
-};
-try {
-  const g = JSON.parse(localStorage.getItem('costos_plataforma')||'null');
-  if (g && typeof g === 'object') COSTOS_PLATAFORMA = Object.assign(COSTOS_PLATAFORMA, g);
-} catch(e){}
+// ===== Capacidad de cada cuenta =====
+// OJO — ACÁ YA NO HAY DINERO. Antes vivía aquí una tabla de costos por
+// plataforma guardada en localStorage (COSTOS_PLATAFORMA) que se repartía
+// entre lugares y ventas (costoMensualCuenta_ / costoPorLugar_ /
+// costoMensualTotal_). Se eliminó a propósito:
+//   1. El costo de las plataformas es un GASTO OPERATIVO MENSUAL, no un costo
+//      por venta. Repartirlo entre lugares inventaba pérdidas que no existen.
+//   2. La fuente de verdad de los costos es la hoja 'costos_plataforma' del
+//      backend (con moneda, tipo de cambio y vigencia histórica). localStorage
+//      no puede tener histórico ni viajar entre dispositivos.
+// La ganancia del mes la calcula el servidor en obtenerResumenMensual.
+// Acá solo queda la CAPACIDAD, que no es dinero.
 
-// Costo mensual de UNA cuenta. Se define POR PLATAFORMA porque en la práctica
-// todas las Netflix cuestan lo mismo: no tiene sentido cargarlo 33 veces.
-// La columna 'costo_mensual' de la hoja, si existe, manda sobre el típico
-// (por si alguna cuenta suelta se compró a otro precio).
-function costoMensualCuenta_(c) {
-  if (!c) return 0;
-  if (c.costoMensual > 0) return c.costoMensual;
-  return COSTOS_PLATAFORMA[c.plataforma] || 0;
-}
 // Lugares de la cuenta, según la hoja.
 function lugaresCuenta_(c) {
   return Math.max(1, parseInt(c && c.slotsTotal) || 1);
 }
-// Lo que cuesta UN lugar de esa cuenta (para repartir el costo por cliente).
-function costoPorLugar_(c) {
-  return costoMensualCuenta_(c) / lugaresCuenta_(c);
-}
-// Costo mensual de TODAS las cuentas: el gasto fijo del negocio.
-function costoMensualTotal_() {
-  return (todasCuentas||[]).reduce((s,c) => s + costoMensualCuenta_(c), 0);
+// Ocupación de una cuenta: cuántos lugares están usados, bloqueados y libres.
+// Es un conteo, NUNCA un monto.
+function ocupacionCuenta_(c) {
+  const reales = (c.slots||[]).slice(0, c.slotsTotal);
+  const ocupados   = reales.filter(s => s && s !== 'x' && s !== 'X').length;
+  const bloqueados = reales.filter(s => s === 'x' || s === 'X').length;
+  return { ocupados, bloqueados, libres: Math.max(0, c.slotsTotal - ocupados - bloqueados) };
 }
 
 function mapearCuentas_(filas) {
@@ -6647,20 +6908,17 @@ function renderGanancias() {
   const pctLimpio = pctVos;
   const de10 = (pctVos/10);
 
-  // El costo de las cuentas SÍ importa, pero en otro lado: los lugares que
-  // NO vendiste. Un slot vacío cuesta igual y no genera un peso — esa es la
-  // pérdida real que no se veía en ningún número.
-  let costoVacios = 0, lugaresVacios = 0;
+  // Lugares sin ocupar = CAPACIDAD LIBRE, no pérdida. Antes acá se multiplicaba
+  // por el costo del lugar y se mostraba como "−$X al mes que estás perdiendo":
+  // eso era falso (el costo de la plataforma se paga igual y ya se resta entero
+  // en el P&L del mes). Ahora es solo un conteo: oportunidad de venta.
+  let lugaresVacios = 0;
   if (MI_ROL === 'admin' && cuentasCargadas) {
-    todasCuentas.forEach(c => {
-      const reales = c.slots.slice(0, c.slotsTotal);
-      const ocupados = reales.filter(s => s && s !== 'x' && s !== 'X').length;
-      const bloqueados = reales.filter(s => s === 'x' || s === 'X').length;
-      const libres = Math.max(0, c.slotsTotal - ocupados - bloqueados);
-      lugaresVacios += libres;
-      costoVacios += libres * costoPorLugar_(c);
-    });
+    todasCuentas.forEach(c => { lugaresVacios += ocupacionCuenta_(c).libres; });
   }
+  // Ventas ya cobradas por adelantado que siguen corriendo. Es SERVICIO vigente,
+  // no dinero de este mes: su ingreso se contó el mes en que se cobró.
+  const multiMesActivas = _vigentes.filter(c => (parseInt(c.meses)||1) > 1).length;
   const _m = n => '$'+Number(n||0).toLocaleString('es-MX',{minimumFractionDigits:0,maximumFractionDigits:2});
   // Los % de cada vendedor, para explicar de dónde sale el tramo ámbar.
   const pctsEquipo = vendedores.map(v=>`${esc(nombreVendedorUI_(v))} ${COMISIONES[v]!==undefined?COMISIONES[v]:100}%`).join(' · ');
@@ -6672,14 +6930,27 @@ function renderGanancias() {
   // Las tres tarjetas de arriba: el mismo `misGanancias` de siempre, solo que
   // ahora acompañado de lo que falta cobrar y del margen, para que la primera
   // pantalla conteste "cuánto gano / cuánto me deben / qué tan bueno es".
-  const heroGananciaHTML = `
+  // ===== Encabezado de Ganancias =====
+  // ADMIN: el P&L del mes lo dibuja bloquePLHTML_ con lo que devuelve el backend
+  // (contenedor #gn-pl, se llena en cuanto responde obtenerResumenMensual).
+  // Debajo, y visualmente separadas, las 4 métricas de contexto.
+  // VENDEDOR: no ve el P&L del negocio (el backend tampoco se lo daría); sigue
+  // viendo lo suyo, igual que antes.
+  const heroGananciaHTML = MI_ROL==='admin'
+    ? `<div id="gn-pl"></div>
+       ${bloqueContextoHTML_({
+          porCobrar, porCobrarCount,
+          pendienteTotal,
+          serviciosActivos: _vigentes.length,
+          multiMes: multiMesActivas,
+          lugaresLibres: lugaresVacios
+       })}`
+    : `
     <div class="gn-kpis">
       <div class="gn-kpi azul">
-        <div class="gn-kpi-lbl">${ico('dinero',13)} ${MI_ROL==='admin'?'Tu ganancia':'Tu comisión'} · ciclos vigentes</div>
+        <div class="gn-kpi-lbl">${ico('dinero',13)} Tu comisión · clientes vigentes</div>
         <div class="gn-kpi-val" style="color:var(--violet2);">${_m(misGanancias)}</div>
-        <div class="gn-kpi-sub">${MI_ROL==='admin'
-          ? `${misClientesDirectos} propias directas · ${misClientes-misClientesDirectos} de tus vendedores`
-          : `${misClientes} cliente${misClientes!==1?'s':''} vigente${misClientes!==1?'s':''}`}</div>
+        <div class="gn-kpi-sub">${misClientes} cliente${misClientes!==1?'s':''} vigente${misClientes!==1?'s':''}</div>
       </div>
       <div class="gn-kpi ambar">
         <div class="gn-kpi-lbl">${ico('relojArena',13)} Por cobrar</div>
@@ -6687,11 +6958,9 @@ function renderGanancias() {
         <div class="gn-kpi-sub">${porCobrarCount} cliente${porCobrarCount!==1?'s':''} con pago PENDIENTE</div>
       </div>
       <div class="gn-kpi verde">
-        <div class="gn-kpi-lbl">${ico('barras',13)} ${MI_ROL==='admin'?'Margen del negocio':`Tu parte de ${mesNombre}`}</div>
-        <div class="gn-kpi-val" style="color:var(--green);">${cobradoMes>0.001?Math.round(pctVos)+'%':'—'}</div>
-        <div class="gn-kpi-sub">${cobradoMes>0.001
-          ? `de cada $10 de ganancia, te quedan $${de10.toFixed(1)} después del equipo`
-          : `sin movimientos registrados en ${mesNombre}`}</div>
+        <div class="gn-kpi-lbl">${ico('barras',13)} Tu parte de ${mesNombre}</div>
+        <div class="gn-kpi-val" style="color:var(--green);">${_m(generadoMes)}</div>
+        <div class="gn-kpi-sub">comisión que generaste en ${mesNombre}</div>
       </div>
     </div>`;
 
@@ -6701,46 +6970,49 @@ function renderGanancias() {
     <div class="gn-mes">
       <div class="gn-mes-head">
         <div>
-          <div class="gn-mes-lbl">Generado en ${mesNombre}</div>
+          <div class="gn-mes-lbl">Movimientos de ${mesNombre}</div>
           <div class="gn-mes-val">${_m(cobradoMes)}</div>
           <div class="gn-mes-sub">${nuevosMes} alta${nuevosMes!==1?'s':''} y renovaciones${difMes!==0
             ? ` · <span style="color:${difMes>0?'var(--green)':'var(--red)'};font-weight:700;">${difMes>0?'+':''}${difMes}</span> vs ${mesPrevNombre}`
             : ` · igual que ${mesPrevNombre}`}</div>
         </div>
         <div class="gn-limpio">
-          <div class="gn-limpio-lbl">Te quedó limpio</div>
+          <div class="gn-limpio-lbl">Tus ventas directas</div>
           <div class="gn-limpio-val">${_m(limpioMes)}</div>
         </div>
       </div>
       <div class="gn-split">
-        <div class="gn-seg vos" style="flex:0 0 ${pctVos.toFixed(2)}%;"><b>${_m(generadoMes)}</b><span>para vos</span></div>
-        ${comisionesMes>0.001?`<div class="gn-seg eq" style="flex:0 0 ${pctEq.toFixed(2)}%;"><b>${_m(comisionesMes)}</b><span>equipo</span></div>`:''}
+        <div class="gn-seg vos" style="flex:0 0 ${pctVos.toFixed(2)}%;"><b>${_m(generadoMes)}</b><span>tus ventas</span></div>
+        ${comisionesMes>0.001?`<div class="gn-seg eq" style="flex:0 0 ${pctEq.toFixed(2)}%;"><b>${_m(comisionesMes)}</b><span>del equipo</span></div>`:''}
       </div>
       <div style="margin-top:14px;">
         <div class="gn-paso">
-          <div class="gn-paso-bar"><i style="width:100%;background:var(--violet);"></i></div>
-          <div class="gn-paso-txt"><b>Generado en ${mesNombre}</b><span>Ganancia de las ventas y renovaciones del mes, con el costo de las cuentas ya descontado por el catálogo</span></div>
-          <div class="gn-paso-monto" style="color:var(--violet2);">${_m(cobradoMes)}</div>
+          <div class="gn-paso-bar"><i style="width:${pctVos.toFixed(2)}%;background:var(--green);"></i></div>
+          <div class="gn-paso-txt"><b>Tu margen de tus ventas</b><span>Tu parte de las ventas y renovaciones que hiciste vos este mes. La ganancia real del negocio es la de arriba: ésta no descuenta los costos de plataformas.</span></div>
+          <div class="gn-paso-monto" style="color:var(--green);">${_m(generadoMes)}</div>
         </div>
         <div class="gn-paso">
           <div class="gn-paso-bar"><i style="width:${pctEq.toFixed(2)}%;background:var(--amber);"></i></div>
-          <div class="gn-paso-txt"><b>− Comisiones del equipo</b><span>${pctsEquipo||'sin vendedores'}</span></div>
-          <div class="gn-paso-monto" style="color:var(--amber);">−${_m(comisionesMes)}</div>
-        </div>
-        <div class="gn-paso final">
-          <div class="gn-paso-bar"><i style="width:${pctVos.toFixed(2)}%;background:var(--green);"></i></div>
-          <div class="gn-paso-txt"><b>Te quedó limpio</b><span>Después de pagarle a tu equipo</span></div>
-          <div class="gn-paso-monto" style="color:var(--green);">${_m(limpioMes)}</div>
+          <div class="gn-paso-txt"><b>Le debés al equipo</b><span>Comisiones que generaron ellos con sus ventas · ${pctsEquipo||'sin vendedores'}</span></div>
+          <div class="gn-paso-monto" style="color:var(--amber);">${_m(comisionesMes)}</div>
         </div>
       </div>
-      ${costoVacios>0.001?`
+      ${comisionesMes>0.001?`
+      <div class="gn-hueco">
+        ${ico('alerta',14)}
+        <div><b>Falta tu parte de lo que vendió tu equipo.</b>
+        Cuando vende ${esc(vendedores.filter(v=>v!=='yo').map(nombreVendedorUI_).join(' o ') || 'un vendedor')}, el libro guarda solo la comisión de ellos —
+        tu ganancia de esas ventas no se registra en ningún lado. Por eso este reparto no la muestra.
+        El dinero completo que entró sí está en <b>Ingresos cobrados</b> de arriba.</div>
+      </div>`:''}
+      ${lugaresVacios>0?`
       <div class="gn-vacios">
         <div class="gn-vacios-txt">
-          <b>${ico('alerta',14)} Te sobran ${lugaresVacios} lugar${lugaresVacios!==1?'es':''} sin vender</b>
-          <span>Esas pantallas te cuestan igual todos los meses y no te generan un peso.
-          Es la plata que estás dejando en la mesa, y no aparece en ningún otro número.</span>
+          <b>${ico('foco',14)} Te quedan ${lugaresVacios} lugar${lugaresVacios!==1?'es':''} sin ocupar</b>
+          <span>Es capacidad disponible para vender, NO una pérdida: el costo de las plataformas
+          ya se descuenta completo en la ganancia del mes, se ocupen o no esos lugares.</span>
         </div>
-        <div class="gn-vacios-val">−${_m(costoVacios)}<span>al mes</span></div>
+        <div class="gn-vacios-val">${lugaresVacios}<span>disponibles</span></div>
       </div>`:''}
     </div>` : '';
 
@@ -6799,11 +7071,17 @@ function renderGanancias() {
   </div>`;
 
   document.getElementById('ganancias-content').innerHTML = heroHTML;
+  // El P&L del mes se pide aparte (es otra llamada) y se inyecta en #gn-pl en
+  // cuanto llega. Se pinta primero el esqueleto para que no salte la pantalla.
+  if (MI_ROL === 'admin') {
+    pintarResumenGN_();
+    cargarResumenMes(mesSelGN || mesActualMMYYYY_(), false);
+  }
   // Rentabilidad por cuenta y de dónde vienen los clientes: van al final,
   // después de lo del equipo, y solo si hay algo que contar.
   const _wrap = document.querySelector('#ganancias-content .earn-wrap');
-  if (_wrap && typeof bloqueRentabilidadHTML_ === 'function') {
-    const _r = bloqueRentabilidadHTML_();
+  if (_wrap && typeof bloqueOcupacionHTML_ === 'function') {
+    const _r = bloqueOcupacionHTML_();
     if (_r) { const d = document.createElement('div'); d.innerHTML = _r; _wrap.appendChild(d.firstElementChild); }
   }
   if (typeof inyectarOrigenesEnGanancias_ === 'function') inyectarOrigenesEnGanancias_();
@@ -7272,11 +7550,12 @@ function renderConfig() {
     ? vendedores.map(v => `${esc(v.nombre)} ${COMISIONES[v.key]!==undefined?COMISIONES[v.key]:100}%`).join(' · ')
     : 'Todavía no hay vendedores';
   // Cada sección del panel izquierdo: id de pestaña, ícono, nombre y su resumen.
-  // Resumen del costo total mensual, para verlo sin entrar a la sección.
-  const _costoTot = costoMensualTotal_();
-  const resumenCostos = _costoTot > 0
-    ? `$${_costoTot.toLocaleString('es-MX',{maximumFractionDigits:0})} al mes en ${todasCuentas.length} cuenta${todasCuentas.length!==1?'s':''}`
-    : 'Cargá lo que te cuesta cada plataforma';
+  // Resumen de costos: sale de lo que ya se bajó de 'costos_plataforma'. Antes
+  // se calculaba sumando una tabla local de costos por cuenta, que ya no existe.
+  const _platsCosto = [...new Set(todosCostosPlat.map(c => String(c.plataforma||'').trim()).filter(Boolean))];
+  const resumenCostos = _platsCosto.length
+    ? `${_platsCosto.length} plataforma${_platsCosto.length!==1?'s':''} con costo registrado`
+    : 'Registrá lo que te cuesta cada plataforma al mes';
 
   const secciones = [
     ['paquetes',     ico('paquete',18), 'Combos y precios', resumenCombos],
@@ -7562,37 +7841,59 @@ function renderConfig() {
     </div>
 
     <div id="config-costos" style="display:none;">
-      <div class="cf-titulo">${ico('dinero',19)} Costo de tus cuentas</div>
-      <div class="cf-desc">Lo que TE cuesta cada plataforma al mes, una sola vez para todas las cuentas
-        de esa plataforma. Escribí el número y listo — se recalcula todo al instante.</div>
-      <div class="cuenta-card" style="padding:14px 16px;">
-        ${(() => {
-          // Se listan primero las plataformas que REALMENTE tenés (salen de tus
-          // cuentas cargadas) y después las demás conocidas, por si sumás una.
-          const mias = [...new Set((todasCuentas||[]).map(c => c.plataforma).filter(Boolean))].sort();
-          const otras = Object.keys(COSTOS_PLATAFORMA).filter(p => mias.indexOf(p) === -1).sort();
-          return mias.concat(otras);
-        })().map(p => {
-          const nCuentas = (todasCuentas||[]).filter(c => c.plataforma === p).length;
-          const lugares = (todasCuentas||[]).filter(c => c.plataforma === p)
-            .reduce((s,c) => s + lugaresCuenta_(c), 0);
-          const porLugar = lugares ? (COSTOS_PLATAFORMA[p] * nCuentas / lugares) : 0;
-          const totalPlat = COSTOS_PLATAFORMA[p] * nCuentas;
-          return `<div class="costo-fila"${nCuentas?'':' style="opacity:.5;"'}>
-            <div class="costo-nom">${esc(PLAT_ICONS[p]||'')} ${esc(p)}
-              <div class="costo-sub">${nCuentas
-                ? `${nCuentas} cuenta${nCuentas!==1?'s':''} · ${lugares} lugares · <b style="color:var(--text2);">$${porLugar.toFixed(2)} por lugar</b> · te sale $${totalPlat.toLocaleString('es-MX',{maximumFractionDigits:0})} al mes en total`
-                : 'no tenés cuentas de esta plataforma'}</div>
-            </div>
-            <input type="number" class="form-input costo-inp" id="costo-${esc(p).replace(/\\s/g,'_')}"
-              value="${COSTOS_PLATAFORMA[p]}" min="0" step="5"
-              onchange="guardarCostoPlataforma_('${esc(p)}', this.value)">
-          </div>`;
-        }).join('')}
+      <div class="cf-titulo">${ico('dinero',19)} Costos de plataformas</div>
+      <div class="cf-desc">Lo que pagás cada mes por operar cada plataforma. Es un <b>gasto mensual del
+        negocio</b>: se resta entero a la ganancia del mes, no se reparte entre las ventas.
+        Se guarda en la hoja <b>costos_plataforma</b>, no en este dispositivo.</div>
+
+      <div class="cuenta-card" style="padding:15px 16px;">
+        <div style="font-size:13px;font-weight:700;margin-bottom:4px;">${ico('mas',13)} Registrar un costo</div>
+        <div style="font-size:11.5px;color:var(--text3);margin-bottom:12px;line-height:1.5;">
+          Si el costo de una plataforma cambia, <b>no edites el anterior</b>: registrá el nuevo con el mes
+          desde el que aplica. Los meses ya cerrados conservan el costo que tenían.
+        </div>
+        <div class="cst-grid">
+          <div>
+            <label class="cst-lbl">Plataforma</label>
+            <input class="form-input" id="cst-plataforma" placeholder="Ej. Spotify" oninput="previewCostoPlat_()">
+          </div>
+          <div>
+            <label class="cst-lbl">Planes</label>
+            <input class="form-input" id="cst-planes" type="number" min="0" step="1" value="1" oninput="previewCostoPlat_()">
+          </div>
+          <div>
+            <label class="cst-lbl">Costo por plan</label>
+            <input class="form-input" id="cst-unitario" type="number" min="0" step="0.01" placeholder="0.00" oninput="previewCostoPlat_()">
+          </div>
+          <div>
+            <label class="cst-lbl">Moneda</label>
+            <select class="form-input" id="cst-moneda" onchange="previewCostoPlat_()">
+              <option value="MXN">MXN</option>
+              <option value="USD">USD</option>
+            </select>
+          </div>
+          <div id="cst-tc-wrap" style="display:none;">
+            <label class="cst-lbl">Tipo de cambio</label>
+            <input class="form-input" id="cst-tc" type="number" min="0" step="0.01" placeholder="Ej. 18.50" oninput="previewCostoPlat_()">
+          </div>
+          <div>
+            <label class="cst-lbl">Vigente desde</label>
+            <input class="form-input" id="cst-vigente" placeholder="MM/AAAA" value="${mesActualMMYYYY_().replace('/','/')}" oninput="previewCostoPlat_()">
+          </div>
+        </div>
+        <label class="cst-lbl" style="margin-top:10px;display:block;">Nota (opcional)</label>
+        <input class="form-input" id="cst-nota" placeholder="Ej. subió el precio del plan familiar">
+
+        <div class="cst-preview" id="cst-preview"></div>
+        <button class="btn-primary" id="btn-guardar-costo" onclick="guardarCostoPlataforma_()">${ico('check',15)} Guardar costo</button>
       </div>
+
+      <div style="font-size:12px;font-weight:700;color:var(--text2);margin:16px 0 8px;">${ico('calendario',12)} Costos registrados</div>
+      <div id="cst-lista"><div class="loading">Cargando costos...</div></div>
+
       <div style="margin-top:12px;padding:11px 14px;background:var(--violet-bg);border-radius:12px;font-size:12px;color:var(--violet);line-height:1.5;">
-        ${ico('foco',13)} Estos números alimentan el aviso de <b>lugares sin vender</b> y la
-        <b>rentabilidad por cuenta</b> al final de Ganancias. Cambiá uno y se recalcula al instante.
+        ${ico('foco',13)} Para cada mes se usa, de cada plataforma, la fila vigente más reciente que no sea
+        posterior a ese mes. Por eso agregar un costo nuevo <b>nunca cambia los meses anteriores</b>.
       </div>
     </div>
 
@@ -7618,15 +7919,158 @@ function renderConfig() {
   actualizarVisibilidadRelayCuenta_();
 }
 
-// Guarda el costo mensual de una plataforma. Vive en localStorage porque es
-// una configuración tuya, no un dato de negocio que deba viajar al servidor.
-function guardarCostoPlataforma_(plat, valor) {
-  const n = parseFloat(valor);
-  if (isNaN(n) || n < 0) return;
-  COSTOS_PLATAFORMA[plat] = n;
-  try { localStorage.setItem('costos_plataforma', JSON.stringify(COSTOS_PLATAFORMA)); } catch(e){}
-  toast(esc(plat)+' cuesta $'+n+' al mes');
-  if (gananciasCargadas) renderGanancias();   // el margen se recalcula al vuelo
+// ===== Costos de plataformas =====
+// Fuente de verdad: la hoja 'costos_plataforma' del backend. Antes esto vivía
+// en localStorage (un número suelto por plataforma) y no tenía moneda, tipo de
+// cambio ni vigencia — así era imposible que un mes histórico conservara su
+// costo. localStorage ya no participa.
+let todosCostosPlat = [];
+
+// Normaliza lo que se escriba en "vigente desde" a 'MM/yyyy'. Devuelve '' si no
+// se entiende. Mismo criterio que normalizarMesAnio_ del backend, que es quien
+// valida de verdad — acá es solo para poder previsualizar y avisar temprano.
+function normalizarMesUI_(v) {
+  const s = String(v||'').trim();
+  let m = s.match(/^(\d{1,2})[\/\-](\d{4})$/);
+  if (m) { const mes = parseInt(m[1],10); if (mes>=1 && mes<=12) return String(mes).padStart(2,'0')+'/'+m[2]; }
+  m = s.match(/^(\d{4})-(\d{1,2})$/);
+  if (m) { const mes = parseInt(m[2],10); if (mes>=1 && mes<=12) return String(mes).padStart(2,'0')+'/'+m[1]; }
+  return '';
+}
+
+// Vista previa del costo convertido a MXN ANTES de guardar. El número que se
+// guarda lo recalcula el servidor con la misma fórmula: acá es solo para que
+// veas lo que vas a registrar.
+function previewCostoPlat_() {
+  const g = id => document.getElementById(id);
+  const box = g('cst-preview'); if (!box) return;
+  const moneda = (g('cst-moneda').value||'MXN').toUpperCase();
+  g('cst-tc-wrap').style.display = moneda === 'MXN' ? 'none' : 'block';
+
+  const plat = (g('cst-plataforma').value||'').trim();
+  const planes = parseFloat(g('cst-planes').value);
+  const unit = parseFloat(g('cst-unitario').value);
+  let tc = moneda === 'MXN' ? 1 : parseFloat(g('cst-tc').value);
+  const vig = normalizarMesUI_(g('cst-vigente').value);
+
+  if (!plat || isNaN(planes) || isNaN(unit) || planes < 0 || unit < 0) {
+    box.className = 'cst-preview'; box.innerHTML = 'Completá plataforma, planes y costo por plan para ver el total.'; return;
+  }
+  if (moneda !== 'MXN' && (isNaN(tc) || tc <= 0)) {
+    box.className = 'cst-preview aviso'; box.innerHTML = 'Falta el tipo de cambio para convertir a MXN.'; return;
+  }
+  if (!vig) {
+    box.className = 'cst-preview aviso'; box.innerHTML = 'La fecha "vigente desde" debe ser MM/AAAA (por ejemplo 08/2026).'; return;
+  }
+  const total = planes * unit * tc;
+  const yaHay = todosCostosPlat.some(c =>
+    String(c.plataforma||'').trim().toLowerCase() === plat.toLowerCase() &&
+    normalizarMesUI_(c.vigente_desde) === vig);
+
+  box.className = 'cst-preview ok';
+  box.innerHTML = `<b>$${total.toLocaleString('es-MX',{minimumFractionDigits:2,maximumFractionDigits:2})} MXN al mes</b>
+    <span>${planes} plan${planes!==1?'es':''} × ${unit.toLocaleString('es-MX',{minimumFractionDigits:2,maximumFractionDigits:2})} ${esc(moneda)}${
+      moneda!=='MXN' ? ` × ${tc} (tipo de cambio)` : ''} · desde ${esc(vig)}</span>
+    <span>${yaHay
+      ? `Ya existe un costo de ${esc(plat)} vigente desde ${esc(vig)}: se <b>corrige</b> esa fila, no se duplica.`
+      : `Se agrega como fila nueva. Los meses anteriores a ${esc(vig)} <b>no cambian</b>.`}</span>`;
+}
+
+// Guarda contra el backend. El costo en MXN lo calcula el servidor.
+function guardarCostoPlataforma_() {
+  const g = id => document.getElementById(id);
+  const plataforma = (g('cst-plataforma').value||'').trim();
+  const planes = parseFloat(g('cst-planes').value);
+  const unit = parseFloat(g('cst-unitario').value);
+  const moneda = (g('cst-moneda').value||'MXN').toUpperCase();
+  const tc = moneda === 'MXN' ? 1 : parseFloat(g('cst-tc').value);
+  const vigente = normalizarMesUI_(g('cst-vigente').value);
+  const nota = (g('cst-nota').value||'').trim();
+
+  if (!plataforma) return toast('Falta el nombre de la plataforma','error');
+  if (isNaN(planes) || planes < 0) return toast('Los planes deben ser un número','error');
+  if (isNaN(unit) || unit < 0) return toast('El costo por plan debe ser un número','error');
+  if (moneda !== 'MXN' && (isNaN(tc) || tc <= 0)) return toast('Falta el tipo de cambio','error');
+  if (!vigente) return toast('La fecha vigente desde debe ser MM/AAAA','error');
+
+  const btn = g('btn-guardar-costo');
+  btn.disabled = true; btn.textContent = 'Guardando...';
+  postDatos({
+    accion:'guardarCostoPlataforma', key:APP_KEY, opId: nuevoOpId(),
+    plataforma, planes, costo_unitario: unit, moneda, tipo_cambio: tc,
+    vigente_desde: vigente, nota
+  })
+  .then(res => {
+    btn.disabled = false; btn.innerHTML = ico('check',15)+' Guardar costo';
+    if (res.status !== 'ok') return toast(res.message||'No se pudo guardar','error');
+    toast(res.actualizado
+      ? esc(plataforma)+' actualizado para '+vigente
+      : esc(plataforma)+' registrado desde '+vigente);
+    g('cst-unitario').value = ''; g('cst-nota').value = '';
+    previewCostoPlat_();
+    // Un costo nuevo cambia la ganancia de los meses afectados: se tira la caché
+    // del P&L y se repinta Ganancias si estaba cargada.
+    cacheResumenGN = {};
+    cargarCostosPlataforma_(true);
+    if (gananciasCargadas && seccionActual === 'ganancias') renderGanancias();
+  })
+  .catch(() => {
+    btn.disabled = false; btn.innerHTML = ico('check',15)+' Guardar costo';
+    toast('No se pudo guardar el costo','error');
+  });
+}
+
+// Lee la hoja 'costos_plataforma' y pinta el historial.
+function cargarCostosPlataforma_(forzar) {
+  const cont = document.getElementById('cst-lista');
+  if (!cont) return;
+  if (todosCostosPlat.length && !forzar) { renderCostosPlataforma_(); return; }
+  postDatos({accion:'leerDatos', tipo:'costos_plataforma', key:APP_KEY})
+    .then(res => { todosCostosPlat = res.rows||[]; renderCostosPlataforma_(); })
+    .catch(() => { cont.innerHTML = '<div class="error-msg" style="margin:0;">No se pudieron cargar los costos. <a href="#" onclick="cargarCostosPlataforma_(true);return false;" style="color:inherit;text-decoration:underline;">Reintentar</a></div>'; });
+}
+
+function renderCostosPlataforma_() {
+  const cont = document.getElementById('cst-lista');
+  if (!cont) return;
+  if (!todosCostosPlat.length) {
+    cont.innerHTML = `<div class="cst-vacio">Todavía no registraste ningún costo.
+      Sin esto, la ganancia del mes no descuenta lo que pagás por las plataformas.</div>`;
+    return;
+  }
+  // Agrupadas por plataforma, y dentro de cada una de la vigencia más nueva a
+  // la más vieja: así se lee como la historia de precios de esa plataforma.
+  const porPlat = {};
+  todosCostosPlat.forEach(c => {
+    const k = String(c.plataforma||'').trim();
+    if (!k) return;
+    (porPlat[k] = porPlat[k] || []).push(c);
+  });
+  const orden = v => { const n = normalizarMesUI_(v); return n ? parseInt(n.slice(3),10)*100 + parseInt(n.slice(0,2),10) : 0; };
+  const hoy = orden(mesActualMMYYYY_());
+
+  cont.innerHTML = Object.keys(porPlat).sort().map(plat => {
+    const filas = porPlat[plat].slice().sort((a,b) => orden(b.vigente_desde) - orden(a.vigente_desde));
+    // La vigente HOY es la primera cuyo vigente_desde no es futuro.
+    const idxVigente = filas.findIndex(f => orden(f.vigente_desde) <= hoy);
+    return `<div class="cst-plat">
+      <div class="cst-plat-nom">${esc(PLAT_ICONS[plat.toUpperCase()]||'')} ${esc(plat)}</div>
+      ${filas.map((f,i) => {
+        const mxn = parseFloat(f.costo_mxn)||0;
+        const futuro = orden(f.vigente_desde) > hoy;
+        return `<div class="cst-fila${i===idxVigente?' vigente':''}">
+          <div>
+            <b>$${mxn.toLocaleString('es-MX',{minimumFractionDigits:2,maximumFractionDigits:2})} MXN</b>
+            <span>${esc(f.planes)} × ${esc(f.costo_unitario)} ${esc(f.moneda||'MXN')}${
+              String(f.moneda||'MXN').toUpperCase()!=='MXN' ? ` · TC ${esc(f.tipo_cambio)}` : ''}${
+              f.nota ? ` · ${esc(f.nota)}` : ''}</span>
+          </div>
+          <div class="cst-vig">desde ${esc(normalizarMesUI_(f.vigente_desde)||f.vigente_desde)}
+            ${i===idxVigente?'<i class="cst-tag">vigente</i>':(futuro?'<i class="cst-tag fut">futuro</i>':'')}</div>
+        </div>`;
+      }).join('')}
+    </div>`;
+  }).join('');
 }
 
 function showConfigTab(tab, btn) {
@@ -7637,6 +8081,8 @@ function showConfigTab(tab, btn) {
   // La lista del equipo se pide hasta que se abre esta pestaña (carga perezosa).
   if (tab === 'vendedores') cargarEquipo_();
   if (tab === 'relay') cargarAliasRelay_();
+  // Los costos viven en el servidor: se bajan al abrir la pestaña.
+  if (tab === 'costos') { cargarCostosPlataforma_(false); previewCostoPlat_(); }
 }
 
 // Stepper del % de comisión. NO calcula dinero: solo mueve el mismo input
@@ -9220,50 +9666,42 @@ function abrirAvisos() {
 }
 function cerrarAvisos() { const o = document.getElementById('avisos-ov'); if (o) o.classList.remove('on'); }
 
-/* ===== 4. Rentabilidad por cuenta =====
-   Cuánto te cuesta cada cuenta contra lo que te generan los clientes que
-   la ocupan. Es lo que revela una cuenta a medio llenar que te está
-   costando dinero en vez de dártelo. */
-function bloqueRentabilidadHTML_() {
+/* ===== 4. Ocupación por cuenta =====
+   ANTES esto era "Rentabilidad por cuenta": repartía el costo de la plataforma
+   entre lugares y lo restaba de un ingreso prorrateado por mes, y marcaba
+   cuentas "en rojo". Los dos números eran inventados:
+     - el costo mensual salía de una tabla local, no de 'costos_plataforma';
+     - el ingreso se prorrateaba entre los meses de las ventas multi-mes, que
+       es exactamente lo que la contabilidad de caja NO hace.
+   La rentabilidad real del negocio es el P&L del mes (obtenerResumenMensual).
+   Acá queda lo que sí es cierto y útil a nivel cuenta: qué tan llena está. */
+function bloqueOcupacionHTML_() {
   if (MI_ROL !== 'admin' || !cuentasCargadas || !todasCuentas.length) return '';
   const filas = todasCuentas.map(c => {
-    const costo = costoMensualCuenta_(c);
-    const reales = c.slots.slice(0, c.slotsTotal);
-    const ocupados = reales.filter(s => s && s !== 'x' && s !== 'X');
-    // Ingreso: el precio POR MES de cada cliente que ocupa un lugar, repartido
-    // entre las plataformas de su paquete (un combo paga varias cuentas).
-    let ingreso = 0;
-    ocupados.forEach(id => {
-      const cli = todosClientes.find(x => x.id === id && x.estado_raw !== 'ARCHIVADO');
-      if (!cli) return;
-      let nPlats = 1;
-      try { nPlats = Math.max(1, (detectarPlataformas(cli.paquete)||[]).length); } catch(e) {}
-      const meses = Math.max(1, parseInt(cli.meses)||1);
-      ingreso += (parseFloat(cli.precio)||0) / nPlats / meses;
-    });
-    const libres = c.slotsTotal - reales.filter(s => s && s !== 'x' && s !== 'X').length
-                                - reales.filter(s => s === 'x' || s === 'X').length;
-    return { c, costo, ingreso, margen: ingreso - costo, libres, ocupados: ocupados.length };
-  }).sort((a,b) => a.margen - b.margen);   // las que peor están, primero
+    const o = ocupacionCuenta_(c);
+    const total = lugaresCuenta_(c);
+    return { c, ocupados: o.ocupados, libres: o.libres, total,
+             pct: total ? (o.ocupados/total)*100 : 0 };
+  }).sort((a,b) => a.pct - b.pct);   // las más vacías primero: ahí está la venta
 
-  const _m = n => '$'+Number(n||0).toLocaleString('es-MX',{maximumFractionDigits:0});
-  const enRojo = filas.filter(f => f.margen < 0).length;
+  const librosTotal = filas.reduce((s,f)=>s+f.libres,0);
 
   return `<div class="mini-stat" style="margin-top:14px;">
-    <div class="lbl">${ico('barras',13)} Rentabilidad por cuenta</div>
+    <div class="lbl">${ico('barras',13)} Ocupación por cuenta</div>
     <div style="font-size:11.5px;color:var(--text3);margin:6px 0 12px;line-height:1.5;">
-      Lo que te cuesta cada una contra lo que te generan sus clientes.
-      ${enRojo ? `<b style="color:var(--red);">${enRojo} cuenta${enRojo!==1?'s':''} te está${enRojo!==1?'n':''} costando más de lo que deja${enRojo!==1?'n':''}.</b>` : 'Todas dejan ganancia.'}
+      Qué tan llena está cada cuenta. ${librosTotal
+        ? `<b>${librosTotal} lugar${librosTotal!==1?'es':''} disponible${librosTotal!==1?'s':''}</b> para vender — es oportunidad, no pérdida.`
+        : 'Todas tus cuentas están llenas.'}
     </div>
     ${filas.map(f => {
-      const color = f.margen < 0 ? 'var(--red)' : 'var(--green)';
+      const color = f.libres > 0 ? 'var(--amber)' : 'var(--green)';
       return `<div class="rent-fila" onclick="abrirFichaCuenta(${esc(JSON.stringify(f.c.nombre))})">
         <div class="rent-ini" style="background:${PLAT_COLORS[f.c.plataforma]||'var(--border-strong)'};">${esc(PLAT_ICONS[f.c.plataforma]||f.c.plataforma.charAt(0))}</div>
         <div class="rent-txt">
-          <b>${esc(f.c.nombre)}${f.margen<0?' <span class="rent-tag">pierde plata</span>':(f.libres>0?` <span class="rent-tag libre">${f.libres} sin vender</span>`:'')}</b>
-          <span>te cuesta ${_m(f.costo)} · te generan ${_m(f.ingreso)} al mes</span>
+          <b>${esc(f.c.nombre)}${f.libres>0?` <span class="rent-tag libre">${f.libres} sin vender</span>`:''}</b>
+          <span>${f.ocupados} de ${f.total} lugares ocupados</span>
         </div>
-        <div class="rent-margen" style="color:${color};">${f.margen>=0?'+':''}${_m(f.margen)}<span>margen</span></div>
+        <div class="rent-margen" style="color:${color};">${Math.round(f.pct)}%<span>lleno</span></div>
       </div>`;
     }).join('')}
   </div>`;
