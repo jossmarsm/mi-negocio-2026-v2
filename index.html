@@ -1216,6 +1216,43 @@ body {
 .pl-det-pie{ font-size:11px; color:var(--text3); margin-top:8px; line-height:1.4; }
 .pl-det-vacio{ margin-top:12px; padding:11px 13px; border-radius:12px; background:var(--violet-bg); color:var(--violet); font-size:12px; line-height:1.5; }
 
+/* ===== Ganancia acumulada (Historial mensual) ===== */
+.acu-wrap{ background:var(--surface-solid); border:1px solid var(--border); border-radius:var(--radius-md);
+  padding:16px; margin-bottom:14px; }
+.acu-title{ font-size:14px; font-weight:700; font-family:'Space Grotesk'; }
+.acu-sub{ font-size:11.5px; color:var(--text3); margin:4px 0 14px; line-height:1.45; }
+.acu-principal{ background:linear-gradient(135deg,var(--green-bg),transparent 70%);
+  border:1px solid rgba(52,211,153,0.4); border-radius:14px; padding:14px 15px; }
+.acu-lbl{ font-size:11.5px; color:var(--text2); font-weight:600; }
+.acu-val{ font-family:'Space Grotesk'; font-size:30px; font-weight:700; line-height:1.1; margin-top:6px;
+  font-variant-numeric:tabular-nums; letter-spacing:-0.02em; }
+.acu-note{ font-size:11px; color:var(--text3); margin-top:5px; line-height:1.4; }
+.acu-secundario{ background:var(--surface); border:1px solid var(--border); border-radius:14px;
+  padding:12px 15px; margin-top:10px; }
+.acu-lbl2{ font-size:11.5px; color:var(--text3); font-weight:600; }
+.acu-val2{ font-family:'Space Grotesk'; font-size:20px; font-weight:700; line-height:1.1; margin-top:4px;
+  font-variant-numeric:tabular-nums; }
+.acu-mini{ display:flex; flex-wrap:wrap; gap:12px; margin-top:8px; font-size:11px; color:var(--text3); }
+.acu-mini b{ color:var(--text2); font-variant-numeric:tabular-nums; }
+.acu-aviso{ display:flex; gap:9px; align-items:flex-start; margin-top:12px; padding:11px 13px; border-radius:12px;
+  background:var(--amber-bg); border:1px solid rgba(251,191,36,0.35); color:var(--amber);
+  font-size:11.5px; line-height:1.6; }
+.acu-tabla-tit{ font-size:12px; font-weight:700; color:var(--text2); text-transform:uppercase;
+  letter-spacing:0.05em; margin:16px 0 8px; }
+.acu-scroll{ overflow-x:auto; }
+.acu-tabla{ width:100%; border-collapse:collapse; font-size:12px; white-space:nowrap; }
+.acu-tabla th{ text-align:left; font-size:10.5px; color:var(--text3); text-transform:uppercase;
+  letter-spacing:0.04em; font-weight:600; padding:6px 10px 6px 0; border-bottom:1px solid var(--border); }
+.acu-tabla td{ padding:8px 10px 8px 0; border-bottom:1px solid var(--border); font-variant-numeric:tabular-nums; }
+.acu-tabla tr.acu-mute td{ opacity:.5; }
+.acu-tabla i{ color:var(--text3); font-size:11px; }
+.acu-tag{ font-size:10px; font-weight:700; padding:2px 7px; border-radius:6px; white-space:nowrap; }
+.acu-tag.ok{ background:var(--green-bg); color:var(--green); }
+.acu-tag.warn{ background:var(--amber-bg); color:var(--amber); }
+.acu-tag.mute{ background:var(--surface-hover); color:var(--text3); }
+.acu-pie{ font-size:11px; color:var(--text3); margin-top:10px; line-height:1.5; }
+.acu-vacio{ font-size:12.5px; color:var(--text3); line-height:1.5; }
+
 /* ===== Cartera recurrente: PROYECCIÓN, no caja =====
    Borde punteado a propósito: tiene que leerse distinto del P&L, que son
    números duros. Acá todo es estimación. */
@@ -4145,6 +4182,8 @@ function marcarDatosSucios() {
   // El P&L del mes también quedó viejo: una venta nueva cambia ingresos y
   // comisiones del mes en curso. Se vacía la caché para que se vuelva a pedir.
   cacheResumenGN = {};
+  // El acumulado también: una venta nueva cambia el mes en curso.
+  resumenRango = null;
   // Alta o baja de una cuenta cambia el inventario: se vuelve a contar.
   inventarioPlat = {};
   actividadCargada = false; // el historial también quedó viejo tras un cambio
@@ -4168,6 +4207,131 @@ function showGananciasTab(tab, btn) {
 }
 
 let todosCortesMensuales = [];
+
+// ============================================================
+// GANANCIA ACUMULADA — calculada al vuelo, nunca congelada
+// ============================================================
+// Cada mes se calcula por separado en el backend y recién después se suma:
+// los costos de julio no entran en agosto. Se muestran DOS acumulados porque
+// un solo número mezclaría meses completos con meses a los que les falta
+// información, y eso miente.
+let resumenRango = null;
+let cargandoRango = false;
+
+function cargarResumenRango(forzar) {
+  if (MI_ROL !== 'admin') return Promise.resolve(null);
+  if (resumenRango && !forzar) { pintarAcumulado_(); return Promise.resolve(resumenRango); }
+  cargandoRango = true;
+  pintarAcumulado_();
+  return postDatos({accion:'obtenerResumenRango', key:APP_KEY})
+    .then(res => {
+      cargandoRango = false;
+      resumenRango = (res.status === 'ok') ? res : null;
+      pintarAcumulado_();
+      return resumenRango;
+    })
+    .catch(() => { cargandoRango = false; resumenRango = null; pintarAcumulado_(); return null; });
+}
+
+function pintarAcumulado_() {
+  const cont = document.getElementById('hm-acumulado');
+  if (cont) cont.innerHTML = bloqueAcumuladoHTML_();
+}
+
+// Etiqueta de qué le falta a cada mes. Un mes SIN COSTOS no se muestra como
+// "costos $0": eso lo haría ver rentable cuando en realidad no sabemos.
+const _ESTADO_MES = {
+  completo:             { txt: 'completo',              cls: 'ok'   },
+  ingresos_incompletos: { txt: 'ingresos incompletos',  cls: 'warn' },
+  sin_costos:           { txt: 'sin costos',            cls: 'warn' },
+  incompleto_ambos:     { txt: 'sin costos e ingresos incompletos', cls: 'warn' },
+  sin_datos:            { txt: 'sin datos',             cls: 'mute' }
+};
+
+function bloqueAcumuladoHTML_() {
+  if (MI_ROL !== 'admin') return '';
+  const _m = moneyGN_;
+
+  if (cargandoRango) return '<div class="acu-wrap"><div class="loading">Calculando el acumulado...</div></div>';
+  if (!resumenRango) return `<div class="acu-wrap">
+    <div class="error-msg" style="margin:0;">${ico('alerta',14)} No se pudo calcular el acumulado.
+    <a href="#" onclick="cargarResumenRango(true);return false;" style="color:inherit;text-decoration:underline;">Reintentar</a></div></div>`;
+
+  const meses = (resumenRango.meses || []).slice().reverse();   // el más reciente arriba
+  if (!meses.length) return `<div class="acu-wrap"><div class="acu-vacio">
+    Todavía no hay movimientos en el libro para acumular.</div></div>`;
+
+  const C = resumenRango.completos, T = resumenRango.todos;
+  const incompletos = meses.filter(m => m.estado !== 'completo' && m.estado !== 'sin_datos');
+
+  // Motivos concretos, mes por mes: nada de "faltan datos" genérico.
+  const motivos = incompletos.map(m => {
+    const partes = [];
+    if (!m.costosCargados) partes.push('sin costos de plataformas cargados');
+    if (!m.ingresosCompletos) partes.push(`${m.sinPrecio} movimiento${m.sinPrecio!==1?'s':''} sin precio`);
+    return `<b>${esc(nombreMesGN_(m.mes))}</b>: ${partes.join(' · ')}`;
+  });
+
+  return `
+  <div class="acu-wrap">
+    <div class="acu-title">${ico('barras',14)} Ganancia acumulada</div>
+    <div class="acu-sub">Cada mes se calcula por separado y después se suman. Los costos de un mes
+      nunca se restan de otro.</div>
+
+    <div class="acu-principal">
+      <div class="acu-lbl">${ico('check',12)} Meses completos</div>
+      <div class="acu-val" style="color:${C.ganancia >= 0 ? 'var(--green)' : 'var(--red)'};">${_m(C.ganancia)}</div>
+      <div class="acu-note">${C.meses === 0
+        ? 'Todavía no hay ningún mes con ingresos y costos completos.'
+        : `${C.meses} mes${C.meses!==1?'es':''} con todo cargado · el número confiable`}</div>
+      ${C.meses > 0 ? `
+      <div class="acu-mini">
+        <span>Ingresos <b>${_m(C.ingresos)}</b></span>
+        <span>Comisiones <b>−${_m(C.comisiones)}</b></span>
+        <span>Costos <b>−${_m(C.costos)}</b></span>
+      </div>` : ''}
+    </div>
+
+    <div class="acu-secundario">
+      <div class="acu-lbl2">Todos los meses (${T.meses})</div>
+      <div class="acu-val2" style="color:${T.ganancia >= 0 ? 'var(--green)' : 'var(--red)'};">${_m(T.ganancia)}</div>
+      <div class="acu-mini">
+        <span>Ingresos <b>${_m(T.ingresos)}</b></span>
+        <span>Comisiones <b>−${_m(T.comisiones)}</b></span>
+        <span>Costos <b>−${_m(T.costos)}</b></span>
+      </div>
+    </div>
+
+    ${motivos.length ? `
+    <div class="acu-aviso">
+      ${ico('alerta',13)}
+      <div><b>Este segundo número mezcla meses incompletos.</b><br>${motivos.join('<br>')}<br>
+      Un mes sin costos cargados <b>no significa que no hubo costos</b>: significa que no los sabemos,
+      y por eso su ganancia se ve más alta de lo real.</div>
+    </div>` : ''}
+
+    <div class="acu-tabla-tit">Mes a mes</div>
+    <div class="acu-scroll">
+      <table class="acu-tabla">
+        <tr><th>Mes</th><th>Ingresos</th><th>Comisiones</th><th>Costos</th><th>Ganancia</th><th>Estado</th></tr>
+        ${meses.map(m => {
+          const e = _ESTADO_MES[m.estado] || _ESTADO_MES.sin_datos;
+          return `<tr class="acu-${e.cls}">
+            <td>${esc(nombreMesGN_(m.mes))}</td>
+            <td>${_m(m.ingresos)}</td>
+            <td>${m.comisiones ? '−'+_m(m.comisiones) : _m(0)}</td>
+            <td>${m.costosCargados ? '−'+_m(m.costos) : '<i>sin cargar</i>'}</td>
+            <td><b style="color:${m.ganancia >= 0 ? 'var(--green)' : 'var(--red)'};">${
+              m.costosCargados ? _m(m.ganancia) : '<i style="color:var(--text3);font-weight:400;">—</i>'}</b></td>
+            <td><span class="acu-tag ${e.cls}">${e.txt}</span></td>
+          </tr>`;
+        }).join('')}
+      </table>
+    </div>
+    <div class="acu-pie">Se recalcula sola: cuando cargues los costos de un mes o recuperes los precios
+      que faltan, ese mes pasa a <b>completo</b> y entra al acumulado principal.</div>
+  </div>`;
+}
 
 function cargarHistorialMensual() {
   document.getElementById('historial-mensual-content').innerHTML = '<div class="loading">Cargando historial...</div>';
@@ -4215,12 +4379,19 @@ function graficaCrecimientoHTML() {
 function renderHistorialMensual() {
   const cont = document.getElementById('historial-mensual-content');
   const grafica = graficaCrecimientoHTML();
+  // La ganancia acumulada va PRIMERO y es independiente de 'cortes_mensuales':
+  // se calcula del libro, así que existe aunque todavía no se haya generado
+  // ningún corte (el corte recién corre el día 1 de cada mes).
+  const acumulado = MI_ROL === 'admin' ? '<div id="hm-acumulado"></div>' : '';
+
   if (!todosCortesMensuales.length) {
-    cont.innerHTML = grafica + `<div class="empty">
+    cont.innerHTML = acumulado + grafica + `<div class="empty">
       <div class="empty-icon">${ico('calendario',24)}</div>
-      <div class="empty-title">Aún no hay cortes mensuales</div>
-      <div class="empty-sub">El primero se genera solo el día 1 del próximo mes</div>
+      <div class="empty-title">Aún no hay cortes de comisiones</div>
+      <div class="empty-sub">El primero se genera solo el día 1 del próximo mes.
+        La ganancia acumulada de arriba no depende de ellos.</div>
     </div>`;
+    if (MI_ROL === 'admin') { pintarAcumulado_(); cargarResumenRango(false); }
     return;
   }
   // Agrupar por mes
@@ -4240,7 +4411,7 @@ function renderHistorialMensual() {
   }
   const nombreVendedor = v => v==='ximenita' ? 'Xime' : (v==='yo' ? 'Tú' : v.charAt(0).toUpperCase()+v.slice(1));
 
-  cont.innerHTML = grafica + meses.map((mes, i) => {
+  cont.innerHTML = acumulado + grafica + meses.map((mes, i) => {
     const filas = porMes[mes];
     const totalGenerado = filas.reduce((s,f)=>s+(parseFloat(f['generado_mes'])||0),0);
     const totalPagado = filas.reduce((s,f)=>s+(parseFloat(f['pagado_mes'])||0),0);
@@ -4284,6 +4455,9 @@ function renderHistorialMensual() {
       </div>
     </div>`;
   }).join('');
+
+  // El bloque acumulado se llena aparte: es otra llamada al servidor.
+  if (MI_ROL === 'admin') { pintarAcumulado_(); cargarResumenRango(false); }
 }
 
 function getEstadoLocal(id) {
