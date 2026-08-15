@@ -1186,6 +1186,15 @@ body {
    Todo esto es SOLO presentación: no hay un cálculo de dinero aquí. La idea es
    que el ojo lea el reparto del dinero como una sola barra continua en vez de
    tener que sumar tarjetas sueltas. */
+/* ===== Cuenta INSERVIBLE (caída) ===== */
+/* Se ve distinta de una cuenta llena: apagada y en rojo, no ámbar. Una llena
+   es buena noticia (vendiste todo); una caída es un problema. */
+.ca-card.card-caida{ border-color:rgba(248,113,113,0.45); opacity:.72; }
+.ca-card.card-caida .ca-slots{ filter:grayscale(1); opacity:.65; }
+.ca-tag-caida{ display:inline-block; font-size:9.5px; font-weight:800; letter-spacing:.06em;
+  text-transform:uppercase; color:var(--red); background:var(--red-bg);
+  border:1px solid rgba(248,113,113,0.4); border-radius:5px; padding:1px 5px; vertical-align:middle; margin-left:5px; }
+
 /* ===== P&L del mes (Ganancias) ===== */
 .pl-wrap{ background:var(--surface-solid); border:1px solid var(--border); border-radius:var(--radius-md); padding:16px; margin-bottom:12px; }
 .pl-head{ display:flex; justify-content:space-between; align-items:flex-start; gap:12px; flex-wrap:wrap; margin-bottom:14px; }
@@ -1206,6 +1215,26 @@ body {
 .pl-det-fila i{ display:block; font-style:normal; font-size:11px; color:var(--text3); margin-top:2px; }
 .pl-det-pie{ font-size:11px; color:var(--text3); margin-top:8px; line-height:1.4; }
 .pl-det-vacio{ margin-top:12px; padding:11px 13px; border-radius:12px; background:var(--violet-bg); color:var(--violet); font-size:12px; line-height:1.5; }
+
+/* ===== Cartera recurrente: PROYECCIÓN, no caja =====
+   Borde punteado a propósito: tiene que leerse distinto del P&L, que son
+   números duros. Acá todo es estimación. */
+.car-wrap{ background:var(--surface-solid); border:1px dashed var(--border-strong); border-radius:var(--radius-md);
+  padding:15px 16px; margin-bottom:12px; }
+.car-title{ font-size:12px; font-weight:700; color:var(--text2); text-transform:uppercase; letter-spacing:0.05em; }
+.car-sub{ font-size:11.5px; color:var(--text3); margin:5px 0 12px; line-height:1.45; }
+.car-val{ font-family:'Space Grotesk'; font-size:30px; font-weight:700; line-height:1.1;
+  font-variant-numeric:tabular-nums; letter-spacing:-0.02em; }
+.car-val-lbl{ font-size:11px; color:var(--text3); margin-top:4px; }
+.car-desglose{ margin-top:14px; border-top:1px solid var(--border); }
+.car-fila{ display:flex; justify-content:space-between; align-items:flex-start; gap:12px;
+  padding:9px 0; border-bottom:1px solid var(--border); font-size:12.5px; }
+.car-fila:last-child{ border-bottom:0; }
+.car-fila i{ display:block; font-style:normal; font-size:10.5px; color:var(--text3); margin-top:2px; line-height:1.4; }
+.car-fila b{ font-variant-numeric:tabular-nums; white-space:nowrap; }
+.car-aviso{ display:flex; gap:9px; align-items:flex-start; margin-top:12px; padding:10px 12px; border-radius:11px;
+  background:var(--amber-bg); border:1px solid rgba(251,191,36,0.3); color:var(--amber);
+  font-size:11.5px; line-height:1.5; }
 
 /* ===== Métricas de contexto: NUNCA son ganancia ===== */
 .ctx-wrap{ background:var(--surface-solid); border:1px solid var(--border); border-radius:var(--radius-md); padding:15px 16px; margin-bottom:12px; }
@@ -3811,6 +3840,9 @@ function cargarResumenMes(mes, forzar) {
 function pintarResumenGN_() {
   const cont = document.getElementById('gn-pl');
   if (cont) cont.innerHTML = bloquePLHTML_();
+  // La cartera recurrente usa el MISMO costo que el P&L (resumenGN.costos), así
+  // que se repinta junto: un solo número de costos en toda la app.
+  if (typeof pintarCarteraGN_ === 'function') pintarCarteraGN_();
 }
 
 // Cambio de mes desde el <select>.
@@ -3902,6 +3934,158 @@ function bloquePLHTML_() {
   </div>`;
 }
 
+// ============================================================
+// CARTERA RECURRENTE — proyección, NO caja
+// ============================================================
+// Contesta "si mis clientes vigentes siguen renovando, ¿cuánto me deja el
+// negocio por mes?". Es un run-rate: NO es dinero cobrado y NO se suma al P&L.
+//
+// TRES REGLAS QUE EVITAN CONTAR EL COSTO DOS VECES:
+//   1. Se parte de 'precio' (lo BRUTO que pagó el cliente). Nunca de 'ganancia'
+//      ni de 'ganancia_neta' del catálogo: esos YA traen descontado el costo del
+//      perfil, y restarles después el costo mensual sería restarlo dos veces.
+//   2. Los clientes de 'yo' aportan comisión 0. En sus filas del libro 'monto'
+//      es TU MARGEN (con el costo adentro), no una comisión pagada a nadie.
+//      Es la misma guarda que ya tiene resumenMensual_ en el backend.
+//   3. El costo de plataformas se resta UNA vez y ENTERO — el mensual real, no
+//      el "costo por lugar" del catálogo. No son dos costos: son el mismo dinero.
+//
+// Acá SÍ se divide entre meses (a diferencia del P&L, donde prorratear estaría
+// mal): una venta de 12 meses ya se reconoció completa el mes que se cobró, y
+// lo que esta métrica mide es cuánto vale esa relación POR MES.
+function calcularCarteraRecurrente_() {
+  const vigentes = (todosClientes || []).filter(c =>
+    c.estado_raw !== 'ARCHIVADO' && c.estado !== 'vencido');
+
+  // Índice del libro: por cliente, su ÚLTIMA venta/renovación. Ese 'monto' es
+  // la comisión realmente abonada en el ciclo vigente — mejor que recalcularla
+  // del catálogo de hoy, que pudo haber cambiado de precio desde entonces.
+  const ultimoMov = {};
+  (todasComisiones || []).forEach(m => {
+    const tipo = (m.tipo || '').toLowerCase();
+    if (tipo !== 'venta' && tipo !== 'renovacion') return;
+    const ref = String(m.referencia || '').trim();
+    if (!ref) return;
+    const f = parseFecha(m.fecha);
+    if (!f) return;
+    const prev = ultimoMov[ref];
+    if (!prev || f.getTime() >= prev.ts) {
+      ultimoMov[ref] = { ts: f.getTime(), monto: parseFloat(m.monto) || 0,
+                         vendedor: (m.vendedor || '').toLowerCase() };
+    }
+  });
+
+  let ingresoMes = 0, comisionMes = 0;
+  let deLibro = 0, deCatalogo = 0, sinDato = 0, deYo = 0;
+
+  vigentes.forEach(c => {
+    const meses = Math.max(1, parseInt(c.meses) || 1);
+    ingresoMes += (parseFloat(c.precio) || 0) / meses;
+
+    // REGLA 2: cliente propio → no hay comisión que pagar.
+    const v = (c.vendedor || '').toLowerCase();
+    if (v === 'yo') { deYo++; return; }
+
+    const mov = ultimoMov[String(c.id || '').trim()];
+    if (mov && mov.vendedor !== 'yo') {
+      comisionMes += mov.monto / meses;
+      deLibro++;
+      return;
+    }
+    // Respaldo: el cliente no tiene fila en el libro (alta anterior al ledger).
+    // Se recalcula del catálogo, que es una aproximación — por eso se cuenta
+    // aparte y se avisa cuántos son.
+    const datos = typeof buscarDatosCombo_ === 'function' ? buscarDatosCombo_(c.paquete) : null;
+    if (datos && datos.gananciaAmigo) {
+      const pct = COMISIONES[v] !== undefined ? COMISIONES[v] : 100;
+      const mesesBase = Math.max(1, parseInt(datos.meses) || 1);
+      const comisionCiclo = datos.gananciaAmigo * (pct / 100) * (meses / mesesBase);
+      comisionMes += comisionCiclo / meses;
+      deCatalogo++;
+    } else {
+      sinDato++;   // sin libro y sin catálogo: se cuenta 0 y se avisa
+    }
+  });
+
+  // Plataformas con cuentas operativas pero SIN costo configurado: hacen que la
+  // cartera se vea MEJOR de lo real. Sólo se puede saber si ya se cargaron las
+  // cuentas (la pestaña Cuentas se baja aparte).
+  let platsSinCosto = [];
+  if (cuentasCargadas && resumenGN && resumenGN.detalleCostos) {
+    const conCosto = {};
+    resumenGN.detalleCostos.forEach(d => { conCosto[String(d.plataforma || '').toUpperCase().trim()] = true; });
+    const conCuentas = [...new Set(cuentasOperativas_().map(c => c.plataforma).filter(Boolean))];
+    platsSinCosto = conCuentas.filter(p => !conCosto[p]);
+  }
+
+  const costos = (resumenGN && typeof resumenGN.costos === 'number') ? resumenGN.costos : null;
+  const r2 = n => Math.round(n * 100) / 100;
+
+  return {
+    clientes: vigentes.length,
+    ingresoMes: r2(ingresoMes),
+    comisionMes: r2(comisionMes),
+    costos: costos,
+    ganancia: costos === null ? null : r2(ingresoMes - comisionMes - costos),
+    deLibro, deCatalogo, sinDato, deYo,
+    platsSinCosto
+  };
+}
+
+// Inyecta el bloque cuando ya llegó el costo del mes (viene con el P&L).
+function pintarCarteraGN_() {
+  const cont = document.getElementById('gn-cartera');
+  if (cont) cont.innerHTML = bloqueCarteraHTML_();
+}
+
+function bloqueCarteraHTML_() {
+  if (MI_ROL !== 'admin') return '';
+  const c = calcularCarteraRecurrente_();
+  const _m = moneyGN_;
+
+  if (c.costos === null) {
+    return `<div class="car-wrap"><div class="car-title">${ico('sube',13)} Ganancia recurrente estimada / mes</div>
+      <div class="loading" style="padding:10px 0;">Esperando los costos del mes...</div></div>`;
+  }
+
+  const color = c.ganancia >= 0 ? 'var(--green)' : 'var(--red)';
+
+  // Avisos de qué tan firme es el número.
+  const avisos = [];
+  if (c.deCatalogo) avisos.push(`${c.deCatalogo} cliente${c.deCatalogo!==1?'s':''} sin registro en el libro: su comisión se estimó con el catálogo actual.`);
+  if (c.sinDato) avisos.push(`${c.sinDato} cliente${c.sinDato!==1?'s':''} sin libro ni catálogo: se contó comisión $0, así que el resultado queda algo optimista.`);
+  if (c.platsSinCosto.length) avisos.push(`<b>${c.platsSinCosto.join(', ')}</b> tiene${c.platsSinCosto.length!==1?'n':''} cuentas pero no tiene${c.platsSinCosto.length!==1?'n':''} costo configurado: esta ganancia está <b>subestimando el gasto</b> y se ve mejor de lo real.`);
+
+  return `
+  <div class="car-wrap">
+    <div class="car-title">${ico('sube',13)} Ganancia recurrente estimada / mes</div>
+    <div class="car-sub">Proyección de lo que deja tu cartera vigente si todos renuevan.
+      <b>No es dinero cobrado</b> y no forma parte del resultado del mes de arriba.</div>
+
+    <div class="car-val" style="color:${color};">${_m(c.ganancia)}</div>
+    <div class="car-val-lbl">por mes · sobre ${c.clientes} cliente${c.clientes!==1?'s':''} vigente${c.clientes!==1?'s':''}</div>
+
+    <div class="car-desglose">
+      <div class="car-fila">
+        <span>Ingreso mensualizado<i>precio de cada ciclo ÷ sus meses</i></span>
+        <b>${_m(c.ingresoMes)}</b>
+      </div>
+      <div class="car-fila">
+        <span>Comisiones mensualizadas<i>${c.deYo===1
+          ? '1 cliente propio no paga comisión'
+          : c.deYo+' clientes propios no pagan comisión'}</i></span>
+        <b style="color:var(--amber);">−${_m(c.comisionMes)}</b>
+      </div>
+      <div class="car-fila">
+        <span>Costo de plataformas<i>el mismo del resultado del mes, restado una sola vez</i></span>
+        <b style="color:var(--amber);">−${_m(c.costos)}</b>
+      </div>
+    </div>
+
+    ${avisos.length ? `<div class="car-aviso">${ico('alerta',13)} <div>${avisos.join('<br>')}</div></div>` : ''}
+  </div>`;
+}
+
 // Métricas SECUNDARIAS: contexto, no resultado. Van en su propio bloque, con
 // su propio encabezado, justamente para que nadie las sume a la ganancia.
 // Ninguna de estas cuatro entra en el P&L de arriba.
@@ -3961,6 +4145,8 @@ function marcarDatosSucios() {
   // El P&L del mes también quedó viejo: una venta nueva cambia ingresos y
   // comisiones del mes en curso. Se vacía la caché para que se vuelva a pedir.
   cacheResumenGN = {};
+  // Alta o baja de una cuenta cambia el inventario: se vuelve a contar.
+  inventarioPlat = {};
   actividadCargada = false; // el historial también quedó viejo tras un cambio
   solicitudesCargadas = false;
   // El libro de comisiones en memoria también: sin esto, el "Historial de
@@ -4312,7 +4498,8 @@ function calcularNotificaciones() {
   // Cuentas llenas / por llenarse (solo admin — el vendedor no compra cuentas).
   if (MI_ROL === 'admin' && cuentasCargadas && todasCuentas.length) {
     let llenas = 0, casi = 0;
-    todasCuentas.forEach(c => {
+    // Solo operativas: una cuenta caida no esta 'llena', esta muerta.
+    cuentasOperativas_().forEach(c => {
       // Solo los slots reales de la cuenta (slice a slotsTotal), como en renderCuentas.
       const reales = c.slots.slice(0, c.slotsTotal);
       const occ = reales.filter(s => s && s!=='x' && s!=='X').length;
@@ -5676,7 +5863,8 @@ function cargarCuentasDisponibles(paquete, targetId, selectClass, cuentasActuale
   // una cuenta DISTINTA de las del cliente, en vez de las dos la misma.
   const refsRestantes = [...cuentasActuales];
   plataformas.forEach(plat => {
-    const cuentasPlat = todasCuentas.filter(c => c.plataforma === plat).map(cuenta => {
+    // Solo operativas: no se puede asignar un cliente a una cuenta caida.
+    const cuentasPlat = cuentasOperativas_().filter(c => c.plataforma === plat).map(cuenta => {
       // "Ya asignada a este cliente" si su NOMBRE (lo nuevo) o su correo (lo viejo)
       // está entre las cuentas actuales del cliente — así se preselecciona bien
       // tanto para clientes nuevos como para los que se guardaron por correo.
@@ -5759,7 +5947,7 @@ function disponibilidadCombo(nombrePaquete) {
   const faltantes = [];
   Object.keys(necesarias).forEach(plat => {
     let libres = 0;
-    todasCuentas.filter(c => c.plataforma === plat).forEach(cuenta => {
+    cuentasOperativas_().filter(c => c.plataforma === plat).forEach(cuenta => {
       libres += cuenta.slots.slice(0, cuenta.slotsTotal).filter(s => !s || s.trim()==='').length;
     });
     const posibles = Math.floor(libres / necesarias[plat]);
@@ -6187,6 +6375,41 @@ function cargarCuentas(forzar) {
 // La ganancia del mes la calcula el servidor en obtenerResumenMensual.
 // Acá solo queda la CAPACIDAD, que no es dinero.
 
+// ¿Esta cuenta está operativa? Vacío = sí (todas las filas anteriores al
+// cambio). 'INSERVIBLE' = se cayó y no debe ofrecerse ni contarse.
+function esOperativa_(c) {
+  return !c || (c.estado || '') !== 'INSERVIBLE';
+}
+// Solo las cuentas que sirven. Es el filtro que va en TODO lo que hable de
+// capacidad, lugares disponibles o asignación de clientes.
+function cuentasOperativas_() {
+  return (todasCuentas || []).filter(esOperativa_);
+}
+// Busca una cuenta por nombre. Desde que una cuenta caída libera su nombre para
+// el reemplazo, puede haber dos con el mismo: gana la operativa, salvo que se
+// pase el correo como desempate exacto.
+function buscarCuenta_(nombre, correo) {
+  const lista = todasCuentas || [];
+  if (correo) {
+    const exacta = lista.find(x => x.nombre === nombre && x.correo === correo);
+    if (exacta) return exacta;
+  }
+  return lista.find(x => x.nombre === nombre && esOperativa_(x)) ||
+         lista.find(x => x.nombre === nombre);
+}
+// Clientes que quedaron dentro de cuentas caídas: hay que migrarlos a mano.
+// NO se mueve ninguno automáticamente — sólo se cuentan para poder avisarte.
+function clientesEnCuentasCaidas_() {
+  const ids = [];
+  (todasCuentas || []).filter(c => !esOperativa_(c)).forEach(c => {
+    c.slots.slice(0, c.slotsTotal).forEach(s => {
+      const v = (s || '').trim();
+      if (v && v.toLowerCase() !== 'x') ids.push({ id: v, cuenta: c.nombre, plataforma: c.plataforma });
+    });
+  });
+  return ids;
+}
+
 // Lugares de la cuenta, según la hoja.
 function lugaresCuenta_(c) {
   return Math.max(1, parseInt(c && c.slotsTotal) || 1);
@@ -6210,6 +6433,12 @@ function mapearCuentas_(filas) {
     slotsTotal: parseInt(f['slots_total']||'0'),
     slots: [f['slot1']||'',f['slot2']||'',f['slot3']||'',f['slot4']||'',f['slot5']||''],
     notas: f['notas']||'',
+    // Estado de la cuenta. Vacío = ACTIVA (todas las filas viejas lo están).
+    // INSERVIBLE = se cayó: sigue visible pero no ofrece lugares ni cuenta
+    // para los costos futuros.
+    estado: (f['estado']||'').toUpperCase().trim(),
+    fechaInservible: f['fecha_inservible']||'',
+    fechaAlta: f['fecha_alta']||'',
     // Opcional: si algún día agregás la columna, manda sobre el típico.
     costoMensual: parseFloat(f['costo_mensual']||'0') || 0,
   })).filter(c => c.nombre);
@@ -6271,8 +6500,9 @@ function renderCuentas() {
   });
 
   // Aviso de cuentas llenas o por llenarse — para saber cuándo comprar otra.
+  // Las caídas quedan fuera: no están llenas, están muertas.
   let nLlenas=0, nCasi=0;
-  lista.forEach(c => {
+  lista.filter(esOperativa_).forEach(c => {
     // Solo los slots REALES de la cuenta (slice a slotsTotal): texto residual
     // en un slot sobrante hacía ver cuentas "LLENAS" que no lo estaban.
     const reales = c.slots.slice(0, c.slotsTotal);
@@ -6281,6 +6511,22 @@ function renderCuentas() {
     const lib = c.slotsTotal - occ - blq;
     if (lib<=0) nLlenas++; else if (lib===1) nCasi++;
   });
+
+  // AVISO DE CUENTAS CAÍDAS. Los clientes NO se migran solos: acá sólo se
+  // cuentan y se ofrece ir a revisarlos. Reasignar es siempre manual.
+  let bannerCaidas = '';
+  const caidas = todasCuentas.filter(c => !esOperativa_(c));
+  if (caidas.length) {
+    const afectados = clientesEnCuentasCaidas_();
+    bannerCaidas = `<div class="cuentas-alerta" style="background:var(--red-bg);border-color:rgba(248,113,113,0.35);color:var(--red);">
+      ${ico('alerta',13)} <b>${caidas.length} cuenta${caidas.length!==1?'s':''} marcada${caidas.length!==1?'s':''} como INSERVIBLE</b>
+      ${afectados.length
+        ? ` — <b>${afectados.length} cliente${afectados.length!==1?'s':''}</b> sigue${afectados.length!==1?'n':''} adentro y hay que migrarlo${afectados.length!==1?'s':''} a mano.`
+        : ' — sin clientes adentro.'}
+      No cuentan para lugares disponibles ni para los costos del mes que viene.
+    </div>`;
+  }
+
   let bannerHTML = '';
   if (nLlenas+nCasi > 0) {
     const partes = [];
@@ -6289,25 +6535,28 @@ function renderCuentas() {
     bannerHTML = `<div class="cuentas-alerta">${ico('alerta',13)} ${partes.join(' · ')} — conviene ir comprando otra cuenta.</div>`;
   }
 
-  let html = bannerHTML;
+  let html = bannerCaidas + bannerHTML;
   Object.keys(grupos).forEach(plat => {
     const color = PLAT_COLORS[plat] || 'var(--border-strong)';
     const inicial = (plat||'?').trim().charAt(0).toUpperCase();
 
     // Resumen del grupo: cuántas cuentas hay y cuántos slots libres suman —
     // es el dato con el que se decide si conviene comprar otra cuenta.
+    // Los lugares libres de una cuenta caída NO son vendibles: no se suman.
     let libresGrupo = 0;
-    grupos[plat].forEach(c => {
+    grupos[plat].filter(esOperativa_).forEach(c => {
       const r = c.slots.slice(0, c.slotsTotal);
       libresGrupo += c.slotsTotal - r.filter(s => s && s!=='x' && s!=='X').length - r.filter(s => s==='x'||s==='X').length;
     });
-    const nCuentas = grupos[plat].length;
+    const nCuentas = grupos[plat].filter(esOperativa_).length;
+    const nCaidasGrupo = grupos[plat].length - nCuentas;
 
     html += `<div class="ca-grupo">
       <div class="ca-grupo-head">
         <div class="ca-grupo-dot" style="background:${color};"></div>
         <div class="ca-grupo-nom">${esc(plat)}</div>
-        <div class="ca-grupo-meta">${nCuentas} cuenta${nCuentas!==1?'s':''} · ${libresGrupo} libre${libresGrupo!==1?'s':''}</div>
+        <div class="ca-grupo-meta">${nCuentas} cuenta${nCuentas!==1?'s':''} · ${libresGrupo} libre${libresGrupo!==1?'s':''}${
+          nCaidasGrupo ? ` · <span style="color:var(--red);">${nCaidasGrupo} inservible${nCaidasGrupo!==1?'s':''}</span>` : ''}</div>
       </div>
       <div class="ca-grid">`;
 
@@ -6318,12 +6567,16 @@ function renderCuentas() {
       const libres = c.slotsTotal - ocupados - bloqueados;
       const cardId = `cuenta-${plat}-${idx}`.replace(/\s/g,'_');
       const nombreArgCuenta = esc(JSON.stringify(c.nombre||''));
-      const claseLlena = libres<=0 ? ' card-llena' : (libres===1 ? ' card-casi' : '');
-      const estadoLibres = libres<=0
-        ? '<div class="ca-pill red">LLENA</div>'
-        : (libres===1
-            ? '<div class="ca-pill amber">1 libre</div>'
-            : `<div class="ca-pill">${libres} libres</div>`);
+      const caida = !esOperativa_(c);
+      const claseLlena = caida ? ' card-caida' : (libres<=0 ? ' card-llena' : (libres===1 ? ' card-casi' : ''));
+      // Una cuenta caída no habla de lugares: habla de que está caída.
+      const estadoLibres = caida
+        ? '<div class="ca-pill red">INSERVIBLE</div>'
+        : (libres<=0
+            ? '<div class="ca-pill red">LLENA</div>'
+            : (libres===1
+                ? '<div class="ca-pill amber">1 libre</div>'
+                : `<div class="ca-pill">${libres} libres</div>`));
 
       // Fila de bloques: un bloque por slot real. El ocupado muestra el PRIMER
       // nombre del cliente (el completo no entra en 32px) y el libre queda
@@ -6342,8 +6595,10 @@ function renderCuentas() {
         <div class="ca-head" style="--ca-grad:linear-gradient(100deg, ${color} 0%, transparent 76%);">
           <div class="ca-ini" style="background:${color};">${esc(inicial)}</div>
           <div style="flex:1;min-width:0;">
-            <div class="ca-nom">${esc(c.nombre)}</div>
-            <div class="ca-sub">${ocupados} de ${c.slotsTotal} ocupada${ocupados!==1?'s':''}${bloqueados?` · ${bloqueados} bloqueada${bloqueados!==1?'s':''}`:''}</div>
+            <div class="ca-nom">${esc(c.nombre)}${caida?' <span class="ca-tag-caida">caída</span>':''}</div>
+            <div class="ca-sub">${caida
+              ? `inservible desde ${esc(c.fechaInservible||'—')}${ocupados?` · <b style="color:var(--red);">${ocupados} cliente${ocupados!==1?'s':''} adentro</b>`:''}`
+              : `${ocupados} de ${c.slotsTotal} ocupada${ocupados!==1?'s':''}${bloqueados?` · ${bloqueados} bloqueada${bloqueados!==1?'s':''}`:''}`}</div>
           </div>
           ${estadoLibres}
           ${MI_ROL==='admin' ? `<button class="ca-copy" onclick="event.stopPropagation();copiarAcceso(${nombreArgCuenta})" title="Copiar correo y contraseña">${ico('portapapeles',14)}</button>` : ''}
@@ -6363,7 +6618,7 @@ function renderCuentas() {
 // Ficha de una cuenta en el MISMO panel lateral que usan los clientes:
 // cabecera con el color de la plataforma, tres cifras y los slots.
 function abrirFichaCuenta(nombreCuenta) {
-  const c = todasCuentas.find(x => x.nombre === nombreCuenta);
+  const c = buscarCuenta_(nombreCuenta);
   if (!c) return;
   const plat = c.plataforma || '';
   const color = PLAT_COLORS[plat] || 'var(--violet)';
@@ -6460,7 +6715,7 @@ function copiarFallback_(texto) {
   } catch (e) { return false; }
 }
 function copiarAcceso(nombreCuenta) {
-  const c = todasCuentas.find(x => x.nombre === nombreCuenta);
+  const c = buscarCuenta_(nombreCuenta);
   if (!c) { toast('Cuenta no encontrada', 'error'); return; }
   const texto = `${c.nombre}\nCorreo: ${c.correo || ''}\nContraseña: ${c.contrasena || ''}`;
   copiarTexto_(texto, 'Acceso copiado ✓');
@@ -6471,13 +6726,13 @@ function copiarAcceso(nombreCuenta) {
 // Se busca el dato en todasCuentas (no se mete en el HTML) para no romper el
 // onclick con contraseñas que llevan comillas u otros caracteres raros.
 function copiarCorreoCuenta(nombreCuenta) {
-  const c = todasCuentas.find(x => x.nombre === nombreCuenta);
+  const c = buscarCuenta_(nombreCuenta);
   if (!c) return;
   if (!c.correo) { toast('Esta cuenta no tiene correo', 'error'); return; }
   copiarTexto_(c.correo, 'Correo copiado 📧');
 }
 function copiarPassCuenta(nombreCuenta, idCampo) {
-  const c = todasCuentas.find(x => x.nombre === nombreCuenta);
+  const c = buscarCuenta_(nombreCuenta);
   if (!c) return;
   if (!c.contrasena) { toast('Esta cuenta no tiene contraseña visible', 'error'); return; }
   copiarTexto_(c.contrasena, 'Contraseña copiada 🔑');
@@ -6485,7 +6740,7 @@ function copiarPassCuenta(nombreCuenta, idCampo) {
 }
 
 function liberarSlot(nombreCuenta, slotIdx) {
-  const cuenta = todasCuentas.find(c => c.nombre === nombreCuenta);
+  const cuenta = buscarCuenta_(nombreCuenta);
   if (!cuenta) return;
   const cliente = cuenta.slots[slotIdx];
   abrirConfirmacion(
@@ -6504,12 +6759,12 @@ function liberarSlot(nombreCuenta, slotIdx) {
 }
 
 // ===== PENDIENTE 1: Eliminar cuentas =====
-function confirmarEliminarCuenta(nombreCuenta) {
+function confirmarEliminarCuenta(nombreCuenta, correoActual) {
   abrirConfirmacion(
     'Eliminar cuenta',
     `¿Eliminar la cuenta "${nombreCuenta}" por completo? Esta acción no se puede deshacer.`,
     () => {
-      return fetch(SCRIPT_URL, {method:'POST', body: JSON.stringify({accion:'eliminarCuenta', nombreCuenta, key:APP_KEY})})
+      return fetch(SCRIPT_URL, {method:'POST', body: JSON.stringify({accion:'eliminarCuenta', nombreCuenta, correoActual, key:APP_KEY})})
         .then(r=>r.json())
         .then(res=>{
           if (res.status==='ok') { cerrarModal('modal-confirmar'); cargarCuentas(); toast('Cuenta eliminada'); return true; }
@@ -6517,7 +6772,7 @@ function confirmarEliminarCuenta(nombreCuenta) {
             abrirConfirmacion(
               'Cuenta con slots ocupados',
               `"${nombreCuenta}" tiene clientes activos en sus slots. ¿Eliminar de todas formas? Sus clientes quedarán sin cuenta asignada.`,
-              () => fetch(SCRIPT_URL, {method:'POST', body: JSON.stringify({accion:'eliminarCuenta', nombreCuenta, forzar:true, key:APP_KEY})})
+              () => fetch(SCRIPT_URL, {method:'POST', body: JSON.stringify({accion:'eliminarCuenta', nombreCuenta, correoActual, forzar:true, key:APP_KEY})})
                 .then(r=>r.json()).then(res2=>{
                   if (res2.status==='ok') { cargarCuentas(); toast('Cuenta eliminada'); return true; }
                   toast('Error al eliminar', 'error'); return false;
@@ -6550,13 +6805,67 @@ function renderAccionesCuenta(c) {
     html += `<button class="acc-btn" onclick="abrirAvisarCuenta(${nombreArg})">${ico('telefono',14)} Avisar nueva clave</button>`;
   }
   html += '</div>';
+
+  // ===== Marcar como inservible / reactivar =====
+  // Es el paso INTERMEDIO entre "funciona" y "la borré": la cuenta se cae, deja
+  // de ocupar lugar y de costar hacia adelante, pero sigue acá para revisarla.
+  const correoArg = esc(JSON.stringify(c.correo||''));
+  if (esOperativa_(c)) {
+    html += `<button class="acc-btn" style="width:100%;margin-top:10px;padding:9px;justify-content:center;color:var(--amber);border-color:rgba(251,191,36,0.4);"
+      onclick="marcarInservible_(${nombreArg},${correoArg})">${ico('alerta',14)} Marcar como INSERVIBLE (se cayó)</button>`;
+  } else {
+    html += `<div style="background:var(--red-bg);border:1px solid rgba(248,113,113,0.3);border-radius:11px;padding:11px 13px;font-size:12px;color:var(--red);margin-top:12px;line-height:1.5;">
+      ${ico('alerta',13)} <b>Cuenta inservible</b> desde ${esc(c.fechaInservible||'—')}.
+      No ofrece lugares ni cuenta para los costos del mes que viene.
+      Sus clientes siguen asignados: hay que moverlos a mano.</div>`;
+    html += `<button class="acc-btn" style="width:100%;margin-top:10px;padding:9px;justify-content:center;color:var(--green);border-color:rgba(52,211,153,0.4);"
+      onclick="reactivarCuenta_(${nombreArg},${correoArg})">${ico('check',14)} Volver a marcarla como ACTIVA</button>`;
+  }
+
   // Eliminar va abajo, separado, en rojo (acción destructiva).
-  html += `<button class="delete-acc-btn" style="width:100%;margin-top:10px;padding:9px;" onclick="confirmarEliminarCuenta(${nombreArg})">${ico('basura',14)} Eliminar esta cuenta</button>`;
+  html += `<button class="delete-acc-btn" style="width:100%;margin-top:10px;padding:9px;" onclick="confirmarEliminarCuenta(${nombreArg},${correoArg})">${ico('basura',14)} Eliminar esta cuenta</button>`;
   return html;
 }
 
+// Marca la cuenta como caída. NO mueve ningún cliente: sólo avisa cuántos
+// quedaron adentro para que los migres vos.
+function marcarInservible_(nombre, correo) {
+  if (!confirm('¿Marcar "' + nombre + '" como INSERVIBLE?\n\n' +
+    '· Deja de ofrecer lugares y de contar para los costos del mes que viene.\n' +
+    '· El mes en curso NO cambia: ese ciclo ya está pagado.\n' +
+    '· Sus clientes NO se mueven: los migrás vos cuando quieras.\n' +
+    '· Podés revertirlo o eliminarla después.')) return;
+  const motivo = prompt('¿Qué pasó? (opcional)', 'Se cayó') || '';
+  postDatos({accion:'marcarCuentaInservible', key:APP_KEY, opId:nuevoOpId(),
+             nombreCuenta:nombre, correoActual:correo, motivo:motivo})
+    .then(res => {
+      if (res.status !== 'ok') return toast(res.message||'No se pudo marcar','error');
+      const n = (res.clientesDentro||[]).length;
+      toast(n ? `Marcada · ${n} cliente${n!==1?'s':''} adentro para migrar` : 'Marcada como inservible');
+      cerrarModal('modal-detalle');
+      marcarDatosSucios();
+      cargarCuentas(true);
+    })
+    .catch(() => toast('No se pudo marcar','error'));
+}
+
+// Revierte el marcado (por si fue un error).
+function reactivarCuenta_(nombre, correo) {
+  if (!confirm('¿Volver a marcar "' + nombre + '" como ACTIVA?')) return;
+  postDatos({accion:'reactivarCuenta', key:APP_KEY, opId:nuevoOpId(),
+             nombreCuenta:nombre, correoActual:correo})
+    .then(res => {
+      if (res.status !== 'ok') return toast(res.message||'No se pudo reactivar','error');
+      toast('Cuenta activa de nuevo');
+      cerrarModal('modal-detalle');
+      marcarDatosSucios();
+      cargarCuentas(true);
+    })
+    .catch(() => toast('No se pudo reactivar','error'));
+}
+
 function abrirGestionarPlataforma(nombreCuenta) {
-  const c = todasCuentas.find(x => x.nombre === nombreCuenta);
+  const c = buscarCuenta_(nombreCuenta);
   if (!c) return;
   const gestion = GESTION_PLATAFORMA[c.plataforma];
   if (!gestion) { toast('No hay enlace de gestión para esta plataforma', 'error'); return; }
@@ -6571,7 +6880,7 @@ function abrirGestionarPlataforma(nombreCuenta) {
 let cuentaEnEdicion = null;
 let cuentaEnAviso = null;
 function abrirEditarCuenta(nombreCuenta) {
-  const c = todasCuentas.find(x => x.nombre === nombreCuenta);
+  const c = buscarCuenta_(nombreCuenta);
   if (!c) return;
   cuentaEnEdicion = c;
   document.getElementById('ec-nombre').textContent = c.nombre + ' · ' + c.plataforma;
@@ -6630,7 +6939,7 @@ function mensajeNuevaContrasena(cliente, cuenta) {
 }
 
 function abrirAvisarCuenta(nombreCuenta) {
-  const c = todasCuentas.find(x => x.nombre === nombreCuenta);
+  const c = buscarCuenta_(nombreCuenta);
   if (!c) return;
   cuentaEnAviso = c;
   // Buscamos los clientes que están en los slots de esta cuenta.
@@ -6914,7 +7223,7 @@ function renderGanancias() {
   // en el P&L del mes). Ahora es solo un conteo: oportunidad de venta.
   let lugaresVacios = 0;
   if (MI_ROL === 'admin' && cuentasCargadas) {
-    todasCuentas.forEach(c => { lugaresVacios += ocupacionCuenta_(c).libres; });
+    cuentasOperativas_().forEach(c => { lugaresVacios += ocupacionCuenta_(c).libres; });
   }
   // Ventas ya cobradas por adelantado que siguen corriendo. Es SERVICIO vigente,
   // no dinero de este mes: su ingreso se contó el mes en que se cobró.
@@ -6944,7 +7253,8 @@ function renderGanancias() {
           serviciosActivos: _vigentes.length,
           multiMes: multiMesActivas,
           lugaresLibres: lugaresVacios
-       })}`
+       })}
+       <div id="gn-cartera"></div>`
     : `
     <div class="gn-kpis">
       <div class="gn-kpi azul">
@@ -7855,11 +8165,15 @@ function renderConfig() {
         <div class="cst-grid">
           <div>
             <label class="cst-lbl">Plataforma</label>
-            <input class="form-input" id="cst-plataforma" placeholder="Ej. Spotify" oninput="previewCostoPlat_()">
+            <select class="form-input" id="cst-plataforma" onchange="previewCostoPlat_()">
+              <option value="">Elegí una...</option>
+            </select>
           </div>
-          <div>
-            <label class="cst-lbl">Planes</label>
-            <input class="form-input" id="cst-planes" type="number" min="0" step="1" value="1" oninput="previewCostoPlat_()">
+          <div id="cst-planes-wrap">
+            <label class="cst-lbl">Cuentas <span style="color:var(--text3);font-weight:400;">(del inventario)</span></label>
+            <input class="form-input" id="cst-planes" type="number" min="0" step="1" value="0"
+                   readonly title="Sale de tus cuentas dadas de alta. No se edita a mano."
+                   style="opacity:.75;cursor:not-allowed;">
           </div>
           <div>
             <label class="cst-lbl">Costo por plan</label>
@@ -7886,6 +8200,19 @@ function renderConfig() {
 
         <div class="cst-preview" id="cst-preview"></div>
         <button class="btn-primary" id="btn-guardar-costo" onclick="guardarCostoPlataforma_()">${ico('check',15)} Guardar costo</button>
+      </div>
+
+      <div class="cuenta-card" style="padding:14px 16px;margin-top:12px;">
+        <div style="font-size:13px;font-weight:700;margin-bottom:4px;">${ico('sube',13)} Inventario y costos</div>
+        <div id="cst-inventario"><div class="loading">Leyendo inventario...</div></div>
+        <button class="btn-primary" id="btn-sync-costos" onclick="sincronizarCostosInventario_()"
+          style="background:var(--surface);color:var(--text);border:1px solid var(--border);box-shadow:none;margin-top:10px;">
+          ${ico('sube',15)} Sincronizar costos con el inventario
+        </button>
+        <div style="font-size:11.5px;color:var(--text3);margin-top:8px;line-height:1.5;">
+          Compara cuántas cuentas tenés hoy contra la última cantidad registrada. Si cambió, agrega
+          la fila del mes en curso. <b>Los meses anteriores no se tocan.</b> Si nada cambió, no escribe nada.
+        </div>
       </div>
 
       <div style="font-size:12px;font-weight:700;color:var(--text2);margin:16px 0 8px;">${ico('calendario',12)} Costos registrados</div>
@@ -7925,6 +8252,116 @@ function renderConfig() {
 // cambio ni vigencia — así era imposible que un mes histórico conservara su
 // costo. localStorage ya no participa.
 let todosCostosPlat = [];
+// Cuentas operativas por plataforma, contadas por el SERVIDOR desde la hoja
+// 'cuentas'. Es la única fuente de la cantidad: acá no se edita a mano nunca.
+let inventarioPlat = {};
+
+// Baja el inventario y refresca lo que dependa de él.
+function cargarInventarioPlat_(forzar) {
+  if (Object.keys(inventarioPlat).length && !forzar) { renderInventarioPlat_(); return Promise.resolve(inventarioPlat); }
+  return postDatos({accion:'obtenerInventarioPlataformas', key:APP_KEY})
+    .then(res => {
+      if (res.status === 'ok') inventarioPlat = res.inventario || {};
+      renderInventarioPlat_();
+      llenarSelectPlataformas_();
+      previewCostoPlat_();
+      return inventarioPlat;
+    })
+    .catch(() => { renderInventarioPlat_(); return {}; });
+}
+
+// El desplegable de plataformas sale del inventario: no se puede escribir una
+// plataforma con typo que después no case con ninguna cuenta.
+function llenarSelectPlataformas_() {
+  const sel = document.getElementById('cst-plataforma');
+  if (!sel) return;
+  const actual = sel.value;
+  // Las que tienen cuentas, más las que ya tienen costo cargado (por si te
+  // quedaste sin cuentas de una y hay que poder verla/corregirla).
+  const conCuentas = Object.keys(inventarioPlat);
+  const conCosto = [...new Set(todosCostosPlat.map(c => String(c.plataforma||'').trim().toUpperCase()).filter(Boolean))];
+  const todas = [...new Set(conCuentas.concat(conCosto))].sort();
+  sel.innerHTML = '<option value="">Elegí una...</option>' + todas.map(p => {
+    const n = inventarioPlat[p] || 0;
+    return `<option value="${esc(p)}">${esc(p)} — ${n} cuenta${n!==1?'s':''}</option>`;
+  }).join('');
+  if (actual && todas.indexOf(actual) !== -1) sel.value = actual;
+}
+
+// Tabla de inventario vs. lo último registrado en costos.
+function renderInventarioPlat_() {
+  const cont = document.getElementById('cst-inventario');
+  if (!cont) return;
+  const plats = Object.keys(inventarioPlat).sort();
+  if (!plats.length) {
+    cont.innerHTML = '<div class="cst-vacio">No se detectaron cuentas en el inventario.</div>';
+    return;
+  }
+  const mesAhora = mesActualMMYYYY_();
+  const ordenMes = v => { const n = normalizarMesUI_(v); return n ? parseInt(n.slice(3),10)*100 + parseInt(n.slice(0,2),10) : -1; };
+
+  cont.innerHTML = plats.map(p => {
+    const n = inventarioPlat[p];
+    // Última fila de costo vigente para esta plataforma.
+    let ult = null;
+    todosCostosPlat.forEach(c => {
+      if (String(c.plataforma||'').trim().toUpperCase() !== p) return;
+      if (ordenMes(c.vigente_desde) > ordenMes(mesAhora)) return;
+      if (!ult || ordenMes(c.vigente_desde) >= ordenMes(ult.vigente_desde)) ult = c;
+    });
+    if (!ult) {
+      return `<div class="cst-fila">
+        <div><b>${esc(p)}</b><span>${n} cuenta${n!==1?'s':''} operativa${n!==1?'s':''} · sin costo configurado</span></div>
+        <div class="cst-vig" style="color:var(--amber);">falta cargar</div>
+      </div>`;
+    }
+    const registradas = parseFloat(ult.planes) || 0;
+    const difiere = registradas !== n;
+    const unit = parseFloat(ult.costo_unitario) || 0;
+    const tc = parseFloat(ult.tipo_cambio) || 1;
+    const proyectado = n * unit * tc;
+    return `<div class="cst-fila${difiere?'':' vigente'}">
+      <div>
+        <b>${esc(p)}</b>
+        <span>Cuentas operativas detectadas: <b style="color:var(--text2);">${n}</b> ·
+          costo unitario ${unit.toLocaleString('es-MX',{minimumFractionDigits:2})} ${esc(ult.moneda||'MXN')}${
+          String(ult.moneda||'MXN').toUpperCase()!=='MXN' ? ` · TC ${tc}` : ''}</span>
+        <span>Costo mensual calculado: <b style="color:var(--text2);">${(n*unit).toLocaleString('es-MX',{minimumFractionDigits:2})} ${esc(ult.moneda||'MXN')}</b>${
+          String(ult.moneda||'MXN').toUpperCase()!=='MXN' ? ` = $${proyectado.toLocaleString('es-MX',{minimumFractionDigits:2})} MXN` : ''}</span>
+      </div>
+      <div class="cst-vig">${difiere
+        ? `<span style="color:var(--amber);">registradas: ${registradas}</span><i class="cst-tag" style="color:var(--amber);">sincronizar</i>`
+        : `<span style="color:var(--text3);">al día</span><i class="cst-tag">coincide</i>`}</div>
+    </div>`;
+  }).join('');
+}
+
+// Crea la fila del mes en curso para las plataformas cuyo conteo cambió.
+function sincronizarCostosInventario_() {
+  const btn = document.getElementById('btn-sync-costos');
+  btn.disabled = true; btn.textContent = 'Sincronizando...';
+  postDatos({accion:'sincronizarCostosDelMes', key:APP_KEY, opId: nuevoOpId()})
+    .then(res => {
+      btn.disabled = false; btn.innerHTML = ico('sube',15)+' Sincronizar costos con el inventario';
+      if (res.status !== 'ok') return toast(res.message||'No se pudo sincronizar','error');
+      const c = res.cambios || [];
+      if (!c.length) {
+        toast('Todo al día — no hizo falta cambiar nada');
+      } else {
+        toast(c.length + ' plataforma' + (c.length!==1?'s':'') + ' actualizada' + (c.length!==1?'s':'') + ' para ' + res.mes);
+      }
+      if ((res.sinCosto||[]).length) {
+        toast((res.sinCosto||[]).map(s=>s.plataforma).join(', ') + ': falta el costo unitario','error');
+      }
+      // El P&L de los meses afectados cambió: se tira la caché.
+      cacheResumenGN = {};
+      cargarCostosPlataforma_(true);
+    })
+    .catch(() => {
+      btn.disabled = false; btn.innerHTML = ico('sube',15)+' Sincronizar costos con el inventario';
+      toast('No se pudo sincronizar','error');
+    });
+}
 
 // Normaliza lo que se escriba en "vigente desde" a 'MM/yyyy'. Devuelve '' si no
 // se entiende. Mismo criterio que normalizarMesAnio_ del backend, que es quien
@@ -7948,13 +8385,41 @@ function previewCostoPlat_() {
   g('cst-tc-wrap').style.display = moneda === 'MXN' ? 'none' : 'block';
 
   const plat = (g('cst-plataforma').value||'').trim();
-  const planes = parseFloat(g('cst-planes').value);
   const unit = parseFloat(g('cst-unitario').value);
   let tc = moneda === 'MXN' ? 1 : parseFloat(g('cst-tc').value);
   const vig = normalizarMesUI_(g('cst-vigente').value);
 
+  // ===== La cantidad NO se escribe: sale del inventario =====
+  // Única excepción, la misma que aplica el servidor: un mes YA CERRADO. El
+  // inventario de hoy no sabe cuántas cuentas había en agosto, así que para
+  // cargar un periodo pasado el campo se habilita.
+  const mesAhora = mesActualMMYYYY_();
+  const ordenM = v => { const n = normalizarMesUI_(v); return n ? parseInt(n.slice(3),10)*100 + parseInt(n.slice(0,2),10) : NaN; };
+  const esPasado = !isNaN(ordenM(vig)) && ordenM(vig) < ordenM(mesAhora);
+  const inpPlanes = g('cst-planes');
+  const detectadas = inventarioPlat[plat.toUpperCase()] || 0;
+
+  const lblPlanes = document.querySelector('#cst-planes-wrap .cst-lbl');
+  if (esPasado) {
+    inpPlanes.readOnly = false;
+    inpPlanes.style.opacity = '1'; inpPlanes.style.cursor = 'auto';
+    inpPlanes.title = 'Periodo ya cerrado: el inventario de hoy no sabe cuántas cuentas había entonces.';
+    if (lblPlanes) lblPlanes.innerHTML = 'Cuentas <span style="color:var(--amber);font-weight:400;">(mes cerrado — cargalas vos)</span>';
+  } else {
+    inpPlanes.readOnly = true;
+    inpPlanes.style.opacity = '.75'; inpPlanes.style.cursor = 'not-allowed';
+    inpPlanes.title = 'Sale de tus cuentas dadas de alta. No se edita a mano.';
+    inpPlanes.value = detectadas;
+    if (lblPlanes) lblPlanes.innerHTML = 'Cuentas <span style="color:var(--text3);font-weight:400;">(del inventario)</span>';
+  }
+  const planes = parseFloat(inpPlanes.value);
+
   if (!plat || isNaN(planes) || isNaN(unit) || planes < 0 || unit < 0) {
-    box.className = 'cst-preview'; box.innerHTML = 'Completá plataforma, planes y costo por plan para ver el total.'; return;
+    box.className = 'cst-preview';
+    box.innerHTML = plat && !esPasado
+      ? `Cuentas operativas detectadas: <b style="color:var(--text2)">${detectadas}</b>. Falta el costo por cuenta.`
+      : 'Elegí la plataforma y poné el costo por cuenta para ver el total.';
+    return;
   }
   if (moneda !== 'MXN' && (isNaN(tc) || tc <= 0)) {
     box.className = 'cst-preview aviso'; box.innerHTML = 'Falta el tipo de cambio para convertir a MXN.'; return;
@@ -7969,7 +8434,9 @@ function previewCostoPlat_() {
 
   box.className = 'cst-preview ok';
   box.innerHTML = `<b>$${total.toLocaleString('es-MX',{minimumFractionDigits:2,maximumFractionDigits:2})} MXN al mes</b>
-    <span>${planes} plan${planes!==1?'es':''} × ${unit.toLocaleString('es-MX',{minimumFractionDigits:2,maximumFractionDigits:2})} ${esc(moneda)}${
+    <span>${planes} cuenta${planes!==1?'s':''} ${esPasado
+        ? '<i style="color:var(--amber);font-style:normal;">(cargadas a mano: mes cerrado)</i>'
+        : '<i style="color:var(--text3);font-style:normal;">(detectadas en el inventario)</i>'} × ${unit.toLocaleString('es-MX',{minimumFractionDigits:2,maximumFractionDigits:2})} ${esc(moneda)}${
       moneda!=='MXN' ? ` × ${tc} (tipo de cambio)` : ''} · desde ${esc(vig)}</span>
     <span>${yaHay
       ? `Ya existe un costo de ${esc(plat)} vigente desde ${esc(vig)}: se <b>corrige</b> esa fila, no se duplica.`
@@ -8026,7 +8493,12 @@ function cargarCostosPlataforma_(forzar) {
   if (!cont) return;
   if (todosCostosPlat.length && !forzar) { renderCostosPlataforma_(); return; }
   postDatos({accion:'leerDatos', tipo:'costos_plataforma', key:APP_KEY})
-    .then(res => { todosCostosPlat = res.rows||[]; renderCostosPlataforma_(); })
+    .then(res => {
+      todosCostosPlat = res.rows||[];
+      renderCostosPlataforma_();
+      // El inventario alimenta el desplegable y la cantidad: se pide junto.
+      cargarInventarioPlat_(true);
+    })
     .catch(() => { cont.innerHTML = '<div class="error-msg" style="margin:0;">No se pudieron cargar los costos. <a href="#" onclick="cargarCostosPlataforma_(true);return false;" style="color:inherit;text-decoration:underline;">Reintentar</a></div>'; });
 }
 
@@ -9603,7 +10075,7 @@ function chequeosSalud() {
 
   // c) Tu cuenta se llena: sin lugar no podés vender más de esa plataforma.
   if (cuentasCargadas && todasCuentas.length) {
-    const llenas = todasCuentas.filter(a => {
+    const llenas = cuentasOperativas_().filter(a => {
       const reales = a.slots.slice(0, a.slotsTotal);
       const occ = reales.filter(s => s && s !== 'x' && s !== 'X').length;
       const blq = reales.filter(s => s === 'x' || s === 'X').length;
@@ -9677,7 +10149,8 @@ function cerrarAvisos() { const o = document.getElementById('avisos-ov'); if (o)
    Acá queda lo que sí es cierto y útil a nivel cuenta: qué tan llena está. */
 function bloqueOcupacionHTML_() {
   if (MI_ROL !== 'admin' || !cuentasCargadas || !todasCuentas.length) return '';
-  const filas = todasCuentas.map(c => {
+  // Solo operativas: la ocupacion habla de capacidad vendible.
+  const filas = cuentasOperativas_().map(c => {
     const o = ocupacionCuenta_(c);
     const total = lugaresCuenta_(c);
     return { c, ocupados: o.ocupados, libres: o.libres, total,
