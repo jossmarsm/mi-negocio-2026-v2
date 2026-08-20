@@ -1201,7 +1201,58 @@ body {
 .pl-title{ font-size:14px; font-weight:700; font-family:'Space Grotesk'; }
 .pl-sub{ font-size:11.5px; color:var(--text3); margin-top:3px; line-height:1.4; }
 .pl-select{ width:auto; min-width:150px; margin:0; padding:8px 10px; font-size:12.5px; }
-.pl-grid{ display:grid; grid-template-columns:repeat(4,1fr); gap:10px; }
+/* auto-fit en vez de 4 columnas fijas: el P&L ahora tiene secciones de 2 y de 3
+   tarjetas, y una rejilla fija de 4 les dejaba huecos vacíos al lado. */
+.pl-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(190px,1fr)); gap:10px; }
+.pl-seccion{ display:flex; align-items:center; gap:7px; font-size:11px; font-weight:700;
+  text-transform:uppercase; letter-spacing:0.06em; color:var(--text3); margin:18px 0 9px; }
+.pl-seccion:first-of-type{ margin-top:0; }
+/* Distintivos. Dos ejes independientes que nunca deben confundirse:
+   BASE     CAJA (contorno azul) vs ECONÓMICO (sólido violeta)
+   CALIDAD  EXACTO vs ESTIMADO
+   Y un tercero puntual: AMORTIZADO, en cualquier cifra que traiga una compra
+   prepagada. Ninguna cifra amortizada debe aparecer sin ese distintivo. */
+.pl-chip{ font-size:9.5px; font-weight:700; letter-spacing:0.05em; padding:2px 7px;
+  border-radius:999px; vertical-align:middle; white-space:nowrap; }
+.pl-chip-ok{ background:var(--green-bg); color:var(--green); border:1px solid rgba(52,211,153,0.35); }
+.pl-chip-est{ background:var(--amber-bg); color:var(--amber); border:1px solid rgba(251,191,36,0.35); }
+.pl-chip-caja{ background:transparent; color:var(--blue); border:1px solid var(--blue); }
+.pl-chip-econ{ background:var(--violet); color:#17111f; border:1px solid var(--violet); }
+.pl-chip-amort{ background:var(--amber); color:#241a02; border:1px solid var(--amber); }
+.pl-chip-frio{ background:var(--violet-bg); color:var(--violet); border:1px solid var(--violet); }
+.pl-chip-proy{ background:transparent; color:var(--text3); border:1px dashed var(--border); }
+
+/* Desglose por plataforma */
+.pl-tabla-wrap{ margin-top:12px; overflow-x:auto; border:1px solid var(--border); border-radius:12px; }
+.pl-tabla{ border-collapse:collapse; width:100%; font-size:12.5px; min-width:620px; }
+.pl-tabla th, .pl-tabla td{ padding:8px 12px; text-align:right; white-space:nowrap; }
+.pl-tabla th:first-child, .pl-tabla td:first-child{ text-align:left; white-space:normal; }
+.pl-tabla thead th{ font-size:10px; letter-spacing:0.06em; text-transform:uppercase;
+  color:var(--text3); font-weight:700; border-bottom:1px solid var(--border); }
+.pl-tabla tbody tr + tr td{ border-top:1px solid var(--border); }
+.pl-tabla td i{ display:block; font-style:normal; font-size:10.5px; color:var(--text3); margin-top:2px; }
+.pl-n{ font-variant-numeric:tabular-nums; }
+.pl-prom{ font-size:9px; color:var(--text3); font-style:italic; }
+.pl-tabla-tot td{ font-weight:700; border-top:1px solid var(--border) !important; background:var(--surface); }
+
+/* Compras amortizadas */
+.pl-amort{ margin-top:10px; padding:14px 16px; border:1px solid var(--border);
+  border-radius:12px; background:var(--surface); }
+.pl-amort-head{ display:flex; justify-content:space-between; align-items:center;
+  gap:10px; flex-wrap:wrap; font-size:13px; }
+.pl-amort-mes{ font-size:11.5px; color:var(--text3); }
+.pl-amort-barra{ display:flex; gap:3px; margin:10px 0; }
+.pl-amort-barra span{ flex:1; height:20px; border-radius:3px;
+  background:var(--bg2, rgba(255,255,255,0.04)); border:1px solid var(--border); }
+.pl-amort-barra span.done{ background:var(--amber); border-color:var(--amber); }
+.pl-amort-barra span.now{ background:var(--amber); border-color:#fff; box-shadow:inset 0 0 0 1px #fff; }
+.pl-amort-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(130px,1fr)); gap:10px; }
+.pl-amort-grid div{ display:flex; flex-direction:column; gap:2px; }
+.pl-amort-grid span{ font-size:10px; text-transform:uppercase; letter-spacing:0.05em;
+  color:var(--text3); font-weight:700; }
+.pl-amort-grid b{ font-family:'Space Grotesk'; font-size:14px; font-variant-numeric:tabular-nums; }
+.pl-amort-nota{ margin-top:10px; font-size:11px; color:var(--text3); line-height:1.45; }
+.pl-sindato{ font-size:14px; font-weight:600; color:var(--text3); font-style:italic; letter-spacing:0; }
 .pl-card{ background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:13px 14px; }
 .pl-card-total{ border-color:rgba(52,211,153,0.4); background:linear-gradient(135deg,var(--green-bg),transparent 70%); }
 .pl-lbl{ font-size:11.5px; color:var(--text2); font-weight:600; line-height:1.3; }
@@ -3877,16 +3928,30 @@ function cargarResumenMes(mes, forzar) {
 function pintarResumenGN_() {
   const cont = document.getElementById('gn-pl');
   if (cont) cont.innerHTML = bloquePLHTML_();
-  // La cartera recurrente usa el MISMO costo que el P&L (resumenGN.costos), así
-  // que se repinta junto: un solo número de costos en toda la app.
+  // La cartera recurrente lee sus costos del MISMO resumenGN que el P&L (usa
+  // costoAsignado, el P&L usa los dos), así que se repinta junto: los costos se
+  // calculan en un solo lugar del backend y nadie los recalcula por su cuenta.
   if (typeof pintarCarteraGN_ === 'function') pintarCarteraGN_();
 }
 
 // Cambio de mes desde el <select>.
 function cambiarMesGN(mes) { cargarResumenMes(mes, false); }
-
-// Bloque completo: 4 métricas principales (del backend) + 4 secundarias
-// (contexto, calculadas en el cliente y CLARAMENTE separadas del P&L).
+// Bloque del P&L: cuatro secciones que NUNCA mezclan sus bases.
+//
+//   CAJA DEL MES        dinero que entró y salió de verdad este mes.
+//   CONSUMO ECONÓMICO   lo que valió el servicio consumido, y qué parte de eso
+//                       corresponde a los lugares realmente ocupados.
+//   INVENTARIO          capacidad total y cuánto se está pagando en vacío.
+//   COMPRAS AMORTIZADAS pagos únicos que cubren varios meses.
+//
+// El costo por lugar SIEMPRE sale del económico: repartir entre los slots de
+// agosto un pago hecho en junio no significa nada. Por eso la caja se muestra
+// como una sola línea, sin repartir, y las métricas por lugar solo aparecen en
+// la sección económica.
+//
+// Todos los números vienen del backend (obtenerResumenMensual). El frontend
+// SOLO presenta. Si alguna de estas cifras se recalcula aquí con fórmulas
+// locales, se vuelve a romper lo que se arregló.
 function bloquePLHTML_() {
   if (MI_ROL !== 'admin') return '';
   const _m = moneyGN_;
@@ -3896,7 +3961,8 @@ function bloquePLHTML_() {
     <div class="pl-head">
       <div>
         <div class="pl-title">${ico('barras',14)} Resultado de ${esc(nombreMesGN_(mes))}</div>
-        <div class="pl-sub">Contabilidad de caja: cada venta cuenta una sola vez, el mes que se cobró.</div>
+        <div class="pl-sub">Los ingresos son de caja: cada venta cuenta una sola vez, el mes que se cobró.
+          Una venta de varios meses no reaparece hasta que el cliente renueve.</div>
       </div>
       <select class="form-input pl-select" onchange="cambiarMesGN(this.value)" aria-label="Elegir mes">
         ${mesesDisponiblesGN_(18).map(m =>
@@ -3910,40 +3976,142 @@ function bloquePLHTML_() {
       <a href="#" onclick="cargarResumenMes('${mes}',true);return false;" style="color:inherit;text-decoration:underline;">Reintentar</a></div></div>`;
 
   const r = resumenGN;
-  const gananciaColor = r.ganancia >= 0 ? 'var(--green)' : 'var(--red)';
   // Un gasto se muestra con el menos adelante, pero un gasto de cero es "$0",
   // no "−$0" (que se lee como si algo hubiera salido mal).
   const _g = n => (Math.abs(Number(n)||0) < 0.005 ? _m(0) : '−' + _m(Math.abs(n)));
+  const hay = v => (v !== null && v !== undefined);
+  const sd = '<span class="pl-sindato">sin dato</span>';
+  const col = v => (Number(v) >= 0 ? 'var(--green)' : 'var(--red)');
 
-  // Aviso de datos incompletos. NO se inventa ningún ingreso: se avisa y punto.
-  const avisoSinPrecio = r.sinPrecio > 0 ? `
-    <div class="pl-aviso">
-      ${ico('alerta',14)}
-      <div><b>Los ingresos de ${esc(nombreMesGN_(mes))} pueden estar incompletos.</b>
-      Hay ${r.sinPrecio} movimiento${r.sinPrecio!==1?'s':''} de este mes sin el monto que pagó el cliente
-      (son de antes de que el sistema empezara a guardarlo). Esas ventas cuentan como $0 en ingresos:
-      no se inventa un precio porque sería falsear el libro. Las ventas nuevas ya se guardan completas.</div>
+  // ---- Distintivos de base y de calidad ----
+  const esEstimado = r.ocupacionOrigen === 'ESTIMADO';
+  const chipOrigen = !r.ocupacionOrigen ? '' :
+    `<span class="pl-chip ${esEstimado ? 'pl-chip-est' : 'pl-chip-ok'}">${
+      esEstimado ? 'ESTIMADO' : 'EXACTO'}</span>` +
+    (r.ocupacionCongelada ? `<span class="pl-chip pl-chip-frio">CONGELADO</span>` : '');
+
+  const prepagadas = (r.detallePrepagadas || []).filter(p => p.vigente || p.cajaMes > 0);
+  const hayAmortizado = prepagadas.length > 0;
+  const chipAmort = hayAmortizado ? `<span class="pl-chip pl-chip-amort">AMORTIZADO</span>` : '';
+
+  // ---- Avisos ----
+  const avisos = [];
+  if (r.sinPrecio > 0) avisos.push(
+    `<b>Los ingresos de ${esc(nombreMesGN_(mes))} pueden estar incompletos.</b> Hay ${r.sinPrecio} ` +
+    `movimiento${r.sinPrecio!==1?'s':''} de este mes sin el monto que pagó el cliente. Cuentan como $0: ` +
+    `no se inventa un precio porque sería falsear el libro.`);
+  if (r.ocupacionCongelada) avisos.push(
+    `Este mes está <b>congelado</b> en la hoja <code>ocupacion_mes</code>. Se lee de ahí y no se recalcula: ` +
+    `cambiar el inventario, archivar clientes o corregir costos ya no lo mueve.`);
+  else if (esEstimado) avisos.push(
+    `La ocupación no está congelada: se <b>reconstruyó</b> de las fechas de tus clientes. Es una estimación.`);
+  if ((r.platsSinLugares||[]).length) avisos.push(
+    `<b>${r.platsSinLugares.map(esc).join(', ')}</b>: no se sabe cuántos lugares da una cuenta de esa ` +
+    `plataforma, así que el costo asignado del mes queda <b>sin dato</b>.`);
+  if (r.cuentasSinResolver > 0) avisos.push(
+    `${r.cuentasSinResolver} asignación${r.cuentasSinResolver!==1?'es':''} apunta a una cuenta que ya no existe. No se adivinó.`);
+  if (r.lugaresEnInservibles > 0) avisos.push(
+    `${r.lugaresEnInservibles} cliente${r.lugaresEnInservibles!==1?'s':''} sigue en una cuenta <b>INSERVIBLE</b>. ` +
+    `Esa cuenta no ofrece capacidad, así que no cuenta como lugar ocupado — pero te está pagando. Reasígnalo.`);
+
+  const avisoHTML = avisos.length ? `
+    <div class="pl-aviso">${ico('alerta',14)}<div>${avisos.join('<br>')}</div></div>` : '';
+
+  // ---- Desglose por plataforma ----
+  // Vix aparece con SUS DOS costos por lugar separados: promediarlos diluiría
+  // el costo real de la cuenta ocupada con el descuento de una que nadie usa.
+  const det = (r.ocupacionDetalle || []);
+  const filasDet = det.map(d => {
+    const mixta = (d.cuentasPrepagadas > 0 && d.cuentasRecurrentes > 0);
+    const ctas = [];
+    if (d.cuentasRecurrentes > 0) ctas.push(`${d.cuentasRecurrentes} recurrente${d.cuentasRecurrentes!==1?'s':''}`);
+    if (d.cuentasPrepagadas > 0) ctas.push(`${d.cuentasPrepagadas} prepagada${d.cuentasPrepagadas!==1?'s':''}`);
+    // Un mes CONGELADO guarda 'costo_por_lugar_prom' pero no las tarifas de
+    // cada cuenta, así que en una plataforma mixta no hay con qué separarlas.
+    // En ese caso se muestra el promedio ETIQUETADO como promedio — nunca se
+    // inventa un desglose, y nunca se presenta una media como si fuera la
+    // tarifa real de una cuenta.
+    const tieneTarifas = hay(d.costoPorLugarRecurrente) || hay(d.costoPorLugarPrepagada);
+    const porLugar = (mixta && hay(d.costoPorLugarRecurrente) && hay(d.costoPorLugarPrepagada))
+      ? `${_m(d.costoPorLugarRecurrente)} rec · ${_m(d.costoPorLugarPrepagada)} pre`
+      : (tieneTarifas
+          ? _m(hay(d.costoPorLugarRecurrente) ? d.costoPorLugarRecurrente : d.costoPorLugarPrepagada)
+          : (hay(d.costoPorLugarProm)
+              ? `${_m(d.costoPorLugarProm)}${mixta ? ' <span class="pl-prom">prom.</span>' : ''}`
+              : sd));
+    return `
+      <tr>
+        <td>${esc(d.plataforma)}${d.cuentasPrepagadas > 0 ? ' <span class="pl-chip pl-chip-amort">AMORT</span>' : ''}
+          <i>${ctas.join(' + ')}</i></td>
+        <td class="pl-n">${d.lugaresOcupados} / ${d.slotsTotales}</td>
+        <td class="pl-n">${porLugar}</td>
+        <td class="pl-n">${_m(d.costoEconomico)}</td>
+        <td class="pl-n">${_m(d.costoCaja)}</td>
+        <td class="pl-n">${hay(d.costoAsignado) ? _m(d.costoAsignado) : sd}</td>
+        <td class="pl-n" style="color:${d.costoOcioso > 0.005 ? 'var(--red)' : 'inherit'};">${
+          hay(d.costoOcioso) ? _m(d.costoOcioso) : sd}</td>
+      </tr>`;
+  }).join('');
+
+  const tablaDet = det.length ? `
+    <div class="pl-tabla-wrap">
+      <table class="pl-tabla">
+        <thead><tr>
+          <th>Plataforma</th><th>Lugares</th><th>Por lugar</th>
+          <th>Económico</th><th>Caja</th><th>Asignado</th><th>Ocioso</th>
+        </tr></thead>
+        <tbody>${filasDet}
+          <tr class="pl-tabla-tot">
+            <td>Total</td>
+            <td class="pl-n">${r.lugaresOcupados} / ${r.slotsTotales}</td>
+            <td class="pl-n">—</td>
+            <td class="pl-n">${hay(r.costoEconomico) ? _m(r.costoEconomico) : sd}</td>
+            <td class="pl-n">${hay(r.costoCaja) ? _m(r.costoCaja) : sd}</td>
+            <td class="pl-n">${hay(r.costoAsignado) ? _m(r.costoAsignado) : sd}</td>
+            <td class="pl-n">${hay(r.costoOcioso) ? _m(r.costoOcioso) : sd}</td>
+          </tr>
+        </tbody>
+      </table>
     </div>` : '';
 
-  // Detalle de costos: qué plataforma y con qué costo vigente entró este mes.
-  const detalle = (r.detalleCostos||[]);
-  const detalleCostos = detalle.length ? `
-    <details class="pl-det">
-      <summary>Ver ${detalle.length===1 ? 'la plataforma' : 'las '+detalle.length+' plataformas'} que pagaste este mes</summary>
-      ${detalle.map(d => `
-        <div class="pl-det-fila">
-          <span>${esc(d.plataforma)} <i>${d.planes} plan${d.planes!==1?'es':''} × ${_m(d.costo_unitario)} ${esc(d.moneda)}${
-            d.moneda!=='MXN' ? ` · TC ${d.tipo_cambio}` : ''}</i></span>
-          <b>${_m(d.costo_mxn)}</b>
-        </div>`).join('')}
-      <div class="pl-det-pie">Vigencias tomadas de <b>costos_plataforma</b>. Un mes histórico conserva el costo que tenía entonces.</div>
-    </details>` : `
-    <div class="pl-det-vacio">${ico('foco',13)} Todavía no cargaste costos de plataformas para este mes.
-      Se registran en <b>Configuración → Costos de plataformas</b>.</div>`;
+  // ---- Compras amortizadas ----
+  const bloqueAmort = hayAmortizado ? `
+    <div class="pl-seccion">${ico('llave',12)} Compras amortizadas ${chipAmort}</div>
+    <div class="pl-sub" style="margin:-4px 0 10px;">Pagos únicos que cubren varios meses.
+      El desembolso ocurrió una sola vez; aquí se ve qué parte se consumió en ${esc(nombreMesGN_(mes))}.</div>
+    ${prepagadas.map(p => {
+      const consumido = (p.mesN || 0) * p.economicoMes;
+      const restante = p.compraMxn - consumido;
+      const casillas = [];
+      for (let i = 1; i <= (p.mesesCubiertos || 0); i++) {
+        casillas.push(`<span class="${i < (p.mesN||0) ? 'done' : (i === (p.mesN||0) ? 'now' : '')}"></span>`);
+      }
+      return `
+      <div class="pl-amort">
+        <div class="pl-amort-head">
+          <b>${esc(p.id)} · ${esc(p.concepto)}</b>
+          <span class="pl-amort-mes">${p.vigente ? `mes ${p.mesN} de ${p.mesesCubiertos}` : 'fuera de cobertura'}</span>
+        </div>
+        <div class="pl-amort-barra">${casillas.join('')}</div>
+        <div class="pl-amort-grid">
+          <div><span>Compra original</span><b>${_m(p.compraTotal)} ${esc(p.moneda)}</b></div>
+          <div><span>Fecha de compra</span><b>${esc(p.fechaCompra)}</b></div>
+          <div><span>Meses cubiertos</span><b>${p.mesesCubiertos}</b></div>
+          <div><span>Económico / mes</span><b style="color:var(--amber);">${_m(p.economicoMes)}</b></div>
+          <div><span>Caja en ${esc(nombreMesGN_(mes))}</span><b style="color:${p.cajaMes > 0.005 ? 'var(--red)' : 'var(--green)'};">${_m(p.cajaMes)}</b></div>
+          <div><span>Consumido</span><b>${_m(consumido)}</b></div>
+          <div><span>Restante</span><b>${_m(restante)}</b></div>
+        </div>
+        ${p.nota ? `<div class="pl-amort-nota">${esc(p.nota)}</div>` : ''}
+      </div>`;
+    }).join('')}` : '';
 
   return `
   <div class="pl-wrap">
     ${selector}
+
+    <div class="pl-seccion">${ico('dinero',12)} Caja del mes
+      <span class="pl-chip pl-chip-caja">CAJA</span></div>
     <div class="pl-grid">
       <div class="pl-card">
         <div class="pl-lbl">${ico('dinero',13)} Ingresos cobrados</div>
@@ -3956,18 +4124,78 @@ function bloquePLHTML_() {
         <div class="pl-note">Generadas para tus vendedores este mes</div>
       </div>
       <div class="pl-card">
-        <div class="pl-lbl">${ico('llave',13)} Costos de plataformas</div>
-        <div class="pl-val" style="color:var(--amber);">${_g(r.costos)}</div>
-        <div class="pl-note">Gasto fijo del mes, se pague o no se venda</div>
+        <div class="pl-lbl">${ico('llave',13)} Costo de caja</div>
+        <div class="pl-val" style="color:var(--amber);">${hay(r.costoCaja) ? _g(r.costoCaja) : sd}</div>
+        <div class="pl-note">Lo que salió de tu bolsillo. Una compra anual aparece
+          completa el mes que la pagaste, y $0 después.</div>
       </div>
       <div class="pl-card pl-card-total">
-        <div class="pl-lbl">${ico('barras',13)} Ganancia del mes</div>
-        <div class="pl-val" style="color:${gananciaColor};">${_m(r.ganancia)}</div>
-        <div class="pl-note">Ingresos − comisiones − costos</div>
+        <div class="pl-lbl">${ico('barras',13)} Cobertura de caja</div>
+        <div class="pl-val" style="color:${col(r.coberturaCaja)};">${hay(r.coberturaCaja) ? _m(r.coberturaCaja) : sd}</div>
+        <div class="pl-note">¿Entró más dinero del que salió este mes?</div>
       </div>
     </div>
-    ${avisoSinPrecio}
-    ${detalleCostos}
+
+    <div class="pl-seccion">${ico('llave',12)} Consumo económico
+      <span class="pl-chip pl-chip-econ">ECONÓMICO</span> ${chipOrigen}</div>
+    <div class="pl-grid">
+      <div class="pl-card">
+        <div class="pl-lbl">${ico('dinero',13)} Ingresos cobrados</div>
+        <div class="pl-val" style="color:var(--violet2);">${_m(r.ingresos)}</div>
+        <div class="pl-note">Los mismos de arriba: no se prorratean</div>
+      </div>
+      <div class="pl-card">
+        <div class="pl-lbl">${ico('personas',13)} Comisiones</div>
+        <div class="pl-val" style="color:var(--amber);">${_g(r.comisiones)}</div>
+        <div class="pl-note">Las mismas de arriba</div>
+      </div>
+      <div class="pl-card">
+        <div class="pl-lbl">${ico('llave',13)} Costo de lugares ocupados</div>
+        <div class="pl-val" style="color:var(--amber);">${hay(r.costoAsignado) ? _g(r.costoAsignado) : sd}</div>
+        <div class="pl-note">Repartido cuenta por cuenta, con el costo de cada una</div>
+      </div>
+      <div class="pl-card pl-card-total">
+        <div class="pl-lbl">${ico('barras',13)} Resultado operativo</div>
+        <div class="pl-val" style="color:${col(r.resultadoOperativo)};">${
+          hay(r.resultadoOperativo) ? _m(r.resultadoOperativo) : sd}</div>
+        <div class="pl-note">¿Lo que vendiste cubrió los lugares que usaste?</div>
+      </div>
+    </div>
+
+    <div class="pl-seccion">${ico('llave',12)} Inventario
+      <span class="pl-chip pl-chip-econ">ECONÓMICO</span></div>
+    <div class="pl-grid">
+      <div class="pl-card">
+        <div class="pl-lbl">${ico('personas',13)} Lugares ocupados</div>
+        <div class="pl-val" style="color:var(--violet2);">${
+          r.lugaresOcupados === null ? sd
+          : `${r.lugaresOcupados}<small style="opacity:.5;font-size:.55em;"> / ${r.slotsTotales}</small>`}</div>
+        <div class="pl-note">${r.ocupacionPct === null ? 'Perfiles con un cliente adentro'
+          : `${r.ocupacionPct}% de tu capacidad trabajando · ${r.slotsTotales - r.lugaresOcupados} vacíos`}</div>
+      </div>
+      <div class="pl-card">
+        <div class="pl-lbl">${ico('llave',13)} Costo económico total</div>
+        <div class="pl-val" style="color:var(--amber);">${hay(r.costoEconomico) ? _m(r.costoEconomico) : sd}</div>
+        <div class="pl-note">Servicio consumido este mes. <b>No se resta otra vez</b>:
+          ya está repartido entre ocupado y ocioso.</div>
+      </div>
+      <div class="pl-card">
+        <div class="pl-lbl">${ico('llave',13)} Costo asignado</div>
+        <div class="pl-val" style="color:var(--amber);">${hay(r.costoAsignado) ? _m(r.costoAsignado) : sd}</div>
+        <div class="pl-note">La parte que corresponde a lugares ocupados</div>
+      </div>
+      <div class="pl-card">
+        <div class="pl-lbl">${ico('alerta',13)} Costo ocioso</div>
+        <div class="pl-val" style="color:${hay(r.costoOcioso) && r.costoOcioso > 0.005 ? 'var(--red)' : 'var(--amber)'};">${
+          hay(r.costoOcioso) ? _m(r.costoOcioso) : sd}</div>
+        <div class="pl-note">Lo que pagas por lugares vacíos. Puedes venderlos sin
+          gastar un peso más.</div>
+      </div>
+    </div>
+    ${tablaDet}
+
+    ${bloqueAmort}
+    ${avisoHTML}
   </div>`;
 }
 
@@ -3984,8 +4212,12 @@ function bloquePLHTML_() {
 //   2. Los clientes de 'yo' aportan comisión 0. En sus filas del libro 'monto'
 //      es TU MARGEN (con el costo adentro), no una comisión pagada a nadie.
 //      Es la misma guarda que ya tiene resumenMensual_ en el backend.
-//   3. El costo de plataformas se resta UNA vez y ENTERO — el mensual real, no
-//      el "costo por lugar" del catálogo. No son dos costos: son el mismo dinero.
+//   3. El costo que se resta es el COSTO DE LUGARES OCUPADOS del mes en curso
+//      (resumenGN.costoAsignado), no el costo total de las plataformas. Esta
+//      métrica proyecta lo que rinden los clientes que TIENES, así que le
+//      corresponde el costo de los lugares que ESOS clientes ocupan. Restarle el
+//      costo total metía adentro los lugares vacíos, que no son culpa de la
+//      cartera — para eso está el 'costo ocioso' del P&L, y ahí se ve una vez.
 //
 // Acá SÍ se divide entre meses (a diferencia del P&L, donde prorratear estaría
 // mal): una venta de 12 meses ya se reconoció completa el mes que se cobró, y
@@ -4055,15 +4287,25 @@ function calcularCarteraRecurrente_() {
     platsSinCosto = conCuentas.filter(p => !conCosto[p]);
   }
 
-  const costos = (resumenGN && typeof resumenGN.costos === 'number') ? resumenGN.costos : null;
+  // Costo de LUGARES OCUPADOS, no costo total. Viene null cuando el backend no
+  // pudo calcular la ocupación con honestidad: en ese caso la métrica entera se
+  // muestra como "sin dato" en vez de caer al costo total, que daría un número
+  // más pesimista y además no comparable con el resultado operativo.
+  const costoAsignado = (resumenGN && typeof resumenGN.costoAsignado === 'number')
+    ? resumenGN.costoAsignado : null;
+  const costoTotal = (resumenGN && typeof resumenGN.costos === 'number') ? resumenGN.costos : null;
   const r2 = n => Math.round(n * 100) / 100;
 
   return {
     clientes: vigentes.length,
     ingresoMes: r2(ingresoMes),
     comisionMes: r2(comisionMes),
-    costos: costos,
-    ganancia: costos === null ? null : r2(ingresoMes - comisionMes - costos),
+    costos: costoAsignado,
+    costoTotal: costoTotal,
+    margen: costoAsignado === null ? null : r2(ingresoMes - comisionMes - costoAsignado),
+    // Alias histórico: había código que leía .ganancia. Se conserva para no
+    // romper nada, pero el nombre bueno es 'margen' — no es ganancia cobrada.
+    ganancia: costoAsignado === null ? null : r2(ingresoMes - comisionMes - costoAsignado),
     deLibro, deCatalogo, sinDato, deYo,
     platsSinCosto
   };
@@ -4081,11 +4323,20 @@ function bloqueCarteraHTML_() {
   const _m = moneyGN_;
 
   if (c.costos === null) {
-    return `<div class="car-wrap"><div class="car-title">${ico('sube',13)} Ganancia recurrente estimada / mes</div>
-      <div class="loading" style="padding:10px 0;">Esperando los costos del mes...</div></div>`;
+    // Puede ser que el P&L aún no llegue, o que sí llegó pero la ocupación del
+    // mes no se pudo calcular. Se distinguen: "cargando" y "sin dato" no son lo
+    // mismo, y decir "cargando" para siempre sería mentir.
+    const esperando = !resumenGN;
+    return `<div class="car-wrap"><div class="car-title">${ico('sube',13)} Margen recurrente estimado / mes</div>
+      ${esperando
+        ? `<div class="loading" style="padding:10px 0;">Esperando los costos del mes...</div>`
+        : `<div class="car-sub" style="padding:8px 0;">No se puede calcular: falta la ocupación de
+             este mes, así que no hay costo de lugares ocupados que restar. Se prefiere no mostrar
+             un número antes que mostrar uno inventado.</div>`}
+    </div>`;
   }
 
-  const color = c.ganancia >= 0 ? 'var(--green)' : 'var(--red)';
+  const color = c.margen >= 0 ? 'var(--green)' : 'var(--red)';
 
   // Avisos de qué tan firme es el número.
   const avisos = [];
@@ -4095,11 +4346,15 @@ function bloqueCarteraHTML_() {
 
   return `
   <div class="car-wrap">
-    <div class="car-title">${ico('sube',13)} Ganancia recurrente estimada / mes</div>
+    <div class="car-title">${ico('sube',13)} Margen recurrente estimado / mes
+      <span class="pl-chip pl-chip-proy">PROYECCIÓN</span>
+      <span class="pl-chip pl-chip-econ">ECONÓMICO</span></div>
     <div class="car-sub">Proyección de lo que deja tu cartera vigente si todos renuevan.
-      <b>No es dinero cobrado</b> y no forma parte del resultado del mes de arriba.</div>
+      <b>No es dinero cobrado</b> y no forma parte del resultado del mes de arriba.
+      Es la versión mensualizada del <b>resultado operativo</b>, así que se compara
+      contra él — no contra la cobertura.</div>
 
-    <div class="car-val" style="color:${color};">${_m(c.ganancia)}</div>
+    <div class="car-val" style="color:${color};">${_m(c.margen)}</div>
     <div class="car-val-lbl">por mes · sobre ${c.clientes} cliente${c.clientes!==1?'s':''} vigente${c.clientes!==1?'s':''}</div>
 
     <div class="car-desglose">
@@ -4114,9 +4369,14 @@ function bloqueCarteraHTML_() {
         <b style="color:var(--amber);">−${_m(c.comisionMes)}</b>
       </div>
       <div class="car-fila">
-        <span>Costo de plataformas<i>el mismo del resultado del mes, restado una sola vez</i></span>
+        <span>Costo de lugares ocupados<i>solo los lugares que usan estos clientes, restado una sola vez</i></span>
         <b style="color:var(--amber);">−${_m(c.costos)}</b>
       </div>
+      ${c.costoTotal !== null && Math.abs(c.costoTotal - c.costos) > 0.005 ? `
+      <div class="car-fila" style="opacity:.65;">
+        <span>Costo total de plataformas<i>referencia · NO se resta aquí, ya está en el P&amp;L</i></span>
+        <b>${_m(c.costoTotal)}</b>
+      </div>` : ''}
     </div>
 
     ${avisos.length ? `<div class="car-aviso">${ico('alerta',13)} <div>${avisos.join('<br>')}</div></div>` : ''}
@@ -4313,22 +4573,45 @@ function bloqueAcumuladoHTML_() {
     <div class="acu-tabla-tit">Mes a mes</div>
     <div class="acu-scroll">
       <table class="acu-tabla">
-        <tr><th>Mes</th><th>Ingresos</th><th>Comisiones</th><th>Costos</th><th>Ganancia</th><th>Estado</th></tr>
+        <tr><th>Mes</th><th>Ingresos</th><th>Comisiones</th>
+            <th>Costo econ.</th><th>Cob. económica</th>
+            <th>Costo caja</th><th>Cob. caja</th><th>Estado</th></tr>
         ${meses.map(m => {
           const e = _ESTADO_MES[m.estado] || _ESTADO_MES.sin_datos;
+          // El backend ya manda las dos lecturas por mes. La de caja NO se
+          // estima nunca: si viene null se muestra '—'. Rellenarla con la cifra
+          // económica sería exactamente el error que este modelo evita.
+          const hayCaja = typeof m.costoCaja === 'number';
+          const nd = '<i style="color:var(--text3);font-weight:400;" title="Sin ocupación calculable para este mes">—</i>';
+          const tags = [`<span class="acu-tag ${e.cls}">${e.txt}</span>`];
+          if (m.origen) {
+            tags.push(`<span class="pl-chip ${m.origen === 'ESTIMADO' ? 'pl-chip-est' : 'pl-chip-ok'}">${m.origen}</span>`);
+          }
+          if (m.congelado) tags.push(`<span class="pl-chip pl-chip-frio">CONGELADO</span>`);
+          if (m.tieneAmortizados) {
+            const detA = (m.amortizados || [])
+              .map(a => `${a.concepto} · mes ${a.mesN} de ${a.mesesCubiertos}`).join(' | ');
+            tags.push(`<span class="pl-chip pl-chip-amort" title="${esc(detA)}">AMORTIZADO</span>`);
+          }
           return `<tr class="acu-${e.cls}">
             <td>${esc(nombreMesGN_(m.mes))}</td>
             <td>${_m(m.ingresos)}</td>
             <td>${m.comisiones ? '−'+_m(m.comisiones) : _m(0)}</td>
             <td>${m.costosCargados ? '−'+_m(m.costos) : '<i>sin cargar</i>'}</td>
             <td><b style="color:${m.ganancia >= 0 ? 'var(--green)' : 'var(--red)'};">${
-              m.costosCargados ? _m(m.ganancia) : '<i style="color:var(--text3);font-weight:400;">—</i>'}</b></td>
-            <td><span class="acu-tag ${e.cls}">${e.txt}</span></td>
+              m.costosCargados ? _m(m.ganancia) : nd}</b></td>
+            <td>${hayCaja ? '−'+_m(m.costoCaja) : nd}</td>
+            <td><b style="color:${hayCaja && m.coberturaCaja >= 0 ? 'var(--green)' : (hayCaja ? 'var(--red)' : 'inherit')};">${
+              hayCaja ? _m(m.coberturaCaja) : nd}</b></td>
+            <td>${tags.join(' ')}</td>
           </tr>`;
         }).join('')}
       </table>
     </div>
-    <div class="acu-pie">Se recalcula sola: cuando cargues los costos de un mes o recuperes los precios
+    <div class="acu-pie">La <b>cobertura económica</b> descuenta el servicio consumido; la <b>de caja</b>,
+      el dinero que realmente salió. Se separan sólo en los meses con compras amortizadas —
+      esos van marcados <b>AMORTIZADO</b>, y pasando el cursor se ve de qué compra se trata.<br>
+      Se recalcula sola: cuando cargues los costos de un mes o recuperes los precios
       que faltan, ese mes pasa a <b>completo</b> y entra al acumulado principal.</div>
   </div>`;
 }
