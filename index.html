@@ -762,11 +762,11 @@ body {
 .nav-tab svg{ width: 17px; height: 17px; flex-shrink: 0; }
 .nav-tab:hover{ background: var(--surface); color: var(--text); }
 .nav-tab.active{ background: #f5f5f7; color: var(--bg); font-weight: 600; }
-#badge-autorizar{
+#badge-autorizar, #badge-contactar{
   margin-left: auto !important; background: var(--red); color: #fff;
   font-size: 10px; font-weight: 800; border-radius: 99px; padding: 1px 6px;
 }
-.nav-tab.active #badge-autorizar{ background: var(--bg); color: var(--text); }
+.nav-tab.active #badge-autorizar, .nav-tab.active #badge-contactar{ background: var(--bg); color: var(--text); }
 
 /* Usuario al pie del menú */
 .sb-user{
@@ -2036,6 +2036,9 @@ body {
     <div class="nav-tab" id="tab-autorizar" onclick="mostrarSeccion('autorizar', this)" style="display:none;">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M9 12.5l2 2 4.5-4.5"/><circle cx="12" cy="12" r="8.5"/></svg>Autorizar<span id="badge-autorizar" style="display:none;">0</span></div>
 
+    <div class="nav-tab" id="tab-contactar" onclick="mostrarSeccion('contactar', this)" style="display:none;">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M20.5 11.7c0 4.2-3.8 7.6-8.5 7.6a9.7 9.7 0 0 1-2.9-.4L4 20.5l1.8-4.2a7.2 7.2 0 0 1-2.3-5.2c0-4.2 3.8-7.6 8.5-7.6s8.5 3.4 8.5 7.6Z"/></svg>Contactar<span id="badge-contactar" style="display:none;"></span></div>
+
     <div class="sb-group">Inventario</div>
     <div class="nav-tab" id="tab-cuentas" onclick="mostrarSeccion('cuentas', this)">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><rect x="3.5" y="4.5" width="7" height="6" rx="1.6"/><rect x="13.5" y="4.5" width="7" height="6" rx="1.6"/><rect x="3.5" y="13.5" width="7" height="6" rx="1.6"/><rect x="13.5" y="13.5" width="7" height="6" rx="1.6"/></svg>Cuentas</div>
@@ -2165,8 +2168,17 @@ body {
 <div id="sec-hoy" class="section-hidden">
   <div class="content" style="padding-top:20px;">
     <div style="font-size:16px;font-weight:700;font-family:'Space Grotesk';margin-bottom:4px;"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="width:17px;height:17px"><path d="M9 6.5h11M9 12h11M9 17.5h11"/><path d="M4.5 6.5h.01M4.5 12h.01M4.5 17.5h.01"/></svg> Tareas de hoy</div>
-    <div style="font-size:13px;color:var(--text2);margin-bottom:16px;">A quién contactar hoy. Toca <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="width:14px;height:14px"><path d="M20.5 11.7c0 4.2-3.8 7.6-8.5 7.6a9.7 9.7 0 0 1-2.9-.4L4 20.5l1.8-4.2a7.2 7.2 0 0 1-2.3-5.2c0-4.2 3.8-7.6 8.5-7.6s8.5 3.4 8.5 7.6Z"/></svg> para abrir el WhatsApp con el mensaje listo.</div>
+    <div style="font-size:13px;color:var(--text2);margin-bottom:16px;">A quién contactar hoy. Toca <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="width:14px;height:14px"><path d="M20.5 11.7c0 4.2-3.8 7.6-8.5 7.6a9.7 9.7 0 0 1-2.9-.4L4 20.5l1.8-4.2a7.2 7.2 0 0 1-2.3-5.2c0-4.2 3.8-7.6 8.5-7.6s8.5 3.4 8.5 7.6Z"/></svg> para abrir el WhatsApp con el mensaje listo. <a href="#" onclick="abrirEditorMensajes();return false;" style="color:var(--violet2);font-weight:700;">Editar mensajes</a></div>
     <div id="tareas-content"><div class="loading">Cargando...</div></div>
+  </div>
+</div>
+
+<!-- SECCIÓN CONTACTAR (rol acumulable "contacto") -->
+<div id="sec-contactar" class="section-hidden">
+  <div class="content" style="padding-top:20px;">
+    <div style="font-size:16px;font-weight:700;font-family:'Space Grotesk';margin-bottom:4px;">Contactar clientes</div>
+    <div style="font-size:13px;color:var(--text2);margin-bottom:14px;">Todos los clientes que vencen pronto o ya vencieron. Toca WhatsApp para escribirles; se marca como avisado solo. <a href="#" onclick="abrirEditorMensajes();return false;" style="color:var(--violet2);font-weight:700;">Editar mensajes</a></div>
+    <div id="contactar-content"><div class="loading">Cargando...</div></div>
   </div>
 </div>
 
@@ -2695,6 +2707,20 @@ body {
   </div>
 </div>
 
+<!-- MODAL EDITAR MENSAJES DE WHATSAPP -->
+<div class="modal-overlay" id="modal-plantillas">
+  <div class="modal" style="max-width:520px;">
+    <div class="modal-header">
+      <div class="modal-title">Mensajes de WhatsApp</div>
+      <button class="modal-close" onclick="cerrarModal('modal-plantillas')"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="width:16px;height:16px"><path d="M6.2 6.2 17.8 17.8M17.8 6.2 6.2 17.8"/></svg></button>
+    </div>
+    <div style="font-size:12px;color:var(--text2);margin-bottom:12px;line-height:1.5;">Puedes usar <strong>{nombre}</strong>, <strong>{paquete}</strong>, <strong>{cuando}</strong> (ej. "vence en 3 días") y <strong>{renovacion}</strong> (fecha). Se guardan en este dispositivo.</div>
+    <div id="pl-lista"></div>
+    <button class="btn-primary" onclick="guardarPlantillas()">Guardar mensajes</button>
+    <button class="btn-secondary" onclick="restablecerPlantillas()">Restablecer los de fábrica</button>
+  </div>
+</div>
+
 <!-- MODAL EDITAR DATOS DE CUENTA -->
 <div class="modal-overlay" id="modal-editar-cuenta">
   <div class="modal" style="max-width:420px;">
@@ -2788,6 +2814,7 @@ let APP_KEY = '';
 let ultimoClienteGuardado = null; // datos del último cliente recién registrado, para el botón de bienvenida
 let MI_VENDEDOR = '';
 let MI_ROL = '';
+let MI_CONTACTO = false; // rol acumulable: puede avisar a TODOS los clientes
 let MI_NOMBRE = '';
 let usuarioSeleccionado = 'admin';
 
@@ -3088,10 +3115,127 @@ function esClienteReciente(c) {
   return dias >= 0 && dias <= 3;
 }
 
+// ===== Clientes con varias cuentas =====
+// Un mismo cliente (mismo teléfono) puede tener varias cuentas, cada una como
+// registro propio (con su vendedor, comisión y fecha). Aquí solo se AGRUPAN
+// para avisarles una sola vez; no cambia ningún dato ni ganancia.
+// Clave para AGRUPAR cuentas de un mismo cliente: solo cuentan los dígitos, así
+// que da igual si el teléfono está con o sin espacios, guiones, paréntesis, con
+// o sin "+", con o sin lada. Se comparan los últimos 10 dígitos (números más
+// cortos, de otros países, se comparan completos).
+function telGrupo_(raw) {
+  const d = quitarPrefijoViejoMX_(telDigitos_(raw));
+  if (!d) return '';
+  return d.length >= 10 ? d.slice(-10) : d;
+}
+function gruposDe_(lista) {
+  const map = {}, orden = [];
+  lista.filter(c => c.estado_raw !== 'ARCHIVADO').forEach(c => {
+    const t = c.contacto ? telGrupo_(c.contacto) : '';
+    const k = t ? 'tel:' + t : 'id:' + c.id;
+    if (!map[k]) { map[k] = []; orden.push(k); }
+    map[k].push(c);
+  });
+  return orden.map(k => ({ key: k, cuentas: map[k] }));
+}
+function cuandoCorto_(c) {
+  if (c.dias === null || c.dias === undefined) return 'sin fecha';
+  if (c.dias < 0) { const d = Math.abs(c.dias); return 'venció hace ' + d + ' día' + (d !== 1 ? 's' : ''); }
+  if (c.dias === 0) return 'vence hoy';
+  return 'vence en ' + c.dias + ' día' + (c.dias !== 1 ? 's' : '');
+}
+// Total a cobrar de un grupo: lo que ya venció o está por vencer; si nada está
+// en ese caso, la suma de todas sus cuentas.
+function totalGrupo_(cuentas) {
+  const due = cuentas.filter(c => c.estado === 'vencido' || c.estado === 'proximo');
+  return (due.length ? due : cuentas).reduce((t, c) => t + (parseFloat(c.precio) || 0), 0);
+}
+function mensajeGrupo_(cuentas) {
+  const nombre = (cuentas[0].cliente || '').trim().split(' ')[0] || 'amig@';
+  const dinero = n => '$' + n.toLocaleString('es-MX', {maximumFractionDigits: 2});
+  const lineas = cuentas.map(c => {
+    const p = parseFloat(c.precio) || 0;
+    return '• ' + (c.paquete || 'Cuenta') + ': ' + cuandoCorto_(c) + (c.renovacion ? ' (' + c.renovacion + ')' : '') + (p > 0 ? ' - ' + dinero(p) : '');
+  }).join('\n');
+  const total = totalGrupo_(cuentas);
+  return 'Hola ' + nombre + ' 👋 Te escribo por tus ' + cuentas.length + ' cuentas:\n' + lineas + '\n\n' +
+    (total > 0 ? 'Total a renovar: ' + dinero(total) + '. ' : '') +
+    '¿Las renovamos todas o prefieres dejar alguna? Tú dime 😊';
+}
+
+// ===== Mensajes de WhatsApp editables =====
+// Los textos por defecto son los de siempre; si editas uno desde "Editar
+// mensajes", se guarda en ESTE dispositivo y se usa en lugar del de fábrica.
+// Se pueden usar {nombre}, {paquete}, {cuando} (ej. "vence en 3 días") y
+// {renovacion} (fecha de renovación).
+const PLANTILLAS_WA = [
+  ['vencido',  'Ya venció',            'Hola {nombre} 👋 Vi que tu {paquete} {cuando}. ¿Seguimos con el servicio? Si quieres renovar, me dices y te lo dejo listo al toque 🙌'],
+  ['hoy',      'Vence hoy',            'Hola {nombre} 👋 Tu {paquete} vence hoy. ¿Renovamos para que no se interrumpa, o prefieres pausarlo por ahora? Tú dime 😊'],
+  ['proximo',  'Vence pronto',         'Hola {nombre}, ¿cómo estás? 😊 Te aviso que tu {paquete} {cuando}. ¿Quieres que te lo renueve o prefieres pausarlo por ahora? Tú dime'],
+  ['activo',   'Cliente al corriente', 'Hola {nombre} 👋 Soy de Cuentas Streaming, ¿en qué te ayudo hoy?'],
+  ['renovado', 'Aviso de renovación',  '¡Listo {nombre}! 🎉 Tu {paquete} quedó renovado hasta el {renovacion}. ¡Gracias por seguir con nosotros!'],
+];
+function plantillasGuardadas_() {
+  try { return JSON.parse(localStorage.getItem('plantillas_wa') || '{}') || {}; } catch (e) { return {}; }
+}
+function llenarPlantilla_(texto, c) {
+  const vals = {
+    nombre: (c.cliente||'').trim().split(' ')[0] || 'amig@',
+    paquete: c.paquete || 'tu servicio',
+    cuando: cuandoCorto_(c),
+    renovacion: c.renovacion || '',
+  };
+  return texto.replace(/\{(\w+)\}/g, (m, k) => (vals[k] !== undefined ? vals[k] : m));
+}
+function claveEstadoMsj_(c) {
+  if (c.estado === 'vencido') return 'vencido';
+  if (c.estado === 'proximo') return c.dias === 0 ? 'hoy' : 'proximo';
+  return 'activo';
+}
+function textoPlantilla_(clave) {
+  const g = plantillasGuardadas_()[clave];
+  if (g) return g;
+  const def = PLANTILLAS_WA.find(p => p[0] === clave);
+  return def ? def[2] : '';
+}
+function abrirEditorMensajes() {
+  const cont = document.getElementById('pl-lista');
+  cont.innerHTML = PLANTILLAS_WA.map(p => `
+    <div class="form-group">
+      <label class="form-label">${esc(p[1])}</label>
+      <textarea class="form-input" id="pl-${p[0]}" rows="3" style="resize:vertical;">${esc(textoPlantilla_(p[0]))}</textarea>
+    </div>`).join('');
+  document.getElementById('modal-plantillas').classList.add('open');
+}
+function guardarPlantillas() {
+  const g = {};
+  PLANTILLAS_WA.forEach(p => {
+    const v = (document.getElementById('pl-' + p[0]).value || '').trim();
+    if (v && v !== p[2]) g[p[0]] = v;
+  });
+  try { localStorage.setItem('plantillas_wa', JSON.stringify(g)); } catch (e) {}
+  cerrarModal('modal-plantillas');
+  toast('Mensajes guardados', 'success', ico('check',13));
+}
+function restablecerPlantillas() {
+  try { localStorage.removeItem('plantillas_wa'); } catch (e) {}
+  abrirEditorMensajes();
+  toast('Mensajes restablecidos', 'success', ico('refrescar',13));
+}
+// Aviso al cliente de que su renovación ya quedó hecha.
+function avisarRenovacion(id) {
+  const c = todosClientes.find(x => x.id === id);
+  if (!c) return;
+  if (!c.contacto) { toast('Este cliente no tiene teléfono guardado', 'error'); return; }
+  window.open(urlWhatsApp_(c.contacto, llenarPlantilla_(textoPlantilla_('renovado'), c)), '_blank');
+}
+
 function mensajeWhatsApp(c) {
   if (esClienteReciente(c)) {
     return mensajeBienvenida(c);
   }
+  const pers = plantillasGuardadas_()[claveEstadoMsj_(c)];
+  if (pers) return llenarPlantilla_(pers, c);
 
   const primerNombre = (c.cliente||'').trim().split(' ')[0] || 'amig@';
   const paquete = c.paquete || 'tu servicio';
@@ -3176,6 +3320,16 @@ function abrirWhatsApp(id, event) {
   const c = todosClientes.find(x => x.id === id);
   if (!c) return;
   if (!c.contacto) { toast('Este cliente no tiene teléfono guardado', 'error'); return; }
+  // Cliente con varias cuentas (mismo teléfono): un solo mensaje con todas
+  // sus cuentas, fechas y el total, y se marcan como avisadas todas las que toquen.
+  const grupo = gruposDe_(todosClientes).find(g => g.cuentas.some(x => x.id === c.id));
+  if (grupo && grupo.cuentas.length > 1) {
+    window.open(urlWhatsApp_(c.contacto, mensajeGrupo_(grupo.cuentas)), '_blank');
+    grupo.cuentas.forEach(x => {
+      if ((x.estado === 'vencido' || x.estado === 'proximo') && !contactadoHoy_(x)) marcarContactoCliente(x.id, false, true);
+    });
+    return;
+  }
   window.open(urlWhatsApp_(c.contacto, mensajeWhatsApp(c)), '_blank');
   // Abrir el WhatsApp de un cliente que va vencido o por vencer ES avisarle:
   // se marca solo, para no tener que acordarse de tocar nada más. A los
@@ -3294,6 +3448,7 @@ function abrirWhatsAppBienvenida(datos) {
 const TITULOS_SECCION = {
   clientes:     ['Clientes',       'tu cartera completa'],
   hoy:          ['Tareas de hoy',  'a quién contactar hoy'],
+  contactar:    ['Contactar',      'avisa a los clientes que vencen'],
   autorizar:    ['Autorizar',      'cambios de vendedores esperando tu OK'],
   cuentas:      ['Cuentas',        'tu inventario de streaming'],
   catalogo:     ['Catálogo',       'paquetes, precios y comisiones'],
@@ -3322,6 +3477,7 @@ function mostrarSeccion(sec, btn) {
   // Cada sección usa lo que ya tenga en memoria si está cargado (instantáneo).
   // La primera vez sí descarga; después, navegar entre pestañas es inmediato.
   if (sec==='hoy') renderTareasHoy();
+  if (sec==='contactar') cargarContactar();
   if (sec==='cuentas') cargarCuentas();          // cargarCuentas ya respeta caché
   if (sec==='catalogo') cargarCatalogo();
   if (sec==='ganancias') {
@@ -5195,8 +5351,16 @@ function renderTareasHoy() {
     </div>`;
   };
 
-  cont.innerHTML =
-    bloque('Ya vencieron', 'var(--red)', vencidos, true) +
+  // Resumen de cobro: cuánto dinero está en juego ya vencido, hoy y esta semana.
+  const semana = pronto.filter(c => c.dias !== null && c.dias <= 7);
+  const resumenCobro = `<div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px;">
+    ${[['Vencido', sumaBloque(vencidos), 'var(--red)'], ['Vence hoy', sumaBloque(hoyVencen), 'var(--amber)'], ['Próx. 7 días', sumaBloque(semana), 'var(--blue)']].map(x =>
+      `<div style="flex:1;min-width:100px;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:10px 12px;">
+        <div style="font-size:11px;color:var(--text3);font-weight:700;text-transform:uppercase;letter-spacing:.04em;">${x[0]}</div>
+        <div style="font-size:17px;font-weight:800;color:${x[2]};">${esc(dinero(x[1]))}</div></div>`).join('')}
+  </div>`;
+
+  cont.innerHTML = resumenCobro +
     bloque('Vencen hoy', 'var(--amber)', hoyVencen, true) +
     bloque('Vencen pronto', 'var(--blue)', pronto, true) +
     bloque('Pendientes de cobro', 'var(--text3)', deben, false);
@@ -5855,6 +6019,7 @@ function verDetalle(id) {
     <button onclick="abrirRenovar('${c.id}')" class="btn-primary" style="margin-top:8px;background:linear-gradient(135deg,#34d399,#10b981);box-shadow:0 6px 18px -4px rgba(52,211,153,0.5);">${ico('refrescar',15)} Renovar cliente</button>
     <button onclick="abrirEditar('${c.id}')" class="btn-primary" style="margin-top:8px;">${ico('lapiz',15)} Editar cliente</button>
     <button onclick="abrirModalComprobante('${c.id}')" class="btn-primary" style="margin-top:8px;background:var(--surface);color:var(--text);border:1px solid var(--border);box-shadow:none;">${ico('clip',15)} Subir comprobante</button>
+    ${c.contacto ? `<button onclick="avisarRenovacion('${c.id}')" class="btn-secondary">Avisar renovación por WhatsApp</button>` : ''}
     <button onclick="confirmarArchivar('${c.id}')" class="btn-secondary">Archivar cliente</button>`;
   document.getElementById('modal-detalle').classList.add('open');
   animarCifras_(document.getElementById('d-contenido'));
@@ -6685,8 +6850,8 @@ async function guardarCliente() {
   // Se comparan los últimos 10 dígitos, así "+52 33 3571 0142" y "3335710142"
   // se reconocen como la misma persona aunque estén escritos distinto.
   if(telNuevo){
-    const claveTel=telClave_(telNuevo);
-    const dup=todosClientes.find(x=>x.estado_raw!=='ARCHIVADO' && telClave_(x.contacto)===claveTel);
+    const claveTel=telGrupo_(telNuevo);
+    const dup=todosClientes.find(x=>x.estado_raw!=='ARCHIVADO' && telGrupo_(x.contacto)===claveTel);
     if(dup){
       const ok=await confirmar('Ya tienes un cliente con ese teléfono:\n\n"'+dup.cliente+'" ('+(dup.paquete||'sin paquete')+').\n\n¿Registrar de todas formas?');
       if(!ok) return;
@@ -8040,7 +8205,7 @@ function renderComprobantes() {
 }
 
 function abrirModalComprobante(clienteId) {
-  const c = todosClientes.find(x => x.id === clienteId);
+  const c = todosClientes.find(x => x.id === clienteId) || contactosLista.find(x => x.id === clienteId);
   if (!c) return;
   comprobanteClienteActual = c;
   document.getElementById('comp-cliente-nombre').textContent = c.cliente;
@@ -8155,7 +8320,7 @@ async function guardarComprobante() {
       }
       comprobantesCargados = false; // fuerza recarga para que aparezca en la lista
       const clienteId = comprobanteClienteActual.id;
-      setTimeout(()=>{ cerrarModal('modal-comprobante'); cargarComprobantes().then(()=>verDetalle(clienteId)); }, res.pendiente ? 1800 : 1000);
+      setTimeout(()=>{ cerrarModal('modal-comprobante'); cargarComprobantes().then(()=>{ if (todosClientes.some(x=>x.id===clienteId)) verDetalle(clienteId); }); }, res.pendiente ? 1800 : 1000);
     } else throw new Error(res.message);
   } catch(err) {
     status.innerHTML = `<div class="error-msg"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="width:14px;height:14px"><path d="M10.7 4.3 2.6 18.2a1.5 1.5 0 0 0 1.3 2.3h16.2a1.5 1.5 0 0 0 1.3-2.3L13.3 4.3a1.5 1.5 0 0 0-2.6 0Z"/><path d="M12 9.5v4.2M12 17.2h.01"/></svg> No se pudo subir. Intenta de nuevo.<br><small>${esc(err.message||'')}</small></div>`;
@@ -9272,6 +9437,157 @@ function actualizarComision(vendedorKey) {
     .catch(()=>{ toast('No se pudo sincronizar el % con el servidor', 'error'); });
 }
 
+// ===== Rol acumulable "contacto": avisar a TODOS los clientes =====
+// Usa su propia lista (tipo 'contactos'): el servidor solo manda lo necesario
+// para avisar (nombre, teléfono, paquete, renovación) — sin precios ni dinero.
+let contactosLista = [];
+let _contactosEnVuelo = new Set();
+
+function cargarContactar() {
+  const cont = document.getElementById('contactar-content');
+  if (!cont) return;
+  if (!contactosLista.length) cont.innerHTML = '<div class="loading">Cargando...</div>';
+  postDatos({accion:'leerDatos', tipo:'contactos', key:APP_KEY})
+    .then(res => {
+      if (res.hoy) HOY_SERVIDOR = res.hoy;
+      contactosLista = (res.rows||[]).map(f => {
+        const renovacion = f['renovacion']||f['renovación']||'';
+        const dias = diasRestantes(renovacion);
+        return {
+          id:f['id']||'', cliente:f['cliente']||'', contacto:f['contacto']||'',
+          paquete:f['paquete']||'', precio:f['precio']||'', pago:f['pago']||'', renovacion, vendedor:f['vendedor']||'',
+          dias, estado:estadoCliente(dias),
+          estado_raw:(f['estado']||'ACTIVO').toUpperCase(),
+          ultimoContacto:f['ultimo_contacto']||'', contactoPor:f['contacto_por']||'',
+        };
+      });
+      renderContactar();
+    })
+    .catch(() => { cont.innerHTML = '<div class="error-msg">No se pudo cargar. Verifica tu conexión.</div>'; });
+}
+
+function renderContactar() {
+  const cont = document.getElementById('contactar-content');
+  if (!cont) return;
+  // Un cliente con varias cuentas (mismo teléfono) sale UNA sola vez, con todas
+  // sus cuentas y el total. Solo cuentan las cuentas vencidas o por vencer.
+  const esDue = c => c.estado === 'vencido' || c.estado === 'proximo';
+  const grupos = gruposDe_(contactosLista).filter(g => g.cuentas.some(esDue));
+  const minDias = g => Math.min.apply(null, g.cuentas.filter(esDue).map(c => c.dias === null ? 99 : c.dias));
+  const pend = grupos.filter(g => g.cuentas.some(faltaAvisar_)).sort((a,b) => minDias(a) - minDias(b));
+  const hechos = grupos.filter(g => !g.cuentas.some(faltaAvisar_)).sort((a,b) => minDias(a) - minDias(b));
+  const badge = document.getElementById('badge-contactar');
+  if (badge) { badge.textContent = pend.length; badge.style.display = pend.length ? '' : 'none'; }
+  const dinero = n => '$' + n.toLocaleString('es-MX', {maximumFractionDigits: 2});
+  const fila = (g, hecho) => {
+    const keyA = esc(JSON.stringify(g.key));
+    const total = totalGrupo_(g.cuentas);
+    const debe = g.cuentas.some(c => (c.pago||'').toUpperCase() === 'PENDIENTE');
+    const ultimo = g.cuentas.find(c => contactadoHoy_(c));
+    const lineas = g.cuentas.map(c => {
+      const p = parseFloat(c.precio) || 0;
+      const col = c.dias !== null && c.dias < 0 ? 'var(--red)' : (esDue(c) ? 'var(--amber)' : 'var(--text3)');
+      return `<div style="font-size:12px;color:${col};">${esc(c.paquete||'—')} · ${esc(cuandoCorto_(c))}${p>0?' · '+esc(dinero(p)):''}</div>`;
+    }).join('');
+    const btn = 'background:none;border:none;color:var(--text3);font-size:12px;font-weight:700;cursor:pointer;text-decoration:underline;';
+    const btnPago = 'background:none;border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:12px;font-weight:700;cursor:pointer;padding:7px 10px;';
+    return `<div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:12px 14px;margin-bottom:8px;display:flex;align-items:center;gap:10px;${hecho?'opacity:.65;':''}">
+      <div style="flex:1;min-width:0;">
+        <div style="font-weight:700;font-size:14px;">${esc(g.cuentas[0].cliente)}${g.cuentas.length>1?` <span style="font-size:11px;color:var(--violet2);">· ${g.cuentas.length} cuentas</span>`:''}</div>
+        ${lineas}
+        <div style="font-size:13px;font-weight:700;margin-top:2px;">${total>0 ? 'Cobrar: '+esc(dinero(total)) : 'Cobrar: —'}${debe ? ' <span style="color:var(--red);font-size:11px;">· pago pendiente</span>' : ''}</div>
+        ${hecho && ultimo ? `<div style="font-size:11.5px;color:var(--green);margin-top:2px;">Avisado hoy a las ${esc(horaContacto_(ultimo))}${ultimo.contactoPor?' · '+esc(ultimo.contactoPor):''}</div>` : ''}
+      </div>
+      ${hecho
+        ? `<button onclick="contactarGrupoMarcar(${keyA}, true)" style="${btn}">Deshacer</button>
+           <button onclick="contactarSubirPago(${keyA})" style="${btnPago}">Subir pago</button>`
+        : `<button onclick="contactarGrupoMarcar(${keyA}, false)" style="${btn}">Ya avisé</button>
+           <button onclick="contactarSubirPago(${keyA})" style="${btnPago}">Subir pago</button>
+           <button onclick="contactarWhatsApp(${keyA})" class="btn-primary" style="width:auto;padding:9px 14px;margin:0;">WhatsApp</button>`}
+    </div>`;
+  };
+  cont.innerHTML =
+    `<div style="font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.05em;margin:4px 0 8px;">Por avisar (${pend.length})</div>` +
+    (pend.length ? pend.map(g=>fila(g,false)).join('') : '<div class="empty-sub" style="margin-bottom:14px;">No hay nadie pendiente por avisar hoy 🎉</div>') +
+    (hechos.length ? `<div style="font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.05em;margin:18px 0 8px;">Ya avisados hoy (${hechos.length})</div>` + hechos.map(g=>fila(g,true)).join('') : '');
+}
+
+function grupoContactar_(key) {
+  return gruposDe_(contactosLista).find(g => g.key === key);
+}
+
+function contactarWhatsApp(key) {
+  const g = grupoContactar_(key);
+  if (!g) return;
+  const conTel = g.cuentas.find(c => c.contacto);
+  if (!conTel) { toast('Este cliente no tiene teléfono guardado', 'error'); return; }
+  const msg = g.cuentas.length > 1 ? mensajeGrupo_(g.cuentas) : mensajeWhatsApp(g.cuentas[0]);
+  window.open(urlWhatsApp_(conTel.contacto, msg), '_blank');
+  g.cuentas.forEach(c => {
+    if ((c.estado === 'vencido' || c.estado === 'proximo') && !contactadoHoy_(c)) contactarMarcar(c.id, false, true);
+  });
+}
+
+// Marca (o desmarca) como avisadas todas las cuentas vencidas/por vencer del grupo.
+function contactarGrupoMarcar(key, quitar) {
+  const g = grupoContactar_(key);
+  if (!g) return;
+  g.cuentas.forEach(c => {
+    if (!(c.estado === 'vencido' || c.estado === 'proximo')) return;
+    if (quitar ? contactadoHoy_(c) : !contactadoHoy_(c)) contactarMarcar(c.id, quitar, true);
+  });
+  toast(quitar ? 'Marcado como pendiente otra vez' : 'Marcado como avisado hoy', 'success', ico('check',13));
+}
+
+// El comprobante se registra contra la primera cuenta por cobrar del grupo,
+// con el total del grupo como monto; tú lo revisas a mano de todas formas.
+function contactarSubirPago(key) {
+  const g = grupoContactar_(key);
+  if (!g) return;
+  const ref = g.cuentas.find(c => c.estado === 'vencido' || c.estado === 'proximo') || g.cuentas[0];
+  abrirModalComprobante(ref.id);
+  const total = totalGrupo_(g.cuentas);
+  if (g.cuentas.length > 1 && total > 0) document.getElementById('comp-monto').value = total;
+}
+
+function contactarMarcar(id, quitar, silencioso) {
+  const c = contactosLista.find(x => x.id === id);
+  if (!c || _contactosEnVuelo.has(id)) return;
+  _contactosEnVuelo.add(id);
+  const antes = { u: c.ultimoContacto, p: c.contactoPor };
+  const ahora = new Date();
+  c.ultimoContacto = quitar ? '' : fechaHoyComparable_() + ' ' +
+    String(ahora.getHours()).padStart(2,'0') + ':' + String(ahora.getMinutes()).padStart(2,'0');
+  c.contactoPor = quitar ? '' : (MI_NOMBRE || '');
+  renderContactar();
+  postDatos({accion:'marcarContacto', key:APP_KEY, id, quitar: !!quitar})
+    .then(res => {
+      if (res.status !== 'ok') throw new Error(res.message||'No se pudo guardar');
+      c.ultimoContacto = res.ultimoContacto || '';
+      c.contactoPor = res.contactoPor || '';
+      renderContactar();
+      if (!silencioso) toast(quitar ? 'Marcado como pendiente otra vez' : 'Marcado como avisado hoy', 'success', ico('check',13));
+    })
+    .catch(err => {
+      c.ultimoContacto = antes.u; c.contactoPor = antes.p;
+      renderContactar();
+      toast('No se pudo guardar la marca: ' + (err.message||''), 'error');
+    })
+    .finally(() => { _contactosEnVuelo.delete(id); });
+}
+
+// Prende/apaga el rol "contacto" de un miembro del equipo (solo admin).
+function alternarContacto_(usuario, activo) {
+  postDatos({accion:'asignarContacto', key:APP_KEY, usuario, activo: !!activo})
+    .then(res => {
+      if (res.status !== 'ok') throw new Error(res.message||'No se pudo cambiar');
+      toast(activo ? 'Ahora puede contactar clientes' : 'Ya no contacta clientes', 'success', ico('persona',13));
+      equipoUsuarios = null;
+      cargarEquipo_();
+    })
+    .catch(err => { toast(err.message||'No se pudo cambiar', 'error'); equipoUsuarios = null; cargarEquipo_(); });
+}
+
 // ===== Equipo: alta de vendedores desde la app (solo admin) =====
 let equipoUsuarios = null; // caché de listarUsuarios para no pedirla en cada render
 
@@ -9288,7 +9604,7 @@ function cargarEquipo_() {
             <span>${u.rol==='admin'?ico('corona',15):ico('persona',15)}</span>
             <span style="font-weight:700;">${esc(u.nombre)}</span>
             <span style="color:var(--text3);">entra como <strong style="color:var(--text2);">${esc(u.usuario)}</strong></span>
-            ${u.rol==='vendedor' ? `<span style="margin-left:auto;color:var(--text3);font-size:11.5px;">comisión ${COMISIONES[u.vendedor]!==undefined?COMISIONES[u.vendedor]:100}%</span>` : '<span style="margin-left:auto;color:var(--violet2);font-size:11px;font-weight:700;">ADMIN</span>'}
+            ${u.rol==='vendedor' ? `<label style="margin-left:auto;display:flex;align-items:center;gap:5px;color:var(--text2);font-size:11.5px;cursor:pointer;"><input type="checkbox" ${u.contacto?'checked':''} onchange="alternarContacto_(${esc(JSON.stringify(u.usuario))}, this.checked)"> contacta clientes</label><span style="color:var(--text3);font-size:11.5px;">comisión ${COMISIONES[u.vendedor]!==undefined?COMISIONES[u.vendedor]:100}%</span>` : '<span style="margin-left:auto;color:var(--violet2);font-size:11px;font-weight:700;">ADMIN</span>'}
           </div>`).join('')}
       </div>`;
   };
@@ -10127,6 +10443,10 @@ function aplicarPermisosUI() {
   document.getElementById('user-nombre').textContent = MI_NOMBRE;
   document.getElementById('user-av').textContent = iniciales(MI_NOMBRE);
   actualizarBadgeAutorizar_();
+  // Rol acumulable "contacto": muestra la pestaña para avisar a todos los clientes.
+  const tabContactar = document.getElementById('tab-contactar');
+  if (tabContactar) tabContactar.style.display = MI_CONTACTO ? '' : 'none';
+  if (MI_CONTACTO) cargarContactar(); // precarga: el badge de pendientes se ve desde el inicio
   if (MI_ROL === 'admin') {
     document.getElementById('tab-historial-mensual').style.display = 'inline-block';
   }
@@ -10165,7 +10485,7 @@ function hacerLogin() {
     .then(r=>r.json())
     .then(res=>{
       if(res.status==='ok'){
-        APP_KEY = res.token; MI_VENDEDOR = res.vendedor; MI_ROL = res.rol; MI_NOMBRE = res.nombre;
+        APP_KEY = res.token; MI_VENDEDOR = res.vendedor; MI_ROL = res.rol; MI_NOMBRE = res.nombre; MI_CONTACTO = !!res.contacto;
         try {
           localStorage.setItem('app_key', res.token);
           cargarConfigLocal();
@@ -10313,7 +10633,7 @@ window.addEventListener('resize', () => {
     .then(r=>r.json())
     .then(res=>{
       if(res.status==='ok'){
-        APP_KEY = saved; MI_VENDEDOR = res.vendedor; MI_ROL = res.rol; MI_NOMBRE = res.nombre;
+        APP_KEY = saved; MI_VENDEDOR = res.vendedor; MI_ROL = res.rol; MI_NOMBRE = res.nombre; MI_CONTACTO = !!res.contacto;
         try { cargarConfigLocal(); } catch(e){}
         document.getElementById('login-overlay').style.display='none';
         if (res.modoAprobacion !== undefined) MI_MODO_APROBACION = !!res.modoAprobacion;
